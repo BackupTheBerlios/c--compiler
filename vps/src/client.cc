@@ -6,6 +6,7 @@
 
 int main()
 {
+	// Nur ein CVS-Test
 	UDPNetwork* net = new UDPNetwork();
 	LifeClient* client = new LifeClient((IPNetwork *)net,"localhost",7654);
 
