@@ -18,7 +18,7 @@ BoardServer::BoardServer(IPNetwork* net,int clientcount, Board* board_a, Board* 
 	this->board_a = board_a;
 	this->board_b = board_b;
 	this->timesteps = timesteps;
-	timestep = 0;
+	timestep = -1;
 	
 }
 
@@ -72,15 +72,16 @@ void BoardServer::start()
 	}
 	w->flush();
 
-	// alle clients mssen sich anmelden
-	for (int i=0; i<clients; i++)
+	cout<<"timestep: "<<timestep<<endl;
+	// alle clients müssen den ersten Schritt anfordern
+	notcomplete = true;
+	while(notcomplete)
 	{
 		IPAddress all(7654);
 		int msg[2];
 		net->receive(all, &msg, sizeof(msg));
+		barrier(&all, msg[1]);
 	}
-	
-	notifyAll();
 	
 	// Und los gehts
 	for( timestep = 0 ; timestep<timesteps; timestep++)
@@ -115,6 +116,7 @@ void BoardServer::start()
 				net->reply(all, &val, sizeof(val));
 			} else if (msg[0]=='N') //barrier
 			{
+				//cerr<<"N\n";
 				barrier(&all, msg[1]);
 			} else
 			{
@@ -155,7 +157,7 @@ void BoardServer::start()
 		board_b = temp;
 		
 		// Clients benachrichtigen
-		notifyAll();
+// 		notifyAll();
 		
 		
 	}
@@ -197,27 +199,34 @@ void BoardServer::logon(IPAddress* ip)
 */
 void BoardServer::barrier(IPAddress* ip,int timestep)
 {
-	if (timestep==-1) return;
+// 	if (timestep==-1) return;
 	if (this->timestep!=timestep)
 	{
 		cout<<"[boardserver] received message from timestep "<<timestep<<" but we are in "<<this->timestep<<endl;
-		//exit(-1);
+		exit(-1);
 	}
 	for(int i=0; i<clients; i++)
 	{
 		if (addresses[i].getAddr() == ip->getAddr())
 		{
 			completed[i] = true;
-			cout<<"[boardserver] client "<<i<<" finished step "<<timestep<<endl;
+			cout<<"[boardserver] client "<<i<</*" at port "<<ip->getPort()<<*/" finished step "<<timestep<<endl;
 		}
 	}
 	bool c = true;
-	for(int i=0; i<clients; i++) 
+	for(int i=0; i<clients; i++)
 	{
 		c &= completed[i];
-		if (!c) return;
+		if (!c)
+		{
+			int repl=2;
+			net->reply(addresses[i], &repl, sizeof(repl));
+			return;
+		}
 	}
-	notcomplete = false; 
+	notcomplete = false;
+	int repl=1;
+	net->reply(*ip, &repl, sizeof(repl));
 }
 
 /**

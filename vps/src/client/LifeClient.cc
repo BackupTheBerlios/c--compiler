@@ -62,25 +62,25 @@ int LifeClient::startUp()
 */
 void LifeClient::loop()
 {
-	int message = 0;
-	int req[2];	// request next Step
-	req[0] = 'N';
-	req[1] = -1;
-	cout<<"A";
-	net->request( server, &req, sizeof(req), &message, sizeof(message));
-	cout<<"B";
-	int step = 0;
-	while (message!=0)	// if Server sends 1, we calculate the next Step
+	int message;
+	int req[2];
+	int step = -1;
+	do		// request the next Step
 	{
-		cout<<"*";
-		makeStep();
+// 		cout<<"*";
 		req[0] = 'N';
-		req[1] = step++;
+		req[1] = step;
 		message = 0;
 		
-		net->request( server, &req, 8,  &message, 4 );
-		cout<<"server sends: "<<message<<" from "<<server.getAddr()<<endl;
-	}
+		net->request( server, &req, sizeof(req), &message, sizeof(message));
+// 		cout<<"server sends: "<<message<<" from "<<server.getAddr()<<endl;
+		if (message==1)		// if Server sends 1, we calculate the next Step
+		{
+// 			cout<<"makestep"<<endl;
+			makeStep();
+			step++;
+		}
+	}while (message!=0);
 }
 
 /**
