@@ -84,6 +84,7 @@ void LifeClient::loop()
 			makeStep();
 			step++;
 		}
+		sleep(1);
 	}while (message!=0);
 
 }

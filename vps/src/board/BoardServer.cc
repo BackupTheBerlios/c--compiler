@@ -4,7 +4,7 @@
 #define ZOOM 3
 #define RANDOM 7
 
-/*
+/**
 * @param net is a pointer to a network object for communication
 * @param clientcount is the number of clients, which will register
 * @param board_a is just a Board
@@ -75,19 +75,6 @@ void BoardServer::start()
 		}
 	}
 	w->flush();
-
-
-/*	cout<<"timestep: "<<timestep<<endl;
-	// alle clients mssen den ersten Schritt anfordern
-	notcomplete = true;
-	/*
-	while(notcomplete)
-	{
-		IPAddress all(7654);
-		int msg[3];
-		net->receive(all, &msg, sizeof(msg));
-	}
-	*/
 	
 	// Und los gehts
 	for( timestep = 0 ; timestep<timesteps; timestep++)
@@ -158,10 +145,28 @@ void BoardServer::start()
 		board_a = board_b;
 		board_b = temp;
 		
-		// Clients benachrichtigen
-// 		notifyAll();
+	}
+
+	// Abmeldung
+	for(int i=0; i<clients; i++) 
+	{
+		cerr<<"[boardserver] waiting for client "<<i<<" to sign off...";
 		
-		
+		while(1)
+		{
+			IPAddress all(7654);	
+			int msg[5];	
+			// auf client warten
+			net->receive(all, &msg, sizeof(msg));
+			
+			if (msg[0]=='N') 
+			{
+				int anything=0;		// ende
+				net->reply(all, &anything, sizeof(anything));
+				break;
+			}
+		}
+		cerr<<"ok\n";
 	}
 	cout<<"[boardserver] fertig\n";
 	
@@ -202,6 +207,14 @@ void BoardServer::logon(IPAddress* ip)
 */
 void BoardServer::barrier(IPAddress* ip, int timestep, int clientid)
 {
+	cout<<"timestep "<<timestep<<" from client "<<clientid<<endl;
+	if (timestep>=(timesteps-1))
+	{
+		int repl=2;
+		net->reply(*ip, &repl, sizeof(repl));
+		notcomplete=false;
+		return;
+	}
 	if (this->timestep>timestep)	// client hat die bestaetigung schon einmal gesendet, sonst waere der timestep noch nicht weiter gezaehlt
 	{
 		int repl=1;
@@ -229,8 +242,9 @@ void BoardServer::barrier(IPAddress* ip, int timestep, int clientid)
 			return;
 		}
 	}
-	int repl=1;
-	net->reply(*ip, &repl, sizeof(repl));
+
+	int anything=1;		// naechster schritt
+	net->reply(*ip, &anything, sizeof(anything));
 	notcomplete = false;
 	for(int i=0; i<clients; i++)
 	{
