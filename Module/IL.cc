@@ -245,6 +245,28 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				outjump(temp,cond.top(),gr);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
 				break;
 			}
+			case EQUALITY_2:
+			{
+				char* temp=tempid();
+				char* src=op.top();
+				op.pop(1);
+				char* dst=op.top();
+				outbin(temp,src,sub,dst);
+				// ergebnis darf muﬂ gleich 0 sein, ansonsten sprung
+				outjump(temp,cond.top(),ne);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
+				break;
+			}
+			case EQUALITY_3:
+			{
+				char* temp=tempid();
+				char* src=op.top();
+				op.pop(1);
+				char* dst=op.top();
+				outbin(temp,src,sub,dst);
+				// ergebnis darf nicht gleich 0 sein, ansonsten sprung
+				outjump(temp,cond.top(),eq);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
+				break;
+			}
 			case COND_START:
 			{
 				cond.push(condlabelid());	// dieses label kommt sp‰ter hinter den true-block
