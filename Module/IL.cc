@@ -743,15 +743,7 @@ void IL::outcopy(TOperand* l, TOperand* r)
 	op->operand1=(TOperand*)l;
 	op->operand2=(TOperand*)r;
 
-	if (condition)
-	{
-		ilList.insert(op,condinsert+1);
-		condinsert++;
-	}
-	else
-	{
-		ilList.append(op);
-	}
+	ilList.append(op);
 }
 
 void IL::outbin(TOperand* l, TOperand* x, TBinOp o, TOperand* y)
