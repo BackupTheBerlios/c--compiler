@@ -6,6 +6,7 @@
 #include "Register.h" 
 #include "FunctionList.h"
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 extern List ilList;
@@ -17,6 +18,8 @@ extern ConstList icl;
 class Bacom
 {
 public:
+	Bacom();
+	~Bacom();
 
 	void genAsm();
 
@@ -54,6 +57,7 @@ private:
 	char* concat(char*, unsigned);
 	
 	Register regs;
+	ofstream bsm;
 	
 	
 };

@@ -1,10 +1,21 @@
 #include "Bacom.h"
 
+Bacom::Bacom()
+{
+	bsm.open("test.bsm");
+}
+
+Bacom::~Bacom()
+{
+	bsm.close();
+}
+
+
 
 void Bacom::genAsm()
 {
 	cout << "\nBASM Ausgabe:\n";
-	cout << "sub.w " <<Register::toString( rnull )<<","<<Register::toString( rnull )<<endl;		// Nullregister 0 setzen
+	bsm << "sub.w " <<Register::toString( rnull )<<","<<Register::toString( rnull )<<endl;		// Nullregister 0 setzen
 	outloa(sint, rsp, rnull, "const_stack");
 	
 	// offset bis zum naechsten lokalen frame = 32
@@ -22,7 +33,7 @@ void Bacom::genAsm()
 		case label_:
 			{
 				para = 32;
-				cout<<op1->label<<":\n";
+				bsm<<op1->label<<":\n";
 				if (op1->type == funclabel)
 				{
 					// Die Parameter liegen bereits im lokalem Frame, jetzt werden die Register gerettet
@@ -322,217 +333,216 @@ void Bacom::genAsm()
 	}
 
 	// Konstanten
-	cout << endl;
 	for (unsigned i=0;i<cl.getCount();i++)
 	{
-		cout << "const_" << i <<":\tdc.";
+		bsm << "const_" << i <<":\tdc.";
 		if ( cl.getType(i) == schar )
-			cout << "b";
+			bsm << "b";
 		else if ( cl.getType(i) == sint )
-			cout << "w";
+			bsm << "w";
 		else if ( cl.getType(i) == slong )
-			cout << "l";
+			bsm << "l";
 		else if ( cl.getType(i) == sfloat )
-			cout << "f";
+			bsm << "f";
 
-		cout<<" "<<cl.getVal(i)<<endl;
+		bsm<<" "<<cl.getVal(i)<<endl;
 	}
 
 	// interne Konstanten
 	for (unsigned i=1;i<=icl.getCount();i++)
 	{
-		cout << "iconst_" << i <<":\tdc.";
+		bsm << "iconst_" << i <<":\tdc.";
 		if ( icl.getType(i) == schar )
-			cout << "b";
+			bsm << "b";
 		else if ( icl.getType(i) == sint )
-			cout << "w";
+			bsm << "w";
 		else if ( icl.getType(i) == slong )
-			cout << "l";
+			bsm << "l";
 		else if ( icl.getType(i) == sfloat )
-			cout << "f";
+			bsm << "f";
 
-		cout<<" "<<icl.getVal(i)<<endl;
+		bsm<<" "<<icl.getVal(i)<<endl;
 	}
 	
-	cout << "const_two:\tdc.w 2 \n";
-	cout << "const_four:\tdc.w 4 \n";
-	cout << "const_six:\tdc.w 6 \n";
-	cout << "const_stack:\tdc.w 65534 \n";  // Startwert Stackpointer
-	cout<<"stp\n";
+	bsm << "stp\n";
+	bsm << "const_two:  dc.w 2 \n";
+	bsm << "const_four:  dc.w 4 \n";
+	bsm << "const_six:  dc.w 6 \n";
+	bsm << "const_stack:  dc.w 65534 \n";  // Startwert Stackpointer
 
 }
 
 void Bacom::outloa( TType type, TReg dest, TReg help, int offset )
 {
-	cout << "loa.";
+	bsm << "loa.";
 	if ( type == schar )
-		cout << "b";
+		bsm << "b";
 	else if ( type == sint )
-		cout << "w";
+		bsm << "w";
 	else if ( type == slong )
-		cout << "l";
+		bsm << "l";
 	else if ( type == sfloat )
-		cout << "f";
-	cout << " " << Register::toString( dest ) << ", " << Register::toString( help ) << ((offset>=0)?"+":"") << offset << endl;
+		bsm << "f";
+	bsm << " " << Register::toString( dest ) << ", " << Register::toString( help ) << ((offset>=0)?"+":"") << offset << endl;
 }
 
 void Bacom::outloa( TType type, TReg dest, TReg help, char* addr )
 {
-	cout << "loa.";
+	bsm << "loa.";
 	if ( type == schar )
-		cout << "b";
+		bsm << "b";
 	else if ( type == sint )
-		cout << "w";
+		bsm << "w";
 	else if ( type == slong )
-		cout << "l";
+		bsm << "l";
 	else if ( type == sfloat )
-		cout << "f";
-	cout << " " << Register::toString( dest ) << ", " << Register::toString( help ) << "+" << addr << endl;
+		bsm << "f";
+	bsm << " " << Register::toString( dest ) << ", " << Register::toString( help ) << "+" << addr << endl;
 }
 
 void Bacom::outstr( TType type, TReg src, TReg help, int offset )
 {
-	cout << "str.";
+	bsm << "str.";
 	if ( type == schar )
-		cout << "b";
+		bsm << "b";
 	else if ( type == sint )
-		cout << "w";
+		bsm << "w";
 	else if ( type == slong )
-		cout << "l";
+		bsm << "l";
 	else if ( type == sfloat )
-		cout << "f";
-	cout << " " << Register::toString( src ) << ", " << Register::toString( help ) << ((offset>=0)?"+":"") << offset << endl;
+		bsm << "f";
+	bsm << " " << Register::toString( src ) << ", " << Register::toString( help ) << ((offset>=0)?"+":"") << offset << endl;
 }
 
 void Bacom::outadd( TType type, TReg dest, TReg src )
 {
-	cout << "add.";
+	bsm << "add.";
 	if ( type == schar )
-		cout << "b";
+		bsm << "b";
 	else if ( type == sint )
-		cout << "w";
+		bsm << "w";
 	else if ( type == slong )
-		cout << "l";
+		bsm << "l";
 	else if ( type == sfloat )
-		cout << "f";
-	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+		bsm << "f";
+	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
 }
 
 void Bacom::outadd( TType type, TReg dest, TReg src, char* c )
 {
-	cout << "add.";
+	bsm << "add.";
 	if ( type == schar )
-		cout << "b";
+		bsm << "b";
 	else if ( type == sint )
-		cout << "w";
+		bsm << "w";
 	else if ( type == slong )
-		cout << "l";
+		bsm << "l";
 	else if ( type == sfloat )
-		cout << "f";
-	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << " + "<<c<< endl;
+		bsm << "f";
+	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << " + "<<c<< endl;
 }
 
 
 void Bacom::outsub( TType type, TReg dest, TReg src )
 {
-	cout << "sub.";
+	bsm << "sub.";
 	if ( type == schar )
-		cout << "b";
+		bsm << "b";
 	else if ( type == sint )
-		cout << "w";
+		bsm << "w";
 	else if ( type == slong )
-		cout << "l";
+		bsm << "l";
 	else if ( type == sfloat )
-		cout << "f";
-	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+		bsm << "f";
+	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
 }
 
 void Bacom::outsub( TType type, TReg dest, TReg src, char* c )
 {
-	cout << "sub.";
+	bsm << "sub.";
 	if ( type == schar )
-		cout << "b";
+		bsm << "b";
 	else if ( type == sint )
-		cout << "w";
+		bsm << "w";
 	else if ( type == slong )
-		cout << "l";
+		bsm << "l";
 	else if ( type == sfloat )
-		cout << "f";
-	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << " + "<<c<< endl;
+		bsm << "f";
+	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << " + "<<c<< endl;
 }
 
 void Bacom::outmul( TType type, TReg dest, TReg src )
 {
-	cout << "mul.";
+	bsm << "mul.";
 	if ( type == schar )
-		cout << "b";
+		bsm << "b";
 	else if ( type == sint )
-		cout << "w";
+		bsm << "w";
 	else if ( type == slong )
-		cout << "l";
+		bsm << "l";
 	else if ( type == sfloat )
-		cout << "f";
-	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+		bsm << "f";
+	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
 }
 
 void Bacom::outdiv( TType type, TReg dest, TReg src )
 {
-	cout << "div.";
+	bsm << "div.";
 	if ( type == schar )
-		cout << "b";
+		bsm << "b";
 	else if ( type == sint )
-		cout << "w";
+		bsm << "w";
 	else if ( type == slong )
-		cout << "l";
+		bsm << "l";
 	else if ( type == sfloat )
-		cout << "f";
-	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+		bsm << "f";
+	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
 }
 
 void Bacom::outshl( TType type, TReg dest, TReg src )
 {
-	cout << "shl.";
+	bsm << "shl.";
 	if ( type == sint )
-		cout << "w";
+		bsm << "w";
 	else if ( type == slong )
-		cout << "l";
-	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+		bsm << "l";
+	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
 }
 
 void Bacom::outshr( TType type, TReg dest, TReg src )
 {
-	cout << "shr.";
+	bsm << "shr.";
 	if ( type == sint )
-		cout << "w";
+		bsm << "w";
 	else if ( type == slong )
-		cout << "l";
-	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+		bsm << "l";
+	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
 }
 
 void Bacom::outmov(TReg r1, TReg r2)
 {
-	cout << "mov.w " << Register::toString( r1 ) << "," << Register::toString( r2 ) << endl;
+	bsm << "mov.w " << Register::toString( r1 ) << "," << Register::toString( r2 ) << endl;
 }
 
 void Bacom::outcvt(TType type, TReg r1, TReg r2)
 {
-	cout << "cvt.";
+	bsm << "cvt.";
 	if (type==sfloat)
-		cout << "f " ;
+		bsm << "f " ;
 	else if (type==slong)
-		cout << "l ";
-	cout << Register::toString( r1 ) << ", " << Register::toString( r2 ) << endl;
+		bsm << "l ";
+	bsm << Register::toString( r1 ) << ", " << Register::toString( r2 ) << endl;
 }
 
 void Bacom::outbra(TReg r, char* c)
 {
-	cout<<"bra "<<Register::toString( r )<<"+"<<c<<endl;
+	bsm<<"bra "<<Register::toString( r )<<"+"<<c<<endl;
 }
 
 
 void Bacom::outbra(TReg r, int offs)
 {
-	cout<<"bra "<<Register::toString( r )<<"+"<<offs<<endl;
+	bsm<<"bra "<<Register::toString( r )<<"+"<<offs<<endl;
 }
 
 
@@ -551,12 +561,12 @@ void Bacom::outjmp(TReg r, char* c, TJmp type)
 
 void Bacom::outlic(TReg r, TReg s, int offs)
 {
-	cout<<"lic.w "<<Register::toString(r)<<", "<<Register::toString(s)<<"+"<<offs<<endl;
+	bsm<<"lic.w "<<Register::toString(r)<<", "<<Register::toString(s)<<"+"<<offs<<endl;
 }
 
 void Bacom::outintout(TReg r)
 {
-	cout<<"out.w "<<Register::toString(r)<<endl;
+	bsm<<"out.w "<<Register::toString(r)<<endl;
 }
 
 char* Bacom::concat(char* pre, unsigned numb)
