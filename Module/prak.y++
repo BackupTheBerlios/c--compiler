@@ -307,20 +307,20 @@ void out(struct TNode* n)
     { 
         
         case PROGRAM                    : out(n->n1); gen(n->type); printf("program \n"); break;
-        case DECL_ST_1                  : out(n->n1); gen(n->type); printf("{decl}* 1"); break;
-        case DECL_ST_2                  : out(n->n1); out(n->n2); gen(n->type); printf("{decl}* 2"); break;
+        case DECL_ST_1                  : out(n->n1); gen(n->type); printf("{decl}*_1 "); break;
+        case DECL_ST_2                  : out(n->n1); out(n->n2); gen(n->type); printf("{decl}*_2 "); break;
         case DECL                       : out(n->n1); gen(n->type); printf("decl "); break;
         case STRUCT_DECL                : out(n->n1); out(n->n2); gen(n->type); printf("struct_decl "); break;
-        case VAR_DECL_ST_1              : out(n->n1); gen(n->type); printf("{var_decl}* 1"); break;
-        case VAR_DECL_ST_2              : out(n->n1); out(n->n2); gen(n->type); printf("{var_decl}* 2"); break;
-        case VAR_PART_ST_1              : out(n->n1); gen(n->type); printf("{var_part}* 3"); break;
-        case VAR_PART_ST_2              : out(n->n1); out(n->n2); gen(n->type); printf("{var_part}* 4"); break;
+        case VAR_DECL_ST_1              : out(n->n1); gen(n->type); printf("{var_decl}*_1 "); break;
+        case VAR_DECL_ST_2              : out(n->n1); out(n->n2); gen(n->type); printf("{var_decl}*_2 "); break;
+        case VAR_PART_ST_1              : out(n->n1); gen(n->type); printf("{var_part}*_3 "); break;
+        case VAR_PART_ST_2              : out(n->n1); out(n->n2); gen(n->type); printf("{var_part}*_4 "); break;
         case VAR_PART_ALL_ST_1          : out(n->n1); gen(n->type); printf("{var_part_all}* "); break;
         case VAR_PART_ALL_ST_2          : out(n->n1); out(n->n2); gen(n->type); printf("{var_part_all}* "); break;
-        case VAR_DECL_1                 : out(n->n1); out(n->n2); gen(n->type); printf("var_decl 1 "); break;
-        case VAR_DECL_2                 : out(n->n1); gen(n->type); printf("var_decl 2 "); break;
-        case VAR_DECL_3                 : out(n->n1); out(n->n2); gen(n->type); printf("var_decl 3 "); break;
-        case VAR_DECL_4                 : out(n->n1); out(n->n2); gen(n->type); printf("var_decl 4 "); break; 
+        case VAR_DECL_1                 : out(n->n1); out(n->n2); gen(n->type); printf("var_decl_1 "); break;
+        case VAR_DECL_2                 : out(n->n1); gen(n->type); printf("var_decl_2 "); break;
+        case VAR_DECL_3                 : out(n->n1); out(n->n2); gen(n->type); printf("var_decl_3 "); break;
+        case VAR_DECL_4                 : out(n->n1); out(n->n2); gen(n->type); printf("var_decl_4 "); break; 
         case DEF_PART                   : out(n->n1); gen(n->type); gen(IDENTIFIER); printf("ident: %s ",(char*)n->n2); printf("def_part "); break;
         case STRUCT_PART                : out(n->n1); gen(n->type); printf("struct_part "); break;
         case BASE_TYPE                  : gen(n->type); printf("base_type "); break;
