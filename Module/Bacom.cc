@@ -294,7 +294,10 @@ void Bacom::genAsm()
 			{
 				if (op2->vtype<=sint)		// wenn convert von int/char, dann in ein doppelregister stecken
 				{
-					outmov(regs.biggerReg(op2), rnull);	// hoeherwertiges Register nullen
+					TReg r1=regs.whichReg( op2 );
+					outmov(regs.biggerReg( op2 ), rnull);	// hoeherwertiges Register nullen
+					if (r1 != regs.whichReg( op2))		// zusaetzlich wurde das Register verschoben aus Platzgruenden
+						outmov(regs.whichReg( op2), r1);
 					op2->vtype=slong;	// op2 wird long, damit changeReg weiß, dass op2 nun auch breites Register hat
 					regs.changeReg( op1, op2 );
 				}
@@ -311,7 +314,10 @@ void Bacom::genAsm()
 			{
 				if (op2->vtype<=sint)		// wenn convert von int, dann zuerst in ein doppelregister stecken
 				{
-					outmov(regs.biggerReg(op2), rnull);	// hoeherwertiges Register nullen
+					TReg r1=regs.whichReg( op2 );
+					outmov(regs.biggerReg( op2 ), rnull);	// hoeherwertiges Register nullen
+					if (r1 != regs.whichReg( op2))		// zusaetzlich wurde das Register verschoben aus Platzgruenden
+						outmov(regs.whichReg( op2), r1);
 				}
 				// danach convert zu float
 				TReg r;
@@ -394,12 +400,16 @@ void Bacom::genAsm()
 			bsm << "b";
 		else if ( cl.getType(i) == sint )
 			bsm << "w";
-		else if ( cl.getType(i) == slong )
-			bsm << "l";
+// 		else if ( cl.getType(i) == slong )
+// 			bsm << "l";
 		else if ( cl.getType(i) == sfloat )
 			bsm << "f";
+		else cout<<"[Bacom] error in constantlist\n";
 
-		bsm<<" "<<cl.getVal(i)<<endl;
+		if ( cl.getType(i) == schar )
+			bsm<<" \""<<cl.getVal(i)<<"\""<<endl;
+		else
+			bsm<<" "<<cl.getVal(i)<<endl;
 	}
 
 	// interne Konstanten
