@@ -93,6 +93,7 @@ void LifeClient::makeStep()
 	// daten holen
 	for (int x=(x1-1);x<=x2+1;x++)
 	{
+// 		if(x%10==0) cout<<x<<endl;
 		for (int y=(y1-1);y<=y2+1;y++)
 		{
 			// Punkte fuer die Anfrage bestimmen
@@ -114,13 +115,13 @@ void LifeClient::makeStep()
 			net->request( server, &req, sizeof(req), &response, sizeof(response) );
 			while (req[ 3 ]!=response[ 1 ])
 			{
- 				cout<<"get seqnr mismatch: "<<req[3]<<", "<<response[1]<<"req - x_: "<<req[ 1 ]<<", y_: "<<req[ 2 ]<<endl;
+//  				cout<<"get seqnr mismatch: "<<req[3]<<", "<<response[1]<<"req - x_: "<<req[ 1 ]<<", y_: "<<req[ 2 ]<<endl;
 				net->request( server, &req, sizeof(req), &response, sizeof(response) );
 			}
-			if (req[ 3 ]==response[ 1 ]) cout<<"get erfolg!\n";
+// 			if (req[ 3 ]==response[ 1 ]) cout<<"get erfolg!\n";
 			if (response[ 0 ]==invalid)
 				cout<<"x_: "<<x_<<", y_: "<<y<<", error!\n";
- 			board_a->setPos( (x-(x1-1)), (y-(y1-1)), (life_status_t)response[ 0 ]);
+			board_a->setPos( (x-(x1-1)), (y-(y1-1)), (life_status_t)response[ 0 ]);
 
 		}
 	}
@@ -128,6 +129,7 @@ void LifeClient::makeStep()
 	// berechnung durchfuehren und daten uebermitteln
 	for (int x=1;x<=(x2-x1)+1;x++)
 	{
+// 		if(x%10==0) cout<<x<<endl;
 		for (int y=1;y<=(y2-y1)+1;y++)
 		{
 			// set count of neighbours
@@ -172,12 +174,12 @@ void LifeClient::makeStep()
 			net->request( server, &req, sizeof(req), &response, sizeof(response) );
 			while (req[ 4 ]!=response)
 			{
- 				cout<<"set seqnr mismatch: "<<req[4]<<", "<<response<<endl;
+// 				cout<<"set seqnr mismatch: "<<req[4]<<", "<<response<<endl;
 				net->request( server, &req, sizeof(req), &response, sizeof(response) );
 			}
-			if (req[ 4 ]==response) cout<<"set erfolg!\n";
+// 			if (req[ 4 ]==response) cout<<"set erfolg!\n";
 
 		}
 	}
-	
+
 }
