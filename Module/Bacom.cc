@@ -27,18 +27,18 @@ void Bacom::genAsm()
 					{
 						outstr(sint, (TReg)i, rsp, 0 );
 						outsub(sint, rsp, rnull);
-						
+
 					}
 					outsub(sint, rnull, rnull);
-					
+
 					// Lokale Basis neu setzen
 					outmov(rlb, rsp);
-					
+
 					// Platz schaffen fuer lokales Frame, sp um Framegroesse weiterschieben
 					outloa(sint, r0, rnull, fl.getFrameConstant(op1->no) );
 					outsub(sint, rsp, rnull);
-					
-					
+					cout<<"\n";
+
 					// Fertig!
 				}
 				break;
@@ -64,13 +64,13 @@ void Bacom::genAsm()
 				break;
 			}
 
-			case push_:
+		case push_:
 			{
 				outstr(op1->vtype, regs.whichReg(op1), rsp, op1->add);
 				break;
 			}
-			
-			
+
+
 
 		case jmpgr_: 	// greater zero
 		case jmple_: 	// less zero
@@ -83,18 +83,14 @@ void Bacom::genAsm()
 
 			{
 				regs.changeReg( op1, op2 ); 						// Registerdeskriptor aendern (op2 wird zu op1)
-				regs.freeReg( op2 );
 				outadd(op1->vtype, regs.whichReg( op1 ), regs.whichReg( op3 ));		// Dann wird der op3 drauf addiert
 				regs.freeReg( op3 );
 				break;
 			}
 		case sub_:
 			{
-				TReg r;
-				regs.getReg( op1, r );
-				outmov(regs.whichReg( op1 ), regs.whichReg( op2 ));
-				outsub(op1->vtype, regs.whichReg( op1 ), regs.whichReg( op3 ));
-				regs.freeReg( op2 );
+				regs.changeReg( op1, op2 ); 						// Registerdeskriptor aendern (op2 wird zu op1)
+				outsub(op1->vtype, regs.whichReg( op1 ), regs.whichReg( op3 ));		// Dann wird der op3 subtrahiert
 				regs.freeReg( op3 );
 				break;
 			}
@@ -107,15 +103,35 @@ void Bacom::genAsm()
 		case ret_:
 		case getret_:
 		case char_:
-		case int_:
-		case long_: break;
+		case int_:	break;
+		case long_:	//Todo: in IL.cc noch toLong und toInt einfuegen!
+			{
+				// wenn convert von int, dann nur in ein doppelregister stecken
+				if (op2->vtype<=sint)
+				{
+					regs.biggerReg(op2);
+				}
+				else	// convert von float
+				{
+					TReg r;
+					regs.getReg(op1, r);
+					outcvt(slong, regs.whichReg( op1 ), regs.whichReg( op2 ) );
+					regs.freeReg( op2 );
+				}
+				break;
+			}
 		case float_:
 			{
-				// todo: evt vorher noch nach long konvertieren
-				// dabei 2 statt einem register verwenden (deshalb momentan freeReg() error)
+				// wenn convert von int, dann zuerst in ein doppelregister stecken
+				if (op2->vtype<=sint)
+				{
+					regs.biggerReg(op2);
+				}
+				// danach convert zu float
 				TReg r;
 				regs.getReg(op1, r);
 				outcvt(op1->vtype, regs.whichReg( op1 ), regs.whichReg( op2 ) );
+				regs.freeReg( op2 );
 				break;
 			}
 		default:
@@ -126,9 +142,10 @@ void Bacom::genAsm()
 
 		}
 	}
-	
+
 	// Konstanten
-	for (unsigned i=1;i<=cl.getCount();i++)
+	cout << endl;
+	for (unsigned i=3;i<=cl.getCount();i++)
 	{
 		cout << "const_" << cl.getAddr(i) <<":\tdc.";
 		if ( cl.getType(i) == schar )
@@ -142,7 +159,7 @@ void Bacom::genAsm()
 
 		cout<<" "<<cl.getVal(i)<<endl;
 	}
-	
+
 	// interne Konstanten
 	for (unsigned i=1;i<=icl.getCount();i++)
 	{
@@ -158,6 +175,7 @@ void Bacom::genAsm()
 
 		cout<<" "<<icl.getVal(i)<<endl;
 	}
+	cout<<"\nstp\n";
 }
 
 

@@ -510,7 +510,7 @@ TOperand* IL::conid(unsigned i)
 	tmp->vtype = cl.getType(i);
 	tmp->label = (char*)malloc(6+10);
 	strcpy(tmp->label,"const_");
-	sprintf (tmp->label+6,"%u",cl.getAddr(i));
+	sprintf (tmp->label+6,"%u",cl.getAddr(i+2));
 	
 	return tmp;
 }
@@ -701,7 +701,8 @@ TType IL::checkConv(TOperand*& m1, TOperand*& m2)
 		TOperand* t = tempid(t1);
 		outcopy(t, m1);
 		m1 = t;
-	} if (((TOperand*)m2)->type!=temp)
+	}
+	if (((TOperand*)m2)->type!=temp)
 	{
 		TOperand* t = tempid(t2);
 		outcopy(t, m2);

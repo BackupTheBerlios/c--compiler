@@ -32,6 +32,12 @@ void freeReg(TOperand*);
 // aendert Register von einem auf den anderen Operanden
 void changeReg(TOperand*, TOperand*);
 
+// packt den Operanden in ein 4-byte grosses Register
+void biggerReg(TOperand*);
+
+// packt den Operanden in ein 2-byte grosses Register
+void smallerReg(TOperand*);
+
 static TReg typeToReg(TOperandType);
 
 void out();

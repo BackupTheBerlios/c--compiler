@@ -36,14 +36,15 @@ TReg Register::getReg(TOperand* temp, TReg& r)
 		}
 	}
 	if (!found) i = minpos;
-	reglist[i].var = temp;
-	reglist[i].mark = mark++;
-	if (temp->vtype>=slong)
-	{
-		reglist[i+1].var = temp;
-		reglist[i+1].mark = mark++;
-	}
-	r = (TReg)i;
+	// was mach ich, wenn kein register mehr frei ist? ->wuerde zu fehler fuehren
+		reglist[i].var = temp;
+		reglist[i].mark = mark++;
+		if (temp->vtype>=slong)
+		{
+			reglist[i+1].var = temp;
+			reglist[i+1].mark = mark;
+		}
+		r = (TReg)i;
 	return (found?unknown:(TReg)i);
 }
 
@@ -66,17 +67,75 @@ void Register::freeReg(TOperand* temp)
 	cout<<"freeReg() error\n";
 }
 
-void Register::changeReg(TOperand* op1, TOperand* op2)
+void Register::changeReg(TOperand* dest, TOperand* src)		// Register wird von op2 auf op1 geaendert
 {
+	if ( (src->vtype>=slong && dest->vtype<=sint) || (src->vtype<=sint && dest->vtype>=slong) ) { cout<<"changeReg() error\n"; return; }
 	for(int i=0; i<regusable; i++)
 	{
-		if (reglist[i].var == op2)
+		if (reglist[i].var == src)
 		{
-			reglist[i].var = op1;
+			reglist[i].var = dest;
+			reglist[i].mark = mark++;
+			if (src->vtype>=slong)
+			{
+				reglist[i+1].var = dest;
+				reglist[i+1].mark = mark;
+			}
 			return;
 		}
 	}
 	cout<<"changeReg() error\n";
+}
+
+void Register::biggerReg(TOperand* op)
+{
+	for(int i=0; i<regusable; i++)
+	{
+		if (reglist[i].var == op)	// op gefunden
+		{
+			if (i%2==0 && reglist[i+1].var == 0) // register liegt an gerader stelle und dahinter ist platz
+			{
+				reglist[i].mark = mark++;
+				reglist[i+1].var = op;
+				reglist[i+1].mark = mark;
+				return;
+			}
+			for(int j=0; j<regusable-1; j++)
+			{
+				if (reglist[j].var == 0 && reglist[j+1].var == 0)
+				{
+					reglist[j].var = op;
+					reglist[j].mark = mark++;
+					reglist[j+1].var = op;
+					reglist[j+1].mark = mark;
+					reglist[i].var = 0;
+					reglist[i].mark = 0;
+					return;
+				}
+			}
+		cout<<"biggerReg() error - op not found!\n";
+		}
+	}
+	// todo: spillcode einfuegen
+	cout<<"biggerReg() error - no Reg free!\n";
+}
+
+void Register::smallerReg(TOperand* op)
+{
+	for(int i=0; i<regusable; i++)
+	{
+		if (reglist[i].var == op)	// op gefunden
+		{
+			if (reglist[i+1].var == op) // register gehoeren wirklich zusammen
+			{
+				reglist[i+1].var = 0;
+				reglist[i+1].mark = 0;
+				reglist[i].mark = mark++;
+				return;
+			}
+		cout<<"smallerReg() error\n";
+		}
+	}
 }
 
 TReg Register::whichReg(TOperand* temp)
