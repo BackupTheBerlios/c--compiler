@@ -49,7 +49,9 @@ private:
 	
 	void outlabel(char*);
 	
-	void outret();
+	void outret(char*);
+	
+	void outpush(char *);
 	
 	Stack op;
 	unsigned tempcount;

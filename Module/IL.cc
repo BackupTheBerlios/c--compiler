@@ -17,6 +17,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 	unsigned constcount = 1;
 	char* lastident = 0;
 	char* funcident = 0;
+	unsigned funcidx = 0;
 	bool func = false;
 
 	while(start<end)
@@ -25,9 +26,9 @@ char* IL::genIL(unsigned* start, unsigned* end)
 		{
 			case IDENTIFIER:
 			{
-				funcident = 0;
 				unsigned idx = *++start;
 				if (idx>MAX_NO_OF_VARIABLES) {
+					funcidx = idx;
 					funcident = funcid(idx); 
 					if (func)
 					{
@@ -38,6 +39,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				{
 					lastident = varid(idx);
 				}
+				//if (funcident==0) cout<<"IDENT: "<<lastident<<endl;
 				//if (funcident!=0) cout<<"FUNCID:"<<funcident<<endl;
 				break;
 			}
@@ -146,6 +148,17 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				outgoto(funcident, true);
 				break;
 			}
+			case FUNCTION_CALL_2:
+			{
+				unsigned i = fl.getNum(funcidx);
+				for (int j=0;j<i;j++)
+				{
+					outpush(op.top());
+					op.pop(1);
+				}
+				outgoto(funcident, true);
+				break;
+			}
 			case FUNC_START:
 			{
 				func = true;
@@ -158,10 +171,25 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case IMPLEMENTATION_5:
 			case IMPLEMENTATION_6:
 			{
-				outret();
+				outret("null");
 				break;
 			}
-			case INT_CONSTANT:		op.push(conid(constcount++)); break;
+			case INT_CONSTANT:
+			{
+				op.push(conid(constcount++)); 
+				break;
+			}
+			case RETURN_1:
+			{
+				outret("null");
+				break;
+			}
+			case RETURN_2:
+			{
+				outret(op.top());
+				op.pop(1);
+				break;
+			}
 		}
 		start++;
 	}
@@ -257,7 +285,12 @@ void IL::outlabel(char* label)
 	cout<<label<<":\n";
 }
 
-void IL::outret()
+void IL::outret(char* l)
 {
-	cout<<"ret;\n";
+	cout<<"ret "<<l<<";\n";
+}
+
+void IL::outpush(char* l)
+{
+	cout<<"push "<<l<<";\n";
 }

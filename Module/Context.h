@@ -27,6 +27,8 @@ public:
 	
 	void ins(unsigned);
 	
+	void insrev(unsigned);
+	
 
 private:
 	

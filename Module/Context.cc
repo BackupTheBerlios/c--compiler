@@ -71,7 +71,12 @@ if(n != 0)
                                             	tmpblock = cblock;
                                             } else if (s.count()==decl) 
                                             {
-                                              f.push(c); ft.push(t); ins(fl.nextId()); func = false;  continue;  // Funktionsident!
+                                              f.push(c); 
+                                              ft.push(t);
+                                              unsigned idx = fl.isProto(f.top(),par.count());
+                                              if (idx!=0) ins(idx); else ins(fl.nextId()); 
+                                              func = false;  
+                                              continue;
                                       	    } else { tmpblock = 1; } // diese deklaration kommt aus dem hauptblock
                                             
                                             
@@ -299,7 +304,7 @@ if(n != 0)
                                             ins(idx);
                                           }
                                           break;
-        case FUNCTION_CALL_2            : call=true; context(n->n1); context(n->n2); context(n->n3);call=false;
+        case FUNCTION_CALL_2            : call=true; ins(0); context(n->n1); context(n->n2); context(n->n3);call=false;
                                           {
                                           char* c = s.top();
                                           
@@ -310,7 +315,7 @@ if(n != 0)
                                             exit(-1);
                                           }
                                           s.pop(1); 
-                                          ins(idx);
+                                          insrev(idx);
                                           }
         break;
         case EPSILON                    :  break;
@@ -323,4 +328,12 @@ void Context::ins(unsigned index)
 {
 	while(*cpos!=IDENTIFIER) cpos++;
 	*(++cpos) = index;
+}
+
+void Context::insrev(unsigned index)
+{
+	unsigned* cposold=cpos;
+	while(*cpos!=0) cpos--;
+	*cpos = index;
+	cpos=cposold;
 }
