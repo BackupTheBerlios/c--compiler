@@ -36,7 +36,7 @@ if(n != 0)
     switch(n->type)
     {
 
-        case PROGRAM                    : {
+        case PROGRAM                    : { // Kontextprüfung fast fertig, Infomationen ausgeben        
                                             b.push(1); 
                                             context(n->n1); 
                                             cout<<"\nNamensliste:\n"; nl.out(); 
@@ -70,7 +70,10 @@ if(n != 0)
         case STRUCT_DECL                : context(n->n1); context(n->n2);  break;
         case VAR_DECL_ST_1              : 
                                         {
-                                            context(n->n1); /*Dekl.-Blockende*/
+	                                    // Hier ist der Deklarationsblock zu Ende, jetzt werden alle gesammelten Idents eingetragen bzw.
+	                                    // weiterverarbeitet
+	                                    
+                                            context(n->n1);
                                             cblock=++blockmax;
                                             b.push(cblock); //aktuelle Blocknummer auf den Stack                                           
                                             unsigned oldsp = sp;
@@ -86,6 +89,7 @@ if(n != 0)
                                                 int tmpblock;
                                                 bool isGlobal = false;
                                                 
+                                                // Behandlung aufgelaufener Funktionsidents und globle Var.
                                                 if (s.count()<decl) 
                                                 { 
                                                     tmpblock = cblock;
@@ -175,14 +179,11 @@ if(n != 0)
                                           TType* sig = (TType*)malloc(100);
                                           TType ret = ft.toptype();
                                           
-                                          // prototypes
+                                          // Bei Prototypen steht noch kein Ident auf dem Funktionsstack, sondern nur auf dem Ident Stack
                                           if (c==0) 
                                           {
                                             c = s.top(); 
-                                            //s.pop(1);
-                                            ret = stype.toptype();
-                                            //stype.pop(1); 
-                                            //ins(fl.nextId());    <<---  Der "ich-habe-zwei-stunden-danach-gesucht"-Bug
+                                            ret = stype.toptype();                                                                                   
                                           }
                                           
                                           if ((ret!=svoid)&&(!retu)&&(!proto))
@@ -191,7 +192,6 @@ if(n != 0)
                                             exit(-1);
                                           }
                                           retu = false;
-                                          //strcpy(sig,"\0");
                                           unsigned num = 0;
                                           
                                           TType para[MAX_NO_OF_PARAMETERS];
@@ -354,7 +354,7 @@ if(n != 0)
         case OPERAND                    : context(n->n1); break;
         case VARIABLE                   : context(n->n1); context(n->n2); 
                                           {
-                                                                            
+                                          // Hier wird nun geprüft, ob eine Variable vor der Benutzung deklariert wurde                                  
                                           v = 0;
                                           cur = cblock;
                                           
