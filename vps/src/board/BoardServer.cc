@@ -1,6 +1,7 @@
 #include "board/BoardServer.h"
 #include "board/LocalBoard.h"
 
+
 #define ZOOM 3
 #define RANDOM 7
 
@@ -75,6 +76,10 @@ void BoardServer::start()
 		}
 	}
 	w->flush();
+	
+	CPUTimer t;
+	unsigned long long elapsed;
+	t.start();
 	
 	// Und los gehts
 	for( timestep = 0 ; timestep<timesteps; timestep++)
@@ -168,7 +173,8 @@ void BoardServer::start()
 		}
 		cerr<<"ok\n";
 	}
-	cout<<"[boardserver] fertig\n";
+	elapsed = t.stop();
+	cout<<"[boardserver] fertig, "<<elapsed<<" CPU Takte wurden benötigt\n";
 	
 	
 }
