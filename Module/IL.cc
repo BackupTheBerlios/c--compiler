@@ -220,8 +220,11 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case INIT_PART:
 			{
 				char* dst = lastident;
+				TType dstt = nl.getType(varidx);
 				char* src = op.top();
+				TType srct = op.toptype();
 				op.pop(1);
+				checkConvAssign(src,srct,dstt);
 				outcopy(dst,src);
 				break;
 			}
@@ -325,7 +328,7 @@ char* IL::varid(unsigned i)
 char* IL::conid(unsigned i)
 {
 	TType t = cl.getType(i);
-	if (t==0) return 0;
+	if (t==undeclared) return 0;
 
 	char* n = (char*)malloc(VAR_LENGTH_ID);
 	if (t==sint) strcpy(n,"int");
@@ -446,9 +449,9 @@ TType IL::checkConv(char*& m1, char*& m2, TType t1, TType t2)
 			outconvert(m1,m3,sfloat);
 			m1 = m3;
 			return sfloat;
-		} else {
+		} else 
 			cout<<"[code-il] warning: types not equal t1: "<<t1<<" t2: "<<t2<<endl;
-		}
+		
 	}
 	return t1;
 }
@@ -457,23 +460,31 @@ TType IL::checkConvAssign(char*& m1, TType t1, TType t2)
 {
 	if (t1!=t2) 
 	{
-		if ((t1==sint)&&(t2==sfloat))
+		if ((t1<=slong)&&(t2==sfloat))
 		{
 			char* t = tempid();
 			outconvert(m1,t,sfloat);
 			m1 = t;
 			return sfloat;
-		} else if ((t1==sfloat)&&(t2==sint))
+		} else if ((t1==sfloat)&&(t2<=slong))
 		{
 			char* t = tempid();
-			outconvert(m1,t,sint);
+			outconvert(m1,t,t2);
 			m1 = t;
 			return sint;
+		} else if (t1>t2)
+		{
+			cout<<"[code-il] warning: loss of precision\n";
 		} else cout<<"[code-il] warning: types not equal t1: "<<t1<<" t2: "<<t2<<endl;
 	}
 	return t1;
 }
 void IL::outconvert(char* m1, char* m2, TType to)
 {
-	cout<<m2<<" := to"<<((to==sint)?"Int(":"Float(")<<m1<<");\n";
+	char* c = (char*)malloc(8);
+	if (to==schar) c = "Char";
+	if (to==sint) c = "Int";
+	if (to==slong) c = "Long";
+	if (to==sfloat) c = "Float";
+	cout<<m2<<" := to"<<c<<"("<<m1<<");\n";
 }

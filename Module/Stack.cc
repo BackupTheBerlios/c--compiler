@@ -85,13 +85,13 @@ char* Stack::first ()
 TType Stack::firsttype ()
 {
 	
-	if (tos==0) return svoid;
+	if (tos==0) return undeclared;
 	
 	TType re = start->type;
 	TStackEntry* ctos = tos;
 	while(1)
 	{
-		if (ctos==0) return svoid;
+		if (ctos==0) return undeclared;
 		
 		if (ctos->next == start) { start = ctos; ctos->next = 0; break; }
 		if (ctos->next == 0) { tos = 0; start = 0; break; }

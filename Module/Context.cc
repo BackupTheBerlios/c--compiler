@@ -122,9 +122,9 @@ if(n != 0)
         case CONSTANT_2                 : context(n->n1); break;
         case CONSTANT_3                 : minus = true; context(n->n1); minus = false; break;
         case UNSIGNED_CONSTANT          : context(n->n1); break;
-        case CHAR_CONSTANT              : if(minus) cl.insert(-(char)n->n1, ++cc); else cl.insert((char)n->n1, ++cc);
+        case CHAR_CONSTANT              : if(minus) cl.insert(-(char)n->n1, ++cc); else cl.insert((char)n->n1, ++cc); break;
         case INT_CONSTANT               : if(minus) cl.insert(-(int)n->n1, ++cc); else cl.insert((int)n->n1, ++cc); break;
-        case FLOAT_CONSTANT		: if(minus) cl.insert(-*(double*)n->n1, ++cc); else cl.insert(*(double*)n->n1, ++cc);
+        case FLOAT_CONSTANT		: if(minus) cl.insert(-*(double*)n->n1, ++cc); else cl.insert(*(double*)n->n1, ++cc); break;
         case COMPLEX_CONSTANT_OPT       : context(n->n1); break;
         case COMPLEX_CONSTANT_ST_1      : context(n->n1); break;
         case COMPLEX_CONSTANT_ST_2      : context(n->n1); context(n->n2); break;
