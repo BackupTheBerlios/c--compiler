@@ -17,5 +17,6 @@ int main(int argc, char* argv[])
 	
 	UDPNetwork* net = new UDPNetwork();
 	LifeClient* client = new LifeClient((IPNetwork *)net,server,7654);
+
 }
 

@@ -91,9 +91,11 @@ void BoardServer::start()
 			
 			if (msg[0]=='S')  //setPos
 			{
+				//cout<<msg[1]<<" "<<msg[2]<<" | ";
 				board_b->setPos(msg[1], msg[2], (life_status_t)msg[3]);
-				int anything=msg[ 4 ];
+			int anything=msg[ 4 ];
 				net->reply(all, &anything, sizeof(anything));
+
 			}
 			else if (msg[0]=='G') //getPos
 			{

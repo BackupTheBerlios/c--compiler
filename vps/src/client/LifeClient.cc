@@ -179,6 +179,7 @@ void LifeClient::makeStep()
 			}
 // 			if (req[ 4 ]==response) cout<<"set erfolg!\n";
 
+
 		}
 	}
 
