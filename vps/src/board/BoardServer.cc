@@ -76,7 +76,7 @@ void BoardServer::start()
 	}
 	w->flush();
 
-	cout<<"timestep: "<<timestep<<endl;
+/*	cout<<"timestep: "<<timestep<<endl;
 	// alle clients müssen den ersten Schritt anfordern
 	notcomplete = true;
 	while(notcomplete)
@@ -85,7 +85,7 @@ void BoardServer::start()
 		int msg[2];
 		net->receive(all, &msg, sizeof(msg));
 		barrier(&all, msg[1]);
-	}
+	}*/
 	
 	// Und los gehts
 	for( timestep = 0 ; timestep<timesteps; timestep++)
@@ -203,7 +203,12 @@ void BoardServer::logon(IPAddress* ip)
 */
 void BoardServer::barrier(IPAddress* ip,int timestep)
 {
-// 	if (timestep==-1) return;
+	if (timestep==-1)	// alle clients sind angemeldet, also kann der 1. schritt erfolgen
+	{
+		int repl=1;
+		net->reply(*ip, &repl, sizeof(repl));
+		return;
+	}
 	if (this->timestep!=timestep)
 	{
 		cout<<"[boardserver] received message from timestep "<<timestep<<" but we are in "<<this->timestep<<endl;
