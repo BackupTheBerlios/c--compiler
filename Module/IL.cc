@@ -218,9 +218,13 @@ char* IL::genIL(unsigned* start, unsigned* end)
 	
 				outbin(temp,dst,sub,src);
 				op.push(temp);
-				// ergebnis darf nicht groesser oder gleich 0 sein
-				outjump(temp,cond.topOp(),jmpgr);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
-				outjump(temp,cond.topOp(),jmpeq);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
+				
+				if (condition)
+				{
+					// ergebnis darf nicht groesser oder gleich 0 sein
+					outjump(temp,cond.topOp(),jmpgr);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
+					outjump(temp,cond.topOp(),jmpeq);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
+				}
 				break;
 			}
 			case RELATION_3:
@@ -235,9 +239,13 @@ char* IL::genIL(unsigned* start, unsigned* end)
 	
 				outbin(temp,src,sub,dst);
 				op.push(temp);
-				// ergebnis darf nicht groesser oder gleich 0 sein
-				outjump(temp,cond.topOp(),jmpgr);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
-				outjump(temp,cond.topOp(),jmpeq);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
+				
+				if (condition)
+				{
+					// ergebnis darf nicht groesser oder gleich 0 sein
+					outjump(temp,cond.topOp(),jmpgr);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
+					outjump(temp,cond.topOp(),jmpeq);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
+				}
 				break;
 			}
 			case RELATION_4:
@@ -252,8 +260,12 @@ char* IL::genIL(unsigned* start, unsigned* end)
 	
 				outbin(temp,dst,sub,src);
 				op.push(temp);
-				// ergebnis darf nicht groesser 0 sein
-				outjump(temp,cond.topOp(),jmpgr);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
+				
+				if (condition)
+				{
+					// ergebnis darf nicht groesser 0 sein
+					outjump(temp,cond.topOp(),jmpgr);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
+				}
 				break;
 			}
 			case RELATION_5:
@@ -268,8 +280,12 @@ char* IL::genIL(unsigned* start, unsigned* end)
 	
 				outbin(temp,src,sub,dst);
 				op.push(temp);
-				// ergebnis darf nicht groesser 0 sein
-				outjump(temp,cond.topOp(),jmpgr);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
+
+				if (condition)
+				{
+					// ergebnis darf nicht groesser 0 sein
+					outjump(temp,cond.topOp(),jmpgr);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
+				}
 				break;
 			}
 			case EQUALITY_2:
@@ -283,9 +299,30 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				TOperand* temp = tempid(tt);
 				
 				outbin(temp,src,sub,dst);
+				
+				// wenn ungleich 0, dann ist "==" falsch und es muﬂ eine 0 nach temp
+/*				TOperand* ne=labelid();
+				TOperand* eq=labelid();
+				TOperand* temp2 = tempid(tt);
+				TOperand* true_ = tempid(tt);
+				true_->label="1";
+				TOperand* false_ = tempid(tt);
+				false_->label="0";
+				outjump(temp,ne,jmpne);		// springe zu nicht gleich
+				
+				outcopy(temp2,true_);		// gleich, also kommt ne 1 rein
+				outjump(eq,jmp);		// sprung
+				
+				outlabel(ne);			// nicht gleich, also kommt ne 0 rein
+				outcopy(temp2,false_);
+
+				op.push(temp2);*/
 				op.push(temp);
-				// ergebnis muﬂ gleich 0 sein, ansonsten sprung
-				outjump(temp,cond.topOp(),jmpne);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
+				if (condition)
+				{
+					// ergebnis muﬂ gleich 0 sein, ansonsten sprung
+					outjump(temp,cond.topOp(),jmpne);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
+				}
 				break;
 			}
 			case EQUALITY_3:
@@ -300,8 +337,12 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				
 				outbin(temp,src,sub,dst);
 				op.push(temp);
-				// ergebnis darf nicht gleich 0 sein, ansonsten sprung
-				outjump(temp,cond.topOp(),jmpeq);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
+				
+				if (condition)
+				{
+					// ergebnis darf nicht gleich 0 sein, ansonsten sprung
+					outjump(temp,cond.topOp(),jmpeq);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
+				}
 				break;
 			}
 			case COND_START:
