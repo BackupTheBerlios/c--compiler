@@ -26,15 +26,15 @@ int main()
 	char rep[]="hello client";
 	net->reply(client,rep,20);
 
-	/*
 	// test fuers board, kommt spaeter in den client
 	Color alivecol = White;
 	Color deadcol  = Blue2;
 
 	// init
-	for (int x=0;x<BOARD_WIDTH;x++)
+/*	for (int x=0;x<BOARD_WIDTH;x++)
 		for (int y=0;y<BOARD_HEIGHT;y++)
-			board_a->setPos(x , y, (((rand()%RANDOM)==2) ? alive : dead) );
+			board_a->setPos(x , y, (((rand()%RANDOM)==2) ? alive : dead) );*/
+	board_a->restoreBoard("test.board");
 
 	XWindow* w=new XWindow(BOARD_WIDTH*ZOOM, BOARD_HEIGHT*ZOOM, "Game of Life");
 
@@ -42,7 +42,6 @@ int main()
 
 	char* count=(char*)malloc(16);
 	unsigned neighbours_alive;
-	board_a->storeBoard("test.board");
 	while(true)
 	{
 		for (int x=0;x<BOARD_WIDTH;x++)
@@ -103,9 +102,8 @@ int main()
 		else
 			w->write(Green1,10,10,count,15);
 		w->flush();
-		for (int x=0;x<BOARD_WIDTH;x++)
-			for (int y=0;y<BOARD_HEIGHT;y++)
-				board_a->setPos(x,y,board_b->readPos(x,y));
+		LocalBoard* board_cache=board_b;
+		board_b=board_a;
+		board_a=board_cache;
 	}
-	*/
 }
