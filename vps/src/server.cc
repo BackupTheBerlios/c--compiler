@@ -5,6 +5,8 @@
 #include "board/Board.h"
 #include "board/LocalBoard.h"
 #include "board/BoardServer.h"
+#include <iostream>
+using namespace std;
 
 #define ZOOM 5
 #define RANDOM 7
@@ -16,15 +18,15 @@ int main()
 	LocalBoard* board_b = new LocalBoard(BOARD_WIDTH,BOARD_HEIGHT);
 	BoardServer* boardserver = new BoardServer((IPNetwork *)net,4,(Board *)board_a,(Board *)board_b);
 
-	//Following code is only a usage example, please use class BoardServer
-	//for such kind of implementation
-	IPAddress client;
+	// UDP-Test
+	IPAddress client("localhost", 7654);
 	char message[20];
 	net->receive(client,message,20);
-	char rep[]="hello";
-	net->reply(client,rep,10);
+	cout<<"[server] received: "<<message<<endl;
+	char rep[]="hello client";
+	net->reply(client,rep,20);
 
-
+	/*
 	// test fuers board, kommt spaeter in den client
 	Color alivecol = White;
 	Color deadcol  = Blue2;
@@ -105,4 +107,5 @@ int main()
 			for (int y=0;y<BOARD_HEIGHT;y++)
 				board_a->setPos(x,y,board_b->readPos(x,y));
 	}
+	*/
 }

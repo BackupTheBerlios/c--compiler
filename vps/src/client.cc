@@ -3,19 +3,20 @@
 #include "net/IPNetwork.h"
 #include "net/UDPNetwork.h"
 #include "client/LifeClient.h"
+#include <iostream>
+using namespace std;
 
 int main()
 {
-	// Nur ein CVS-Test
 	UDPNetwork* net = new UDPNetwork();
-	LifeClient* client = new LifeClient((IPNetwork *)net,"localhost",7654);
+	//LifeClient* client = new LifeClient((IPNetwork *)net,"localhost",7654);
 
-	//Following code is only a usage example, please use class LifeClient
-	//for such kind of implementation
+	// UDP-Test
 	IPAddress server("localhost",7654);
-	char message[10];
+	char message[20];
 	char req[]="hello server";
-	net->request(server,(void *)req,13,message,10);
+	net->request(server,(void *)req,13,message,20);
+	cout<<"[client] received: "<<message<<endl;
 
 }
 
