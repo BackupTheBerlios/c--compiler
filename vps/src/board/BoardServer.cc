@@ -213,14 +213,21 @@ void BoardServer::logon(IPAddress* ip)
 */
 void BoardServer::barrier(IPAddress* ip, int timestep, int clientid)
 {
-	cout<<"timestep "<<timestep<<" from client "<<clientid<<endl;
+	// notcomplete-variable setzen, falls ende erreicht und alle clients fertig mit letztem schritt
 	if (timestep>=(timesteps-1))
 	{
+		completed[clientid] = true;
 		int repl=2;
 		net->reply(*ip, &repl, sizeof(repl));
-		notcomplete=false;
+		bool c = true;
+		for (int i=0; i<clients; i++)
+		{
+			c &= completed[i];
+		}
+		notcomplete=!c;
 		return;
 	}
+	
 	if (this->timestep>timestep)	// client hat die bestaetigung schon einmal gesendet, sonst waere der timestep noch nicht weiter gezaehlt
 	{
 		int repl=1;
