@@ -295,7 +295,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				// wenn man hier angelangt ist(im zwischencode), beginnt der true-block
 				// cout<<"\ntrue-block\n";
 				condition=false;
-				if (!switchcond)
+				if ((!switchcond)&&(!relation))
 				{
 					char* src = op.top();
 					char* temp = tempid();
@@ -304,11 +304,12 @@ char* IL::genIL(unsigned* start, unsigned* end)
 					
 					outjump(temp,cond.top(),jmpne);	
 				}
-				if (relation) 
+				if ((relation)&&(switchcond)) 
 				{
 					op.push(tempid());
 					outcopy(op.top(), truevar);
 				}
+				relation = false;
 				break;
 			}
 			case WHILE_COND:
