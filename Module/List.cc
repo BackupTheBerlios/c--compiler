@@ -138,6 +138,10 @@ void List::out()
 			cout<<"jmpne";
 			break;
 
+			case jmpa_:
+			cout<<"jmpa";
+			break;
+
 			case mult_:
 			cout<<"mult";
 			break;

@@ -160,10 +160,11 @@ struct TOp
 
 enum	TOpType {
     mov_,
-    jmpgr_,
-    jmple_,
-    jmpeq_,
-    jmpne_,
+    jmpgr_,	// greater zero
+    jmple_,	// less zero
+    jmpeq_,	// equal zero
+    jmpne_,	// not equal
+    jmpa_,	// always
     mult_,
     divi_,
     mod_,
@@ -188,7 +189,8 @@ enum TJmp {
     jmpgr,
     jmple,
     jmpeq,
-    jmpne
+    jmpne,
+    jmpa
 };
 
 enum TType {

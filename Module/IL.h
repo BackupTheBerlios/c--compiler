@@ -70,6 +70,8 @@ private:
 	Stack op;
 	Stack label;
 	Stack cond;
+	bool condition;
+	unsigned condinsert;
 	unsigned tempcount;
 	unsigned labelcount;
 	unsigned condlabelcount;

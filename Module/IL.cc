@@ -3,6 +3,7 @@
 IL::IL()
 {
 	tempcount = 1;
+	condition = false;
 }
 
 /* generiert die Zwischensprache.
@@ -128,7 +129,6 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				op.pop(1);
 				char* dst = op.top();
 				TType dstt = op.toptype();
-				op.pop(1);
 				//cout<<src<<" dst:"<<dst<<endl;
 				checkConvAssign(src,srct,dstt);
 
@@ -188,9 +188,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				// hier endet der true-block, false-block ueberspringen
 				char* l=labelid();
 				label.push(l);
-				char* temp=tempid();
-				outcopy(temp, "1");
-				outjump(temp,l,jmpgr);
+				outjump("0",l,jmpa);
 
 				//Sprungmarke für cond=false setzen
 				outlabel(cond.top());
@@ -267,6 +265,8 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case COND_START:
 			{
+				condition=true;
+				condinsert=ilList.count();
 				cond.push(condlabelid());	// dieses label kommt später hinter den true-block
 				break;
 			}
@@ -277,6 +277,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 
 				// wenn man hier angelangt ist(im zwischencode), beginnt der true-block
 				// cout<<"\ntrue-block\n";
+				condition=false;
 				break;
 			}
 			case WHILE_COND:
@@ -289,9 +290,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case WHILE:
 			{
 				// sprung zum start der while-schleife
-				char* temp=tempid();
-				outcopy(temp, "1");
-				outjump(temp,label.top(),jmpgr);
+				outjump("0",label.top(),jmpa);
 				label.pop(1);
 
 				// austritt aus der schleife
@@ -472,7 +471,16 @@ void IL::outcopy(char* l, char* r)
 	op->TOpType=mov_;
 	op->operand1=l;
 	op->operand2=r;
-	ilList.append(op);
+
+	if (condition)
+	{
+		ilList.insert(op,condinsert+1);
+		condinsert++;
+	}
+	else
+	{
+		ilList.append(op);
+	}
 }
 
 void IL::outbin(char* l, char* x, TBinOp o, char* y)
@@ -545,7 +553,7 @@ void IL::outgoto(char* label, bool call)
 void IL::outlabel(char* label)
 {
 	cout<<label<<":\n";
-	
+
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=label_;
 	op->operand1=label;
@@ -569,10 +577,16 @@ void IL::outjump(char* cc,char* jmp,TJmp type)
 		case jmpne:
 		cout<<"ne";
 		break;
+		case jmpa:
+		cout<<"a "<<jmp<<";\n";
+		break;
 	}
-	cout<<" "<<cc<<", "<<jmp<<";\n";
-	
-	
+	if (type!=jmpa)
+	{
+		cout<<" "<<cc<<", "<<jmp<<";\n";
+	}
+
+
 	unsigned a;
 	switch(type)
 	{
@@ -580,9 +594,16 @@ void IL::outjump(char* cc,char* jmp,TJmp type)
 		case jmple: a = jmple_; break;
 		case jmpeq: a = jmpeq_; break;
 		case jmpne: a = jmpne_; break;
+		case jmpa: a = jmpa_; break;
 	}
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=a;
+	if (type==jmpa)
+	{
+		op->operand1=jmp;
+		ilList.append(op);
+		return;
+	}
 	op->operand1=cc;
 	op->operand2=jmp;
 	ilList.append(op);
@@ -678,5 +699,14 @@ void IL::outconvert(char* m1, char* m2, TType to)
 	op->TOpType=a;
 	op->operand1=m2;
 	op->operand2=m1;
-	ilList.append(op);
+	if (condition)
+	{
+		ilList.insert(op,condinsert+1);
+		condinsert++;
+	}
+	else
+	{
+		ilList.append(op);
+	}
+
 }
