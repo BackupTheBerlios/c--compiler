@@ -211,11 +211,11 @@ void List::out()
 			break;
 		}
 		if (curr->op->operand1!=0)
-			cout<<" "<<curr->op->operand1;
+			cout<<"\t"<<curr->op->operand1;
 		if (curr->op->operand2!=0)
-			cout<<", "<<curr->op->operand2;
+			cout<<",\t"<<curr->op->operand2;
 		if (curr->op->operand3!=0)
-			cout<<", "<<curr->op->operand3;
+			cout<<",\t"<<curr->op->operand3;
 		cout<<";"<<endl;
 		curr=curr->next;
 	}

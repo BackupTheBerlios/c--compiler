@@ -544,7 +544,6 @@ char* IL::condlabelid()
 
 void IL::outcopy(char* l, char* r)
 {
-	cout<<l<<" := "<<r<<";\n";
 
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=mov_;
@@ -564,19 +563,6 @@ void IL::outcopy(char* l, char* r)
 
 void IL::outbin(char* l, char* x, TBinOp o, char* y)
 {
-	char* c = (char*)malloc(8);
-	switch(o)
-	{
-		case shiftl: c = "<<"; break;
-		case shiftr: c = ">>"; break;
-		case mult: c = "*"; break;
-		case divi: c = "/"; break;
-		case mod: c = "%"; break;
-		case add: c = "+"; break;
-		case sub: c = "-"; break;
-	}
-	cout<<l<<" := "<<x<<" "<<c<<" "<<y<<";\n";
-
 	unsigned a;
 	switch(o)
 	{
@@ -598,8 +584,6 @@ void IL::outbin(char* l, char* x, TBinOp o, char* y)
 
 void IL::outun(char* l, TUnOp u, char* y)
 {
-	if (u==sminus) cout<<l<<" := -"<<y<<";\n";
-
 	if (u==sminus)
 	{
 		struct TOp* op=(TOp*)malloc(sizeof(TOp));
@@ -620,9 +604,6 @@ void IL::outun(char* l, TUnOp u, char* y)
  */
 void IL::outgoto(char* label, bool call)
 {
-	cout<<(call?"call":"goto");
-	cout<<" "<<label<<";\n";
-
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=call?call_:goto_;
 	op->operand1=label;
@@ -631,8 +612,6 @@ void IL::outgoto(char* label, bool call)
 
 void IL::outlabel(char* label)
 {
-	cout<<label<<":\n";
-
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=label_;
 	op->operand1=label;
@@ -641,25 +620,6 @@ void IL::outlabel(char* label)
 
 void IL::outjump(char* cc,char* jmp,TJmp type)
 {
-	cout<<"jmp";
-	switch(type)
-	{
-		case jmpgr:
-		cout<<"gr";
-		break;
-		case jmple:
-		cout<<"le";
-		break;
-		case jmpeq:
-		cout<<"eq";
-		break;
-		case jmpne:
-		cout<<"ne";
-		break;
-	}
-	cout<<" "<<cc<<", "<<jmp<<";\n";
-
-
 	unsigned a;
 	switch(type)
 	{
@@ -677,8 +637,6 @@ void IL::outjump(char* cc,char* jmp,TJmp type)
 
 void IL::outret(char* l)
 {
-	cout<<"ret "<<l<<";\n";
-
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=ret_;
 	op->operand1=l;
@@ -687,8 +645,6 @@ void IL::outret(char* l)
 
 void IL::outpush(char* l)
 {
-	cout<<"push "<<l<<";\n";
-
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=push_;
 	op->operand1=l;
@@ -749,13 +705,6 @@ TType IL::checkConvAssign(char*& m1, TType t1, TType t2)
 }
 void IL::outconvert(char* m1, char* m2, TType to)
 {
-	char* c = (char*)malloc(8);
-	if (to==schar) c = "Char";
-	if (to==sint) c = "Int";
-	if (to==slong) c = "Long";
-	if (to==sfloat) c = "Float";
-	cout<<m2<<" := to"<<c<<"("<<m1<<");\n";
-
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	unsigned a;
 	if (to==schar) a = char_;
