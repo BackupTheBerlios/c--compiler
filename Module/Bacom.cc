@@ -250,7 +250,7 @@ void Bacom::genAsm()
 
 				break;
 			}
-		case char_:	// todo: abschneiden
+		case char_:
 			{
 				if (op2->vtype==sfloat)		// float vorher nach long konvertieren
 				{
@@ -268,6 +268,9 @@ void Bacom::genAsm()
 				}
 				op2->vtype=schar;		// typ setzen, damit typen von op1 und op2 gleich
 				regs.changeReg( op1, op2 );
+				// Register noch abschneiden
+				outshl(sint, regs.whichReg(op1), rnull, "const_eight");		// kleiner machen
+				outshr(sint, regs.whichReg(op1), rnull, "const_eight");		// ...und wieder zurueck an den richtigen Platz
 				break;
 			}
 		case int_:
@@ -432,6 +435,7 @@ void Bacom::genAsm()
 	bsm << "const_two:  dc.w 2 \n";
 	bsm << "const_four:  dc.w 4 \n";
 	bsm << "const_six:  dc.w 6 \n";
+	bsm << "const_eight:  dc.w 8 \n";
 	bsm << "const_stack:  dc.w 32764 \n";  // Startwert Stackpointer
 	bsm << "const_global:  dc.w 10000 \n";  // Startwert globale variablen
 	bsm << "const_lic:  dc.w 22 \n";  // rücksprungoffset zur lic anweisung
@@ -575,6 +579,16 @@ void Bacom::outshl( TType type, TReg dest, TReg src )
 	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
 }
 
+void Bacom::outshl( TType type, TReg dest, TReg src, char* c )
+{
+	bsm << "shl.";
+	if ( type == sint )
+		bsm << "w";
+	else if ( type == slong )
+		bsm << "l";
+	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << "+" <<c<<endl;
+}
+
 void Bacom::outshr( TType type, TReg dest, TReg src )
 {
 	bsm << "shr.";
@@ -583,6 +597,16 @@ void Bacom::outshr( TType type, TReg dest, TReg src )
 	else if ( type == slong )
 		bsm << "l";
 	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+}
+
+void Bacom::outshr( TType type, TReg dest, TReg src, char* c )
+{
+	bsm << "shr.";
+	if ( type == sint )
+		bsm << "w";
+	else if ( type == slong )
+		bsm << "l";
+	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << "+" <<c<<endl;
 }
 
 void Bacom::outmov(TReg r1, TReg r2)

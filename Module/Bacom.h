@@ -40,7 +40,9 @@ private:
 	void outstr(TType, TReg, TReg, int);
 	void outstr(TType, TReg, TReg, char*);
 	void outshl(TType, TReg, TReg);
+	void outshl(TType, TReg, TReg, char*);
 	void outshr(TType, TReg, TReg);
+	void outshr(TType, TReg, TReg, char*);
 	void outadd(TType, TReg, TReg);
 	void outadd(TType, TReg, TReg, char*);
 	void outsub(TType, TReg, TReg);
