@@ -837,22 +837,46 @@ TType IL::checkConv(TOperand*& m1, TOperand*& m2)
 		if ( t1==sfloat || t2==sfloat )		// konvertieren nach float
 		{
 			TOperand* m3 = tempid(sfloat);
-			outconvert(m1,m3,sfloat);
-			m1 = m3;
+			if ( t1==sfloat )
+			{
+				outconvert(m2,m3,sfloat);
+				m2 = m3;
+			}
+			else
+			{
+				outconvert(m1,m3,sfloat);
+				m1 = m3;
+			}
 			return sfloat;
 		}
 		else if ( t1==slong || t2==slong )
 		{
 			TOperand* m3 = tempid(slong);
-			outconvert(m1,m3,slong);
-			m1 = m3;
+			if ( t1==slong )
+			{
+				outconvert(m2,m3,slong);
+				m2 = m3;
+			}
+			else
+			{
+				outconvert(m1,m3,slong);
+				m1 = m3;
+			}
 			return slong;
 		}
 		else if ( t1==sint || t2==sint )
 		{
 			TOperand* m3 = tempid(sint);
-			outconvert(m1,m3,sint);
-			m1 = m3;
+			if ( t1==sint )
+			{
+				outconvert(m2,m3,sint);
+				m2 = m3;
+			}
+			else
+			{
+				outconvert(m1,m3,sint);
+				m1 = m3;
+			}
 			return sint;
 		}
 		else
