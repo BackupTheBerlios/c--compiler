@@ -19,8 +19,9 @@ void LocalBoard::storeBoard(char* filename)
 	ofstream boardFile(filename);
 	boardFile<<BOARD_WIDTH<<endl;
 	boardFile<<BOARD_HEIGHT<<endl;
-	for (unsigned x=0;x<BOARD_WIDTH;x++)
-		for (unsigned y=0;y<BOARD_HEIGHT;y++)
+	for (unsigned y=0;y<BOARD_HEIGHT;y++)
+	{
+		for (unsigned x=0;x<BOARD_WIDTH;x++)
 		{
 			if (readPos(x,y)==alive)
 				boardFile<<"0";
@@ -29,6 +30,8 @@ void LocalBoard::storeBoard(char* filename)
 			else
 				boardFile<<"x";
 		}
+// 		boardFile<<endl;	// debug
+	}
 	boardFile.close();
 }
 
@@ -45,8 +48,8 @@ void LocalBoard::restoreBoard(char* filename)
 		//exit(-1);
 	}
 	boardFile.get(stat);	// read over newline
-	for (unsigned x=0;x<width;x++)
-		for (unsigned y=0;y<height;y++)
+	for (unsigned y=0;y<height;y++)
+		for (unsigned x=0;x<width;x++)
 		{
 			boardFile.get(stat);
 			if (stat=='0')
