@@ -1,7 +1,11 @@
 #ifndef LOCALBOARD_H
 #define LOCALBOARD_H
 
+#include <fstream>
+#include <iostream>
+#include <string.h>
 #include "board/Board.h"
+using namespace std;
 
 /**
  * This class implements the functions readPos(...) and setPos(...)
