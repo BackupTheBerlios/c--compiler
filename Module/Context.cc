@@ -76,10 +76,10 @@ if(n != 0)
                                             }
                                             
                                             unsigned idx = nl.insert(c,tmpblock,t);           
-                                            ins(idx);
+                                            ins(idx);                                            
                                             
                                           }
-                                          
+                                          decl = 0;
                                           //nl.out();
                                           break;
         case VAR_DECL_ST_2              : decl++; // Deklarationen mitzählen, um sie von denen des hauptblocks zu unterscheiden
@@ -192,7 +192,7 @@ if(n != 0)
         case PAR_DECL_ST_2              : context(n->n1); context(n->n2); break;
         case PAR_DECL                   : context(n->n1); context(n->n2); stype.push(lasttype); decl++; break;
         case PAR_IDENT                  : context(n->n1); s.push((char*)n->n1); break;
-        case BLOCK                      : context(n->n1); context(n->n2); /*Blockende*/ cblock = b.topi(0); b.pop(1); break;
+        case BLOCK                      : context(n->n1); context(n->n2); /*Blockende*/ b.pop(1); cblock = b.topi(0); break;
         case STM_ST_1                   : context(n->n1); break;
         case STM_ST_2                   : context(n->n1); context(n->n2);break;
         case STM                        : context(n->n1); ex = 0; break;
@@ -223,7 +223,7 @@ if(n != 0)
         case CASE_LABEL_1               : context(n->n1); break;
         case CASE_LABEL_2               : break;
         case WHILE                      : context(n->n1); context(n->n2); break;
-        case COMPOUND                   : context(n->n1); context(n->n2); /*Blockende*/ cblock = b.topi(0); b.pop(1);  break;
+        case COMPOUND                   : context(n->n1); context(n->n2); /*Blockende*/ b.pop(1); cblock = b.topi(0);   break;
         case EXPRESSION_ST_1            : context(n->n1); break;
         case EXPRESSION_ST_2            : context(n->n1); context(n->n2); break;
         case EXPRESSION_1               : context(n->n1); ex++; break;
@@ -312,7 +312,6 @@ if(n != 0)
 
 void Context::ins(unsigned index)
 {
-	
 	while(*cpos!=IDENTIFIER) cpos++;
 	*(++cpos) = index;
 }
