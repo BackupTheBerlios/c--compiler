@@ -96,9 +96,9 @@ void ConstList::out()
 	while(1)
 	{
 		cout<<"No: "<<cur->ct<<" Val: ";
-		if (cur->t==schar) cout<<cur->val.c;
-		else if (cur->t==sint) cout<<cur->val.i;
-		else if (cur->t==sfloat) cout<<cur->val.f;
+		if (cur->t==schar) cout<<cur->val.c<<"\tType: Char";
+		else if (cur->t==sint) cout<<cur->val.i<<"\tType: Int";
+		else if (cur->t==sfloat) cout<<cur->val.f<<"\tType: Float";
 		cout<<endl;
 		cur = cur->next;
 		if (cur==0) return;
