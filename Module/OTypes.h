@@ -149,6 +149,7 @@ enum TType {
 enum TBinOp {
 	mult,
 	divi,
+	mod,
 	add,
 	sub,
 	shiftl,
