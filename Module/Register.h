@@ -4,11 +4,12 @@
 #include <iostream>
 using namespace std;
 
-#define regmax 3
+#define regmax 16     // Gesamtanzahl der Register
+#define regusable 13  // Anzahl frei nutzbarer Register
 
 struct TRegEntry
 {
-	char* var;
+	TOperand* var;  // von welcher temp. Variable belegt?
 	unsigned mark; // wann zuletzt benutzt
 };
 
@@ -18,16 +19,21 @@ public:
 
 Register();
 
-// beschaft ein Register für die uebergebene temporaere Variable
-TReg getReg(char*);
+// beschaft ein Register für die uebergebene temporaere Variable, Register steht im Argument
+// Rückgabe ist das Register, welches freigemacht wurde
+TReg getReg(TOperand*, TReg&);
 
 // welches Register belegt diese Variable?
-TReg whichReg(char*);
+TReg whichReg(TOperand*);
 
 // gibt das Register wieder frei
-void freeReg(char*);
+void freeReg(TOperand*);
+
+static TReg typeToReg(TOperandType);
 
 void out();
+
+static char* toString(TReg);
 
 private:
 

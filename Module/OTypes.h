@@ -264,10 +264,10 @@ enum TReg {
 	r10,
 	r11,
 	r12,
-	r13,
-	r14,
-	r15,
-	unknown
+	rlb,     // lokale basis
+	rconst,  // startadresse fuer Konstanten
+	rglobal, // startadresse fuer globale Variablen
+	unknown  // Fehler
 };
 	
 
