@@ -3,6 +3,7 @@
 
 #include "net/IPAddress.h"
 #include "net/IPNetwork.h"
+#include "board/LocalBoard.h"
 #include <iostream>
 using namespace std;
 
