@@ -137,7 +137,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case SHIFT_2:
 			{
 				TOperand* m1 = op.topOp();
-				TType t1 = op.toptype();
+				TType t1 = m1->vtype;
 				op.pop(1);
 				TOperand* m2 = op.topOp();
 				TType t2 = op.toptype();
@@ -155,7 +155,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case SHIFT_3:
 			{
 				TOperand* m1 = op.topOp();
-				TType t1 = op.toptype();
+				TType t1 = m1->vtype;
 				op.pop(1);
 				TOperand* m2 = op.topOp();
 				TType t2 = op.toptype();
@@ -746,6 +746,7 @@ TType IL::checkConvAssign(TOperand*& m1, TOperand*& m2)
 {
 	TType t1 = m1->vtype;
 	TType t2 = m2->vtype;
+	
 	// es duerfen nur temp. variablen als operanden verwendet werden!
 	if (((TOperand*)m1)->type!=temp) 
 	{
