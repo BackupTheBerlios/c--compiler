@@ -167,7 +167,6 @@ enum	TOpType {
     jmple_,	// less zero
     jmpeq_,	// equal zero
     jmpne_,	// not equal
-    jmpa_,	// always
     mult_,
     divi_,
     mod_,
@@ -193,7 +192,6 @@ enum TJmp {
     jmple,
     jmpeq,
     jmpne,
-    jmpa
 };
 
 enum TType {

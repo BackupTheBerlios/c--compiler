@@ -190,7 +190,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				// hier endet der true-block, false-block ueberspringen
 				char* l=labelid();
 				label.push(l);
-				outjump("0",l,jmpa);
+				outgoto(l,false);
 
 				//Sprungmarke für cond=false setzen
 				outlabel(cond.top());
@@ -306,7 +306,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case WHILE:
 			{
 				// sprung zum start der while-schleife
-				outjump("0",label.top(),jmpa);
+				outgoto(label.top(),false);
 				label.pop(1);
 				// austritt aus der schleife
 				outlabel(cond.top());
@@ -656,14 +656,8 @@ void IL::outjump(char* cc,char* jmp,TJmp type)
 		case jmpne:
 		cout<<"ne";
 		break;
-		case jmpa:
-		cout<<"a "<<jmp<<";\n";
-		break;
 	}
-	if (type!=jmpa)
-	{
-		cout<<" "<<cc<<", "<<jmp<<";\n";
-	}
+	cout<<" "<<cc<<", "<<jmp<<";\n";
 
 
 	unsigned a;
@@ -673,16 +667,9 @@ void IL::outjump(char* cc,char* jmp,TJmp type)
 		case jmple: a = jmple_; break;
 		case jmpeq: a = jmpeq_; break;
 		case jmpne: a = jmpne_; break;
-		case jmpa: a = jmpa_; break;
 	}
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=a;
-	if (type==jmpa)
-	{
-		op->operand1=jmp;
-		ilList.append(op);
-		return;
-	}
 	op->operand1=cc;
 	op->operand2=jmp;
 	ilList.append(op);
