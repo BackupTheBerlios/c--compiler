@@ -118,6 +118,14 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				op.push(p);
 				break;
 			}
+			case INIT_PART:
+			{
+				char* dst = lastident;
+				char* src = op.top();
+				op.pop(1);
+				outcopy(dst,src);
+				break;
+			}
 			case INT_CONSTANT:		op.push(conid(constcount++)); break;
 		}
 		start++;
