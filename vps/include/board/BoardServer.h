@@ -36,6 +36,8 @@ private:
 	Board* board_a;
 	Board* board_b; 	//one board for timestep n for reading, and one for timestep n+1 for writing
 	IPAddress addresses[10];
+	bool completed[10];
+	bool notcomplete;
 	int client;
 	int clients;
 	
@@ -44,7 +46,7 @@ private:
 	 * It stores the address of the client and determines the part of the board the client
 	 * has to work on.
 	 */
-	void logon();
+	void logon(IPAddress* ip);
 
 	/**
 	 * This function is the global barrier for interstepsynchronization. All clients must call

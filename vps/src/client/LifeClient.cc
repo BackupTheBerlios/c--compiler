@@ -40,10 +40,10 @@ LifeClient::~LifeClient()
 int LifeClient::startUp()
 {
 	int message[ 4 ];
-	char req[] = "X";
+	int req = 'X';
 
 	// beim server anmelden
-	net->request( server, ( void* ) req, 1, ( void* ) message, 20 );
+	net->request( server, &req, 4, &message, 20 );
 
 	// grenzen setzen
 	x1 = message[ 0 ];
@@ -59,12 +59,17 @@ int LifeClient::startUp()
 void LifeClient::loop()
 {
 	int message;
-	char req[] = "N";	// request next Step
- 	net->request( server, ( void* ) req, 1, ( void* ) message, sizeof(message) );
+	int req[2];	// request next Step
+	req[0] = 'N';
+	req[1] = -1;
+ 	net->request( server, &req, 8, &message, sizeof(message) );
+	
+	int step = 0;
 	while (message==1)	// if Server sends 1, we calculate the next Step
 	{
 		makeStep();
-		net->request( server, ( void* ) req, 1, ( void* ) message, sizeof(message) );
+		req[1] = step++;
+		net->request( server, &req, 8,  &message, sizeof(message) );
 	}
 }
 
@@ -90,7 +95,8 @@ void LifeClient::makeStep()
 			req[ 0 ] = 1;			// Anfrage eines Punktes
 			req[ 1 ] = x;
 			req[ 2 ] = y;
-			net->request( server, ( void* ) req, 1, ( void* ) message, sizeof(message) );
+			cout<<"G";
+			net->request( server, &req, 12, &message, sizeof(message) );
 			board_a->setPos(x-(x1-1), y-(y1-1), (life_status_t)message);
 		}
 	}
@@ -134,7 +140,8 @@ void LifeClient::makeStep()
 				else
 					req[ 3 ] = board_a->readPos(x,y);
 			}
-			net->request( server, ( void* ) req, 1, ( void* ) message, sizeof(message) );
+			cout<<"S";
+			net->request( server, &req, 16, &message, sizeof(message) );
 		}
 	}
 	

@@ -14,9 +14,9 @@ using namespace std;
 int main()
 {
 	UDPNetwork* net = new UDPNetwork(7654);
-	LocalBoard* board_a = new LocalBoard(100,100);
+	LocalBoard* board_a = new LocalBoard(BOARD_WIDTH,BOARD_HEIGHT);
 	LocalBoard* board_b = new LocalBoard(BOARD_WIDTH,BOARD_HEIGHT);
-	BoardServer* boardserver = new BoardServer((IPNetwork *)net,4,(Board *)board_a,(Board *)board_b);
+	BoardServer* boardserver = new BoardServer((IPNetwork *)net,1,(Board *)board_a,(Board *)board_b,10);
 	
 	boardserver->start();
 	

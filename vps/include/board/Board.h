@@ -3,8 +3,8 @@
 
 #include <sys/types.h>
 
-#define BOARD_WIDTH 100
-#define BOARD_HEIGHT 100
+#define BOARD_WIDTH 101
+#define BOARD_HEIGHT 101
 
 enum life_status_t {invalid,dead,alive};
 
