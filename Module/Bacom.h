@@ -5,6 +5,7 @@
 #include "ConstList.h"
 #include "Register.h" 
 #include "FunctionList.h"
+#include "IL.h"
 #include <iostream>
 #include <fstream>
 using namespace std;
@@ -14,7 +15,7 @@ extern FunctionList fl;
 extern ConstList cl;
 extern ConstList icl;
 extern ofstream bsm;
-
+extern IL il;
 
 class Bacom
 {
@@ -56,11 +57,13 @@ private:
 	void outdc(float);
 	void out_out(TType, TReg);
 	void out_in(TType, TReg);
+
+	char* convlabelid(bool pos);
 	
 	char* concat(char*, unsigned);
 	
 	Register regs;
-// 	ofstream bsm;
+	unsigned convlabelcount;
 	
 	
 };
