@@ -14,13 +14,13 @@ FunctionList::FunctionList()
 
 unsigned FunctionList::insert(char* n, TType* sig, TType ret, unsigned num, bool proto, unsigned maxsp, unsigned frame_constant, unsigned sig_constant)
 {
-	if (no!=0) 
+	if (no!=0)
 	{
 		TFunctionListEntry* cur = start;
 		unsigned c = MAX_NO_OF_VARIABLES+1;
 		while(1)
 		{
-			if ((strcmp(cur->name,n)==0)&&(cur->num==num)&&(cur->proto)) 
+			if ((strcmp(cur->name,n)==0)&&(cur->num==num)&&(cur->proto))
 			{
 				cur->proto = 0;
 				cur->maxsp = maxsp;
@@ -49,7 +49,7 @@ unsigned FunctionList::insert(char* n, TType* sig, TType ret, unsigned num, bool
 
 
 unsigned FunctionList::isDefined(char* n, unsigned num, bool proto)
-{	
+{
 	if (no==0) return 0;
 	TFunctionListEntry* cur = start;
 	unsigned c = MAX_NO_OF_VARIABLES+1;
@@ -57,7 +57,7 @@ unsigned FunctionList::isDefined(char* n, unsigned num, bool proto)
 	{
 		//cout<<"name: "<<n<<" Sig: "<<sig<<"  curname: "<<cur->name<<" cursig: "<<cur->signature<<"\n";
 		// NOCH KEINE AUSWERTUNG DER SIGNATUR
-		//if ((strcmp(cur->name,n)==0)&&(strcmp(cur->signature,sig)==0)) return true; 
+		//if ((strcmp(cur->name,n)==0)&&(strcmp(cur->signature,sig)==0)) return true;
 		if ((strcmp(cur->name,n)==0)&&(cur->num==num)&&(!(cur->proto&&proto))) return c;
 		cur++;
 		c++;
@@ -69,7 +69,7 @@ void FunctionList::out()
 {
 	if (no==0) { cout<<"<<leer>>"; return; }
 	TFunctionListEntry* cur = start;
-	
+
 	while(1)
 	{
 		cout<<"Name: "<<cur->name<<" Sig: ";
@@ -102,7 +102,7 @@ char* FunctionList::checkForUnImplemented()
 {
 	if (no==0) return 0;
 	TFunctionListEntry* cur = start;
-	
+
 	while(1)
 	{
 		if (cur->proto==1) return cur->name;
@@ -113,7 +113,7 @@ char* FunctionList::checkForUnImplemented()
 
 
 unsigned FunctionList::isProto(char* n, unsigned num)
-{	
+{
 	if (no==0) return 0;
 	TFunctionListEntry* cur = start;
 	unsigned c = MAX_NO_OF_VARIABLES+1;
@@ -121,7 +121,7 @@ unsigned FunctionList::isProto(char* n, unsigned num)
 	{
 		//cout<<"name: "<<n<<" Sig: "<<sig<<"  curname: "<<cur->name<<" cursig: "<<cur->signature<<"\n";
 		// NOCH KEINE AUSWERTUNG DER SIGNATUR
-		//if ((strcmp(cur->name,n)==0)&&(strcmp(cur->signature,sig)==0)) return true; 
+		//if ((strcmp(cur->name,n)==0)&&(strcmp(cur->signature,sig)==0)) return true;
 		if ((strcmp(cur->name,n)==0)&&(cur->num==num)&&(cur->proto)) return c;
 		cur++;
 		c++;

@@ -149,7 +149,7 @@ int ConstList::getIntVal(unsigned u)
 		if (cur==0) return 0;
 	}
 	return 0;
-	
+
 }
 
 

@@ -23,28 +23,28 @@ class Context
 public:
 
 	Context();
-	
+
 	void context(struct TNode*);
-	
+
 	void ins(unsigned);
-	
+
 	void insrev(unsigned);
-	
+
 	unsigned align(unsigned, unsigned);
-	
+
 
 private:
-	
+
 	Stack b;      //Blocknummern-Stack
 	Stack s;      //Variablen-Ident-Stack
 	Stack f;      //Funktions-Ident-Stack
 	Stack ft;     // Funktions-Typen-Stack
 	Stack par;    //Parameter-Stack
 	Stack stype;  //typen-stack
-	
+
 	Stack pro;  // Protypen-ident
 	TType lasttype;  //letzter Basistyp
-	
+
 	unsigned* cpos;
 	unsigned cblock;     // aktueller block
 	unsigned blockmax;   // letzte vergebene blocknummer
@@ -60,21 +60,15 @@ private:
 	unsigned gp; // pointer fuer globale variablen (auch zur Adressberechnung)
 	Stack bl; // Speichergroesse der Bloecke
 	unsigned maxsp; // max. grosse des Speicherbereichs einer Funktion
-	
+
 	unsigned caselabels[MAX_NO_OF_CASE_LABELS];
 	unsigned labelcount;
 	Stack startcount;
 	unsigned lastconst;
 	unsigned startc;
 	unsigned func_constants;
-	
-
-
 
 };
-
-
-
 
 
 #endif

@@ -6,7 +6,7 @@ void Bacom::genAsm()
 	bsm << "sub.w\t" <<Register::toString( rnull )<<", "<<Register::toString( rnull )<<endl;		// Nullregister 0 setzen
 	outloa(sint, rsp, rnull, "const_stack");
 	outloa(sint, rglobal, rnull, "const_global");
-	
+
 	// offset bis zum naechsten lokalen frame = 36
 	unsigned para = 0;
 	for ( unsigned i = 1; i <= ilList.count(); i++ )
@@ -31,7 +31,7 @@ void Bacom::genAsm()
 						outstr(sint, (TReg)i, rsp, 0 );
 						outsub(sint, rsp, rnull, "const_two");
 					}
-					
+
 					// Registerzuordnungen löschen
 					regs.invalidate();
 
@@ -59,14 +59,14 @@ void Bacom::genAsm()
 						outloa( op1->vtype, r, Register::typeToReg( op2->type ), op2->add );
 					else if (op2->type==lvar)
 						outloa( op1->vtype, r, Register::typeToReg( op2->type ), -(op2->add) );
-					
-					
+
+
 
 				} else	// a:=t;
 				{
 					if (op1->type==gvar)
 						outstr( op1->vtype, regs.whichReg( op2 ), rglobal,  op1->add );
-					else 
+					else
 						outstr( op1->vtype, regs.whichReg( op2 ), rlb,  -(op1->add) );
 					regs.freeReg( op2 );
 				}
@@ -76,48 +76,48 @@ void Bacom::genAsm()
 
 
 		case push_:
-		{
-			// Paramter ins lokale Frame der aufgerufenen Funktion schreiben
-			unsigned offs = para++;
-			unsigned add = fl.getParaAdd(op2->no, offs);
-			outstr(op1->vtype, regs.whichReg(op1), rsp, -(40+add)); //40
-			break;
-		}
-		
-		case ret_:
-		{
-			bsm<<endl;
-			// Lokales Frame abräumen
-			outadd(sint, rsp, rnull, concat("iconst_", fl.getFrameConstant(op2->no)) );
-			
-			// Rueckgabewert einschreiben
-			if (op1!=0)
 			{
-				TReg r = regs.whichReg(op1);
-				outstr(op1->vtype, r, rsp, 36);
+				// Paramter ins lokale Frame der aufgerufenen Funktion schreiben
+				unsigned offs = para++;
+				unsigned add = fl.getParaAdd(op2->no, offs);
+				outstr(op1->vtype, regs.whichReg(op1), rsp, -(40+add)); //40
+				break;
 			}
-			
-			// Register wiederherstellen
-			outadd(sint, rsp, rnull, "const_two");
-			for (int i=14;i>=0;i--)
-			{
-				outloa(sint, (TReg)i, rsp, 0 );
-				outadd(sint, rsp, rnull, "const_two");
-				
-			}
-			
 
-			// Rücksprungadresse abräumen 
-			outloa( sint, rnull, rsp, 0 );
-			
-			// Rücksprung
-			outbra(rnull, 0);
-	
-			
-			break;
-		}
-			
-			
+		case ret_:
+			{
+				bsm<<endl;
+				// Lokales Frame abräumen
+				outadd(sint, rsp, rnull, concat("iconst_", fl.getFrameConstant(op2->no)) );
+
+				// Rueckgabewert einschreiben
+				if (op1!=0)
+				{
+					TReg r = regs.whichReg(op1);
+					outstr(op1->vtype, r, rsp, 36);
+				}
+
+				// Register wiederherstellen
+				outadd(sint, rsp, rnull, "const_two");
+				for (int i=14;i>=0;i--)
+				{
+					outloa(sint, (TReg)i, rsp, 0 );
+					outadd(sint, rsp, rnull, "const_two");
+
+				}
+
+
+				// Rücksprungadresse abräumen
+				outloa( sint, rnull, rsp, 0 );
+
+				// Rücksprung
+				outbra(rnull, 0);
+
+
+				break;
+			}
+
+
 
 		case jmpgr_: 	// greater zero
 			{
@@ -194,7 +194,7 @@ void Bacom::genAsm()
 				TReg r;
 				regs.getReg( op1, r );
 				outloa( op2->vtype, r, rnull , op2->label );
-				
+
 				if (op2->vtype<=sint)
 					outmul(sint, regs.whichReg( op1 ), rnull, "const_minusw");
 				else if (op2->vtype==slong)
@@ -211,10 +211,10 @@ void Bacom::genAsm()
 		case call_:
 			{
 				// Parameter liegen schon auf dem Stack
-				
+
 				// Platz machen für Rückgabewert
 				outsub(sint, rsp, rnull, "const_eight");
-				
+
 				// Rücksprungadresse sichern
 				outlic(rglobal, rnull);  // Instruction counter laden
 				outadd(sint, rglobal, rnull, "const_lic"); // offset dazuaddieren
@@ -222,16 +222,16 @@ void Bacom::genAsm()
 				outloa(sint, rglobal, rnull, "const_global"); // restore rglobal
 				outsub(sint, rsp, rnull, "const_two"); // stack weiterzählen
 				outbra(rnull, op1->label); // Sprung zur Funktion
-				
+
 				// Hier kehren wir zurück:
 				// in rnull steht jetzt noch die rücksprungadresse!
 				outsub(sint, rnull, rnull);
-				
+
 				// sp auf rückgabewert schieben
 				outadd(sint, rsp, rnull, "const_four");
-				
+
 				// Jetzt steht an sp der Rückgabewert --> weitere Behandlung bei getRet
-				
+
 				break;
 			}
 		case goto_:
@@ -244,7 +244,7 @@ void Bacom::genAsm()
 				TReg r;
 				regs.getReg(op1, r);
 				//cout<<"getretstr: "<<op1->vtype<<endl;
-				outloa(op1->vtype, r, rsp, 0); 
+				outloa(op1->vtype, r, rsp, 0);
 				outadd(sint, rsp, rnull, "const_four");
 
 				break;
@@ -259,20 +259,20 @@ void Bacom::genAsm()
 					regs.getReg(op1, r);
 					outcvt(slong, regs.whichReg( op1 ), regs.whichReg( op2 ) );
 					regs.freeReg( op2 );
-					
+
 					// checken, ob operand negativ
- 					char* p=convlabelid(true);			// label holen fuer op2=positiv
+					char* p=convlabelid(true);				// label holen fuer op2=positiv
 					outmul(slong, regs.whichReg(op1),rnull, "const_one");	// CC setzen
-					outjmp(rnull, p, jmpgr);			// springe zu positiv
-					outjmp(rnull, p, jmpeq);			// springe zu positiv
-					
+					outjmp(rnull, p, jmpgr);				// springe zu positiv
+					outjmp(rnull, p, jmpeq);				// springe zu positiv
+
 					outmul(slong, regs.whichReg( op1 ), rnull, "const_minusl");	// wert wird positiv
-					
+
 					regs.smallerReg(op1);
-										
+
 					outmul(sint, regs.whichReg( op1 ), rnull, "const_minusw");	// ... und wieder negativ
-					bsm<<p<<":\n";					// setze positivlabel
-					
+					bsm<<p<<":\n";							// setze positivlabel
+
 					op1->vtype=schar;	// Typ wieder auf int setzen
 					// Register noch abschneiden
 					outshl(sint, regs.whichReg(op1), rnull, "const_eight");		// kleiner machen
@@ -283,19 +283,19 @@ void Bacom::genAsm()
 				if (op2->vtype==slong)
 				{
 					// checken, ob operand negativ
- 					char* p=convlabelid(true);			// label holen fuer op2=positiv
+					char* p=convlabelid(true);				// label holen fuer op2=positiv
 					outmul(slong, regs.whichReg(op2),rnull, "const_one");	// CC setzen
-					outjmp(rnull, p, jmpgr);			// springe zu positiv
-					outjmp(rnull, p, jmpeq);			// springe zu positiv
-					
+					outjmp(rnull, p, jmpgr);				// springe zu positiv
+					outjmp(rnull, p, jmpeq);				// springe zu positiv
+
 					outmul(slong, regs.whichReg( op2 ), rnull, "const_minusl");	// wert wird positiv
-					
+
 					regs.smallerReg(op2);
-										
+
 					outmul(sint, regs.whichReg( op2 ), rnull, "const_minusw");	// ... und wieder negativ
-					bsm<<p<<":\n";					// setze positivlabel
+					bsm<<p<<":\n";							// setze positivlabel
 				}
-				op2->vtype=schar;		// typ setzen, damit typen von op1 und op2 gleich
+				op2->vtype=schar;						// typ setzen, damit typen von op1 und op2 gleich
 				regs.changeReg( op1, op2 );
 				// Register noch abschneiden
 				outshl(sint, regs.whichReg(op1), rnull, "const_eight");		// kleiner machen
@@ -313,40 +313,40 @@ void Bacom::genAsm()
 					regs.getReg(op1, r);
 					outcvt(slong, regs.whichReg( op1 ), regs.whichReg( op2 ) );
 					regs.freeReg( op2 );
-					
+
 					// checken, ob operand negativ
- 					char* p=convlabelid(true);			// label holen fuer op2=positiv
+					char* p=convlabelid(true);				// label holen fuer op2=positiv
 					outmul(slong, regs.whichReg(op1),rnull, "const_one");	// CC setzen
-					outjmp(rnull, p, jmpgr);			// springe zu positiv
-					outjmp(rnull, p, jmpeq);			// springe zu positiv
-					
+					outjmp(rnull, p, jmpgr);				// springe zu positiv
+					outjmp(rnull, p, jmpeq);				// springe zu positiv
+
 					outmul(slong, regs.whichReg( op1 ), rnull, "const_minusl");	// wert wird positiv
-					
+
 					regs.smallerReg(op1);
-										
+
 					outmul(sint, regs.whichReg( op1 ), rnull, "const_minusw");	// ... und wieder negativ
-					bsm<<p<<":\n";					// setze positivlabel
-					
-					op1->vtype=sint;	// Typ wieder auf int setzen
+					bsm<<p<<":\n";							// setze positivlabel
+
+					op1->vtype=sint;					// Typ wieder auf int setzen
 					bsm<<"// ******** Ende toInt ******** //\n";
 					break;
 				}
 				if (op2->vtype==slong)
 				{
 					// checken, ob operand negativ
- 					char* p=convlabelid(true);			// label holen fuer op2=positiv
+					char* p=convlabelid(true);				// label holen fuer op2=positiv
 					outmul(slong, regs.whichReg(op2),rnull, "const_one");	// CC setzen
-					outjmp(rnull, p, jmpgr);			// springe zu positiv
-					outjmp(rnull, p, jmpeq);			// springe zu positiv
-					
+					outjmp(rnull, p, jmpgr);				// springe zu positiv
+					outjmp(rnull, p, jmpeq);				// springe zu positiv
+
 					outmul(slong, regs.whichReg( op2 ), rnull, "const_minusl");	// wert wird positiv
-					
+
 					regs.smallerReg(op2);
-										
+
 					outmul(sint, regs.whichReg( op2 ), rnull, "const_minusw");	// ... und wieder negativ
-					bsm<<p<<":\n";					// setze positivlabel
+					bsm<<p<<":\n";							// setze positivlabel
 				}
-				op2->vtype=sint;		// typ setzen, damit typen von op1 und op2 gleich
+				op2->vtype=sint;						// typ setzen, damit typen von op1 und op2 gleich
 				regs.changeReg( op1, op2 );
 				bsm<<"// ******** Ende toInt ******** //\n";
 				break;
@@ -357,26 +357,26 @@ void Bacom::genAsm()
 				if (op2->vtype<=sint)		// wenn convert von int/char, dann in ein doppelregister stecken
 				{
 					// checken, ob operand negativ
-					char* p=convlabelid(true);			// label holen fuer op2=positiv
+					char* p=convlabelid(true);				// label holen fuer op2=positiv
 					outmul(sint, regs.whichReg(op2),rnull, "const_one");	// CC setzen
-					outjmp(rnull, p, jmpgr);			// springe zu positiv
-					outjmp(rnull, p, jmpeq);			// springe zu positiv
-					
+					outjmp(rnull, p, jmpgr);				// springe zu positiv
+					outjmp(rnull, p, jmpeq);				// springe zu positiv
+
 					outmul(sint, regs.whichReg( op2 ), rnull, "const_minusw");	// wert wird positiv
-					
+
 					TReg r=regs.whichReg(op2);
 					regs.biggerReg( op2 );
-										
+
 					outmul(slong, regs.whichReg( op2 ), rnull, "const_minusl");	// ... und wieder negativ
-					
+
 					char* n=convlabelid(false);
 					outbra(rnull, n	);				// springe ueber positiv-behandlung
-					
+
 					bsm<<p<<":\n";					// setze positivlabel
-					
+
 					outmov((TReg)(regs.whichReg(op2)+1), rnull);
 					outmov(regs.whichReg(op2), r);
-										
+
 					bsm<<n<<":\n";					// setze negativlabel
 
 					op2->vtype=slong;
@@ -398,26 +398,26 @@ void Bacom::genAsm()
 				if (op2->vtype<=sint)		// wenn convert von int, dann zuerst in ein doppelregister stecken
 				{
 					// checken, ob operand negativ
- 					char* p=convlabelid(true);			// label holen fuer op2=positiv
+					char* p=convlabelid(true);				// label holen fuer op2=positiv
 					outmul(sint, regs.whichReg(op2),rnull, "const_one");	// CC setzen
-					outjmp(rnull, p, jmpgr);			// springe zu positiv
-					outjmp(rnull, p, jmpeq);			// springe zu positiv
-					
+					outjmp(rnull, p, jmpgr);				// springe zu positiv
+					outjmp(rnull, p, jmpeq);				// springe zu positiv
+
 					outmul(sint, regs.whichReg( op2 ), rnull, "const_minusw");	// wert wird positiv
-					
+
 					TReg r=regs.whichReg(op2);
 					regs.biggerReg( op2 );
-										
+
 					outmul(slong, regs.whichReg( op2 ), rnull, "const_minusl");	// ... und wieder negativ
-					
+
 					char* n=convlabelid(false);
 					outbra(rnull, n	);				// springe ueber positiv-behandlung
-					
+
 					bsm<<p<<":\n";					// setze positivlabel
-					
+
 					outmov((TReg)(regs.whichReg(op2)+1), rnull);
 					outmov(regs.whichReg(op2), r);
-										
+
 					bsm<<n<<":\n";					// setze negativlabel
 				}
 				// danach convert zu float
@@ -529,7 +529,7 @@ void Bacom::genAsm()
 
 		bsm<<" "<<icl.getVal(i)<<endl;
 	}
-	
+
 	bsm << "stp\n";
 	bsm << "const_minusw:\tdc.w -1\n";
 	bsm << "const_minusl:\tdc.l -1\n";
@@ -807,11 +807,11 @@ char* Bacom::concat(char* pre, unsigned numb)
 	return c;
 }
 
-char* Bacom::convlabelid(bool pos)
+char* Bacom::convlabelid(bool pos)		// liefert ein Label fuer die Convert-Funktionalitaet
 {
 	char* n = (char*)malloc(VAR_LENGTH_ID);
 	strcpy(n,(pos)?"poslabel":"neglabel");
 	sprintf (n+8,"%u",convlabelcount++);
-	
+
 	return n;
 }
