@@ -179,9 +179,9 @@ if(n != 0)
                                           if (c==0) 
                                           {
                                             c = s.top(); 
-                                            s.pop(1);
+                                            //s.pop(1);
                                             ret = stype.toptype();
-                                            stype.pop(1); 
+                                            //stype.pop(1); 
                                             //ins(fl.nextId());    <<---  Der "ich-habe-zwei-stunden-danach-gesucht"-Bug
                                           }
                                           
@@ -211,7 +211,7 @@ if(n != 0)
                                             exit(-1);
                                           }
                                           fl.insert(c, sig-num, ret, num, proto, maxsp, func_constants, func_constants+1);
-                                          icl.insert((int)maxsp, func_constants++);
+                                          icl.insert((int)align(maxsp,4), func_constants++);
                                           icl.insert((int)num, func_constants++);
                                           
                                           proto = false;

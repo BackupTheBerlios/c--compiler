@@ -48,6 +48,7 @@ unsigned getSigConstant(unsigned);
 void setMainFunc(unsigned i) { mainfunc = i; }
 unsigned getMainFunc() { return mainfunc; }
 
+
 private:
 	
 	struct TFunctionListEntry* last;

@@ -243,7 +243,8 @@ enum	TOpType {
     intin,
     charin,
     longin,
-    floatin
+    floatin,
+    stop
 };
 
 enum TJmp {

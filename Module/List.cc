@@ -245,6 +245,11 @@ void List::out()
 			case floatin:
 			cout<<"floatin";
 			break;
+			
+			case stop:
+			cout<<"stop";
+			break;
+			
 		}
 		
 		for (int i=0;i<3;i++)

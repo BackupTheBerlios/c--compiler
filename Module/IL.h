@@ -68,6 +68,8 @@ private:
 	
 	void outio(TOpType, TOperand*);			// fuer Eingabe
 	
+	void outstop();
+	
 	TType checkConvAssign(TOperand*&, TOperand*&);
 	
 	TType checkConv(TOperand*&, TOperand*&);

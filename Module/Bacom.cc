@@ -93,14 +93,11 @@ void Bacom::genAsm()
 			// Lokales Frame abräumen
 			outadd(sint, rsp, rnull, concat("iconst_", fl.getFrameConstant(op2->no)) );
 			
-			//Rueckgabewert
+			// Rueckgabewert einschreiben
 			if (op1!=0)
 			{
-				
 				TReg r = regs.whichReg(op1);
-				int offs;
-				if (op1->vtype>=slong) offs = -16; else offs = -14;
-				outstr(op1->vtype, r, rsp, offs);
+				outstr(op1->vtype, r, rsp, 36);
 			}
 			
 			// Register wiederherstellen
@@ -207,8 +204,11 @@ void Bacom::genAsm()
 		case call_:
 			{
 				// Parameter liegen schon auf dem Stack
-				// Also: Rücksprungadresse sichern
 				
+				// Platz machen für Rückgabewert
+				outsub(sint, rsp, rnull, "const_four");
+				
+				// Rücksprungadresse sichern
 				outlic(rglobal, rnull);  // Instruction counter laden
 				outadd(sint, rglobal, rnull, "const_lic"); // offset dazuaddieren
 				outstr(sint, rglobal, rsp, 0); // auf den stack
@@ -220,15 +220,10 @@ void Bacom::genAsm()
 				// in rnull steht jetzt noch die rücksprungadresse!
 				outsub(sint, rnull, rnull);
 				
-				// stackpointer muss auch noch zurückgeschoben werden:
-				TType ret = fl.getReturnType(op1->no);
-				if ((ret==slong)||(ret==sfloat)) outadd(sint, rsp, rnull, "const_four");
-				else if (ret<slong) outadd(sint, rsp, rnull, "const_two");
-				//else outadd(sint, rsp, rnull, "const_two"); //void
+				// sp auf rückgabewert schieben
+				outadd(sint, rsp, rnull, "const_four");
 				
 				// Jetzt steht an sp der Rückgabewert --> weitere Behandlung bei getRet
-				
-				// fertig
 				
 				break;
 			}
@@ -242,8 +237,8 @@ void Bacom::genAsm()
 				TReg r;
 				// spillcode fehlt noch
 				regs.getReg(op1, r);
-				cout<<"getretstr: "<<op1->vtype<<endl;
-				outstr(op1->vtype, r, rsp, 0); 
+				//cout<<"getretstr: "<<op1->vtype<<endl;
+				outloa(op1->vtype, r, rsp, 0); 
 
 				break;
 			}
@@ -369,6 +364,11 @@ void Bacom::genAsm()
 				out_in(sfloat, regs.whichReg( op1 ));
 				break;
 			}
+		case stop:
+			{
+				bsm<<"stp\n";
+				break;
+			}
 		default:
 			{
 				cout << "[bacom] noch nicht implementiert\n";
@@ -414,7 +414,7 @@ void Bacom::genAsm()
 	bsm << "const_two:  dc.w 2 \n";
 	bsm << "const_four:  dc.w 4 \n";
 	bsm << "const_six:  dc.w 6 \n";
-	bsm << "const_stack:  dc.w 65534 \n";  // Startwert Stackpointer
+	bsm << "const_stack:  dc.w 32764 \n";  // Startwert Stackpointer
 	bsm << "const_global:  dc.w 10000 \n";  // Startwert globale variablen
 	bsm << "const_lic:  dc.w 22 \n";  // rücksprungoffset zur lic anweisung
 

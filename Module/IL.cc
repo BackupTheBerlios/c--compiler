@@ -53,7 +53,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 					if (func)
 					{
 						func = false;
-						outlabel(funcident);
+						/*if (!fl.isProto(idx))*/ outlabel(funcident);
 					}
 				}
 				else
@@ -479,7 +479,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case FUNC_START:
 			{
-				if (firstfunc) { outgoto(mainfunc, true); firstfunc=false; }
+				if (firstfunc) { outgoto(mainfunc, true); outstop(); firstfunc=false; }
 				func = true;
 				break;
 			}
@@ -955,5 +955,13 @@ void IL::outio(TOpType type, TOperand* p)
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=type;
 	op->operand1=p;
+	ilList.append(op);
+}
+
+void IL::outstop()
+{
+	struct TOp* op=(TOp*)malloc(sizeof(TOp));
+	op->TOpType=stop;
+	op->operand1=0;
 	ilList.append(op);
 }
