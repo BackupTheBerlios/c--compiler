@@ -1,0 +1,8 @@
+#!/bin/sh
+scrun -nodes=8,group=h0 bin/tacolife
+
+if [ -z "`diff --brief bin/test.result bin/test.result_100`" ]; then
+    echo "diff successful!";
+else
+    echo "diff failed!";
+fi
