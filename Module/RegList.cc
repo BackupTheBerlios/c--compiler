@@ -46,7 +46,6 @@ bool RegList::del (struct TOperand* op)
 			}
 			prev=curr->next;
 			return true;
-			// todo: Speicher wieder frei geben
 		}
 		prev=curr;
 		curr=curr->next;

@@ -203,11 +203,6 @@ void Bacom::genAsm()
 					outmul(sfloat, regs.whichReg( op1 ), rnull, "const_minusf");
 				break;
 			}
-		case splus_:
-			{
-				cout << "[bacom] splus noch nicht implementiert\n";
-				break;
-			}
 		case call_:
 			{
 				// Parameter liegen schon auf dem Stack
