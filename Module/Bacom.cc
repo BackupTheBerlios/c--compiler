@@ -319,7 +319,25 @@ void Bacom::genAsm()
 			}
 		case intout:
 			{
-				outintout(regs.whichReg( op2 ));
+				out_out(sint, regs.whichReg( op2 ));
+				regs.changeReg( op1, op2);
+				break;
+			}
+		case charout:
+			{
+				out_out(schar, regs.whichReg( op2 ));
+				regs.changeReg( op1, op2);
+				break;
+			}
+		case longout:
+			{
+				out_out(slong, regs.whichReg( op2 ));
+				regs.changeReg( op1, op2);
+				break;
+			}
+		case floatout:
+			{
+				out_out(sfloat, regs.whichReg( op2 ));
 				regs.changeReg( op1, op2);
 				break;
 			}
@@ -564,9 +582,18 @@ void Bacom::outlic(TReg r, TReg s, int offs)
 	bsm<<"lic.w "<<Register::toString(r)<<", "<<Register::toString(s)<<"+"<<offs<<endl;
 }
 
-void Bacom::outintout(TReg r)
+void Bacom::out_out(TType type, TReg r)
 {
-	bsm<<"out.w "<<Register::toString(r)<<endl;
+	bsm << "out.";
+	if ( type == sint )
+		bsm << "w ";
+	else if ( type == schar )
+		bsm << "b ";
+	else if ( type == slong )
+		bsm << "l ";
+	else if ( type == sfloat )
+		bsm << "f ";
+	bsm<<Register::toString(r)<<endl;
 }
 
 char* Bacom::concat(char* pre, unsigned numb)

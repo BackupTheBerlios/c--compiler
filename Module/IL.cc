@@ -409,30 +409,36 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				op.push(p);
 				break;
 			}
-/*			case FUNCTION_CALL_CHAR_OUT:
+			case FUNCTION_CALL_CHAR_OUT:
 			{
 				TOperand* m = op.topOp();
 				TOperand* p = tempid(schar);
-				outio(charout, p, m);
 				op.pop(1);
+				checkConvAssign(m, p);
+				outio(charout, p, m);
+				op.push(p);
 				break;
 			}
 			case FUNCTION_CALL_LONG_OUT:
 			{
 				TOperand* m = op.topOp();
 				TOperand* p = tempid(slong);
-				outio(longout, p, m);
 				op.pop(1);
+				checkConvAssign(m, p);
+				outio(longout, p, m);
+				op.push(p);
 				break;
 			}
 			case FUNCTION_CALL_FLOAT_OUT:
 			{
 				TOperand* m = op.topOp();
 				TOperand* p = tempid(sfloat);
-				outio(floatout, p, m);
 				op.pop(1);
+				checkConvAssign(m, p);
+				outio(floatout, p, m);
+				op.push(p);
 				break;
-			}*/
+			}
 			case FUNC_START:
 			{
 				func = true;
