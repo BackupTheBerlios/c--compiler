@@ -538,12 +538,16 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				outlabel(label.topOp());
 				label.pop(1);
 				label.push(labelid());
-				TOperand* temp=tempid(slong);
-				TOperand* src=op.topOp();
+				
+				TOperand* src = op.topOp();
 				op.pop(1);
-				TOperand* dst=op.topOp();
+				TOperand* dst = op.topOp();
+				op.pop(1);
+				TType tt = checkConv(src,dst);
+				TOperand* temp = tempid(tt);
 				
 				outbin(temp,src,sub,dst);
+				op.push(temp);
 				outjump(temp,label.topOp(),jmpne);
 				break;
 			}
