@@ -1,6 +1,7 @@
 #ifndef BOARDSERVER_H
 #define BOARDSERVER_H
 
+#include "X/XWindow.h"
 #include "board/Board.h"
 #include "net/IPAddress.h"
 #include "net/IPNetwork.h"
