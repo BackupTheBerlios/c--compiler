@@ -162,6 +162,23 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				outjump(label.top());
 				break;
 			}
+			case WHILE_COND:
+			{
+				char* e=labelid();
+				label.push(e);
+				outlabel(e);
+				break;
+			}
+			case WHILE:
+			{
+				char* label_end=label.top();
+				label.pop(1);
+				char* label_begin=label.top();
+				label.pop(1);
+				outjump(label_begin);
+				outlabel(label_end);
+				break;
+			}
 			case INIT_PART:
 			{
 				char* dst = lastident;
@@ -319,7 +336,7 @@ void IL::outgoto(char* label, bool call)
 
 void IL::outlabel(char* label)
 {
-	cout<<"\n"<<label<<":\n";
+	cout<<label<<":\n";
 }
 
 void IL::outjump(char* jmp)
