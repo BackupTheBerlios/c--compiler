@@ -170,8 +170,3 @@ unsigned ConstList::getCount()
 {
 	return nmb;
 }
-
-// unsigned ConstList::getVal(i)
-// {
-// 	return nmb;
-// }
