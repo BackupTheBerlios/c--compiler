@@ -30,15 +30,18 @@ TReg Register::getReg(TOperand* temp, TReg& r)
 				break;
 			}
 		}
+		if (temp->vtype>=slong && i%2==1)
+			continue;				// wenn 4 byte verarbeitungsbreite werden nur gerade register vergeben!
 		if (reglist[i].mark<minmark)
 		{
 			minpos = i;
 			minmark = reglist[i].mark;
 		}
 	}
-	if (!found) i = minpos;
-	// was mach ich, wenn kein register mehr frei ist? ->wuerde zu fehler fuehren
-	// todo: spillcode einfuegen
+	if (!found) {
+		i = minpos;				// ->wurde lange nicht mehr benutzt, wird ausgelagert
+		spillreglist.append(reglist[i].var, (TReg)i);	// wenn kein register mehr frei ->am laengsten nicht mehr benutztes wird ausgelagert
+	}
 	reglist[i].var = temp;
 	reglist[i].mark = mark++;
 	if (temp->vtype>=slong)
@@ -46,8 +49,9 @@ TReg Register::getReg(TOperand* temp, TReg& r)
 		reglist[i+1].var = temp;
 		reglist[i+1].mark = mark;
 	}
+	if (i>=regusable) cout<<"Register "<<i<<" wurde vergeben!\n";
 	r = (TReg)i;
-	return (found?unknown:(TReg)i);
+	return (TReg)i;
 }
 
 void Register::freeReg(TOperand* temp)
@@ -66,7 +70,8 @@ void Register::freeReg(TOperand* temp)
 			return;
 		}
 	}
-	cout<<"freeReg() error\n";
+	if (!spillreglist.del(temp))		// evt. noch ausgelagert, muss auch geloescht werden, Fehler, wenn auch dort nicht vorhanden
+		cout<<"freeReg() error\n";
 }
 
 void Register::changeReg(TOperand* dest, TOperand* src)		// Register wird von op2 auf op1 geaendert
@@ -86,7 +91,11 @@ void Register::changeReg(TOperand* dest, TOperand* src)		// Register wird von op
 			return;
 		}
 	}
-	cout<<"changeReg() error: Register not found!\n";
+	char* label=spillreglist.where(src);
+	if (!spillreglist.del(src))		// evt ausgelagert, dort loeschen
+		cout<<"changeReg() error: Register not found!\n";
+	else
+		spillreglist.append(dest,label);	// ... und neuen operanden einfuegen
 }
 
 void Register::biggerReg(TOperand* op)
@@ -114,15 +123,14 @@ void Register::biggerReg(TOperand* op)
 					reglist[i].var = 0;
 					reglist[i].mark = 0;
 					bsm<<"mov.w\tr"<<j+1<<", r"<<rnull<<endl;	// oberes Register wird null gesetzt
-					bsm<<"mov.w\tr"<<j<<", r"<<i<<endl;	// außerdem muß noch das alte kleine Register ins niederwertige neue verschoben werden
+					bsm<<"mov.w\tr"<<j<<", r"<<i<<endl;		// außerdem muß noch das alte kleine Register ins niederwertige neue verschoben werden
 					return;
 				}
 			}
-			cout<<"biggerReg() error - no Reg free!\n";
 		}
 	}
-	// todo: spillcode einfuegen
-	cout<<"biggerReg() error - op not found!\n";
+	if (!spillreglist.isValid(op))		// pruefen, ob operand ausgelagert ist
+		cout<<"biggerReg() error - op not found!\n";
 	return;
 }
 
@@ -142,7 +150,9 @@ void Register::smallerReg(TOperand* op)
 			cout<<"smallerReg() error\n";
 		}
 	}
-	cout<<"smallerReg() error - op not found!\n";
+	if (!spillreglist.isValid(op))		// pruefen, ob operand ausgelagert ist
+		cout<<"smallerReg() error - op not found!\n";
+	return;
 }
 
 TReg Register::whichReg(TOperand* temp)
@@ -155,6 +165,22 @@ TReg Register::whichReg(TOperand* temp)
 			return (TReg)i;
 		}
 	}
+// 	cout<<"Register::whichReg ->Operand nicht in Registern vorhanden!\n";
+	if (spillreglist.isValid(temp))		// pruefen, ob operand ausgelagert ist
+	{
+		TReg r;
+		getReg(temp,r);			// einlagern
+		bsm<<"// Spillcode: Einlagern"<<endl;
+		bsm<<"loa.";
+		if (temp->vtype==schar) bsm<<"b";
+		else if (temp->vtype==sint) bsm<<"w";
+		else if (temp->vtype==slong) bsm<<"l";
+		else if (temp->vtype==sfloat) bsm<<"f";
+		bsm<<"\tr"<<r<<", r"<<rnull<<" + "<<spillreglist.where(temp)<<endl;
+		spillreglist.del(temp);
+		return r;
+	}
+	cout<<"Register::whichReg error!\n";
 	return unknown;
 }
 
@@ -171,7 +197,7 @@ void Register::out()
 
 char* Register::toString(TReg r)
 {
-	if (r>regmax-1) cout<<" Registerfehler";
+	if (r>regmax-1) cout<<"Registerfehler!\n";
 	char* n = (char*)malloc(3);
 	strcpy(n,"r");
 	sprintf (n+1,"%u",r);
@@ -193,4 +219,5 @@ void Register::invalidate()
 		reglist[i].var = 0;
 		reglist[i].mark = 0;
 	}
+	spillreglist.invalidate();
 }

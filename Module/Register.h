@@ -1,12 +1,13 @@
 #ifndef register_h
 #define register_h
 #include "OTypes.h"
+#include "RegList.h"
 #include <iostream>
 #include <fstream>
 using namespace std;
 
 #define regmax 16     // Gesamtanzahl der Register
-#define regusable 13  // Anzahl frei nutzbarer Register
+#define regusable 12  // Anzahl frei nutzbarer Register
 
 extern ofstream bsm;
 
@@ -54,7 +55,7 @@ private:
 
 TRegEntry reglist[regmax];
 unsigned mark;
-
+RegList spillreglist;
 
 };
 #endif

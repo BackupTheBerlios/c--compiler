@@ -28,6 +28,7 @@ IL il;
 List ilList;
 Bacom bc;
 ofstream bsm;
+ofstream spilldata;
 
 
 int main(int argc, char* arv[])
@@ -70,6 +71,7 @@ int main(int argc, char* arv[])
 	
 	
 	bsm.open(ofile);
+	spilldata.open("spill");
 	yyin = fopen(ifile,"r+");
 	
 	yyparse();
@@ -86,6 +88,13 @@ int main(int argc, char* arv[])
 	bc.genAsm();
 	cout<<"\n[bacom] OK\n";
 	bsm.close();
+	spilldata.close();
+	
+	char* f = (char*)malloc(50);
+	strcpy(f, "cat spill>>");
+	strcpy(f+11, ofile);
+	system(f);
+	
 	if (basm)
 	{
 		char* f = (char*)malloc(50);
