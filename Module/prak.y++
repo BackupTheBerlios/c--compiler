@@ -1,0 +1,444 @@
+%{
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+#include "OTypes.h"
+
+using namespace std;
+
+
+
+int yyerror(char*);
+extern int yylex();
+
+struct TNode* createNewNode(struct TNode* n1, struct TNode* n2, struct TNode* n3, struct TNode* n4, struct TNode* n5, int type);
+
+void out(struct TNode* n);
+void gen(unsigned);
+
+#define output
+struct TNode* root;
+
+// Speicher für traversierten Syntaxbaum
+unsigned* pos = (unsigned*)malloc(8096);
+unsigned* start = pos;
+
+%}
+
+%union 
+{
+  struct TNode* nodep;
+};
+
+%type <nodep> program decl_st decl struct_decl var_decl_st var_part_st var_part_all_st var_decl 
+%type <nodep> def_part struct_part base_type var_part var_part_all var_ident dim_st
+%type <nodep> array_part dim init_part constant unsigned_constant char_constant
+%type <nodep> int_constant complex_constant_opt complex_constant_st complex_constant
+%type <nodep> func_decl prototype ret_type func_ident par_type_st par_type implementation
+%type <nodep> par_decl_st par_decl par_ident block stm_st stm empty expr break return if
+%type <nodep> cond switch case_st case case_label while compound expression_st expression
+%type <nodep> equality relation shift add_sub mult_div primitive operand variable
+%type <nodep> qualifying function_call epsilon float_constant
+
+%token <nodep> ident numb_lit char_lit float_lit
+%token <nodep> _struct _char _int _long _float _break _return _if _else _switch _case _default _while _void _gl _ngl _klgl _grgl _shl _shr
+
+%left '+' '-'
+%left '*' '/' '%'
+
+%nonassoc _if
+%nonassoc _else
+
+%start program
+
+%%
+epsilon:                /*empty*/                                       { $$ = createNewNode(0,0,0,0,0,EPSILON);}
+        ;
+program:                decl_st                                         { $$ = createNewNode($1,0,0,0,0,PROGRAM);
+                                                                          root = $$;
+                                                                          #ifdef output 
+                                                                          out($$); 
+                                                                          #endif
+                                                                          return 0;
+                                                                        }
+        ;
+decl_st:                decl                                            { $$ = createNewNode($1,0,0,0,0,DECL_ST_1);}
+        |               decl decl_st                                    { $$ = createNewNode($1,$2,0,0,0,DECL_ST_2);}
+        ;       
+decl:                   struct_decl                                     { $$ = createNewNode($1,0,0,0,0,DECL);}
+        |               var_decl                                        { $$ = createNewNode($1,0,0,0,0,DECL);}
+        |               func_decl                                       { $$ = createNewNode($1,0,0,0,0,DECL);}
+        ;
+struct_decl:            _struct ident '{' var_decl_st '}' ';'           { $$ = createNewNode($2,$4,0,0,0,STRUCT_DECL);}
+        ;
+var_decl_st:            epsilon                                         { $$ = createNewNode($1,0,0,0,0,VAR_DECL_ST_1);}
+        |               var_decl var_decl_st                            { $$ = createNewNode($1,$2,0,0,0,VAR_DECL_ST_2);}
+        ;
+var_part_st:            var_part                                        { $$ = createNewNode($1,0,0,0,0,VAR_PART_ST_1);}
+        |               var_part ',' var_part_all_st                    { $$ = createNewNode($1,$3,0,0,0,VAR_PART_ST_2);}
+        ;
+
+var_part_all_st:        var_part_all                                    { $$ = createNewNode($1,0,0,0,0,VAR_PART_ALL_ST_1);}
+        |               var_part_all ',' var_part_all_st                { $$ = createNewNode($1,$3,0,0,0,VAR_PART_ALL_ST_2);}
+        ;
+
+
+var_decl:               base_type var_part_st ';'                       { $$ = createNewNode($1,$2,0,0,0,VAR_DECL_1);}
+        |               def_part ';'                                    { $$ = createNewNode($1,0,0,0,0,VAR_DECL_2);}
+        |               def_part ',' var_part_all_st ';'                { $$ = createNewNode($1,$3,0,0,0,VAR_DECL_3);}
+        |               struct_part var_part_all_st ';'                 { $$ = createNewNode($1,$2,0,0,0,VAR_DECL_4);}
+        ;
+        
+def_part:               base_type ident                                 { $$ = createNewNode($1,$2,0,0,0,DEF_PART);}
+        ;
+
+struct_part:            _struct ident                                   { $$ = createNewNode($2,0,0,0,0,STRUCT_PART);}
+        ;
+
+base_type:              _char                                           { $$ = createNewNode($1,0,0,0,0,BASE_TYPE);}
+        |               _int                                            { $$ = createNewNode($1,0,0,0,0,BASE_TYPE);}
+        |               _long                                           { $$ = createNewNode($1,0,0,0,0,BASE_TYPE);}
+        |               _long _int                                      { $$ = createNewNode($1,0,0,0,0,BASE_TYPE);}
+        |               _float                                          { $$ = createNewNode($1,0,0,0,0,BASE_TYPE);}
+        ;
+var_part:               var_ident array_part                            { $$ = createNewNode($1,$2,0,0,0,VAR_PART_1);}
+        |               var_ident init_part                             { $$ = createNewNode($1,$2,0,0,0,VAR_PART_1);}
+        |               var_ident array_part init_part                  { $$ = createNewNode($1,$2,$3,0,0,VAR_PART_2);}
+        ;
+
+var_part_all:           var_ident                                       { $$ = createNewNode($1,0,0,0,0,VAR_PART_ALL_1);}
+        |               var_ident array_part                            { $$ = createNewNode($1,$2,0,0,0,VAR_PART_ALL_2);}
+        |               var_ident init_part                             { $$ = createNewNode($1,$2,0,0,0,VAR_PART_ALL_2);}
+        |               var_ident array_part init_part                  { $$ = createNewNode($1,$2,$3,0,0,VAR_PART_ALL_3);}
+        ;
+
+var_ident:              ident                                           { $$ = createNewNode($1,0,0,0,0,VAR_IDENT);}
+        ;
+dim_st:                 dim                                             { $$ = createNewNode($1,0,0,0,0,DIM_ST_1);}
+        |               dim ',' dim_st                                  { $$ = createNewNode($1,$3,0,0,0,DIM_ST_2);}
+        ;
+array_part:             '[' dim_st ']'                                  { $$ = createNewNode($2,0,0,0,0,ARRAY_PART);}
+        ;
+dim:                    numb_lit                                        { $$ = createNewNode($1,0,0,0,0,DIM);}
+        ;
+init_part:              '=' constant                                    { $$ = createNewNode($2,0,0,0,0,INIT_PART);}
+        |               '=' complex_constant                            { $$ = createNewNode($2,0,0,0,0,INIT_PART);}
+        ;
+constant:               unsigned_constant                               { $$ = createNewNode($1,0,0,0,0,CONSTANT_1);}
+        |               '+' int_constant                                { $$ = createNewNode($2,0,0,0,0,CONSTANT_2);}
+        |               '+' float_constant                              { $$ = createNewNode($2,0,0,0,0,CONSTANT_2);}
+        |               '-' int_constant                                { $$ = createNewNode($2,0,0,0,0,CONSTANT_3);}
+        |               '-' float_constant                              { $$ = createNewNode($2,0,0,0,0,CONSTANT_3);}
+        ;
+unsigned_constant:      char_constant                                   { $$ = createNewNode($1,0,0,0,0,UNSIGNED_CONSTANT);}
+        |               int_constant                                    { $$ = createNewNode($1,0,0,0,0,UNSIGNED_CONSTANT);}
+        |               float_constant                                  { $$ = createNewNode($1,0,0,0,0,UNSIGNED_CONSTANT);}
+        ;
+char_constant:          char_lit                                        { $$ = createNewNode($1,0,0,0,0,CHAR_CONSTANT);}
+        ;
+int_constant:           numb_lit                                        { $$ = createNewNode($1,0,0,0,0,INT_CONSTANT);}
+        ;
+float_constant:		float_lit					{ $$ = createNewNode($1,0,0,0,0,FLOAT_CONSTANT);}
+	;
+complex_constant_opt:   ',' constant                                    { $$ = createNewNode($2,0,0,0,0,COMPLEX_CONSTANT_OPT);}
+        |               ',' complex_constant                            { $$ = createNewNode($2,0,0,0,0,COMPLEX_CONSTANT_OPT);}
+        ;
+complex_constant_st:    complex_constant_opt                            { $$ = createNewNode($1,0,0,0,0,COMPLEX_CONSTANT_ST_1);}
+        |               complex_constant_opt complex_constant_st        { $$ = createNewNode($1,$2,0,0,0,COMPLEX_CONSTANT_ST_2);}
+        ;
+complex_constant:       '{' constant complex_constant_st '}'            { $$ = createNewNode($2,$3,0,0,0,COMPLEX_CONSTANT_1);}
+        |               '{' complex_constant_st '}'                     { $$ = createNewNode($2,0,0,0,0,COMPLEX_CONSTANT_2);}
+        ;
+func_decl:              prototype                                       { $$ = createNewNode($1,0,0,0,0,FUNC_DECL);}
+        |               implementation                                  { $$ = createNewNode($1,0,0,0,0,FUNC_DECL);}
+        ;
+prototype:              ret_type func_ident '(' ')' ';'                 { $$ = createNewNode($1,$2,0,0,0,PROTOTYPE_1);}
+        |               ret_type func_ident '(' par_type_st ')' ';'     { $$ = createNewNode($1,$2,$4,0,0,PROTOTYPE_2);}
+        |               struct_part func_ident '(' ')' ';'              { $$ = createNewNode($1,$2,0,0,0,PROTOTYPE_3);}
+        |               struct_part func_ident '(' par_type_st ')' ';'  { $$ = createNewNode($1,$2,$4,0,0,PROTOTYPE_4);}
+        |               def_part '(' ')' ';'                            { $$ = createNewNode($1,0,0,0,0,PROTOTYPE_5);}
+        |               def_part '(' par_type_st ')' ';'                { $$ = createNewNode($1,$3,0,0,0,PROTOTYPE_6);}
+        ;       
+ret_type:               _void                                           { $$ = createNewNode($1,0,0,0,0,RET_TYPE);}
+        ;
+        
+func_ident:             ident                                           { $$ = createNewNode($1,0,0,0,0,FUNC_IDENT);}
+        ;
+par_type_st:            par_type                                        { $$ = createNewNode($1,0,0,0,0,PAR_TYPE_ST_1);}
+        |               par_type ',' par_type_st                        { $$ = createNewNode($1,$3,0,0,0,PAR_TYPE_ST_2);}
+        ;
+par_type:               base_type                                       { $$ = createNewNode($1,0,0,0,0,PAR_TYPE_1);}
+        |               _struct ident                                   { $$ = createNewNode($2,0,0,0,0,PAR_TYPE_2);}
+        ;
+implementation:         ret_type func_ident '(' ')' block                               { $$ = createNewNode($1,$2,$5,0,0,IMPLEMENTATION_1);}
+        |               ret_type func_ident '(' par_decl par_decl_st ')' block          { $$ = createNewNode($1,$2,$4,$5,$7,IMPLEMENTATION_2);}
+        |               struct_part func_ident '(' ')' block                            { $$ = createNewNode($1,$2,$5,0,0,IMPLEMENTATION_3);}
+        |               struct_part func_ident '(' par_decl par_decl_st ')' block       { $$ = createNewNode($1,$2,$4,$5,$7,IMPLEMENTATION_4);}
+        |               def_part '(' ')' block                                          { $$ = createNewNode($1,$4,0,0,0,IMPLEMENTATION_5);}
+        |               def_part '(' par_decl par_decl_st ')' block                     { $$ = createNewNode($1,$3,$4,$6,0,IMPLEMENTATION_6);}
+        ;
+        
+par_decl_st:            epsilon                                         { $$ = createNewNode($1,0,0,0,0,PAR_DECL_ST_1);}
+        |               ',' par_decl par_decl_st                        { $$ = createNewNode($2,$3,0,0,0,PAR_DECL_ST_2);}
+        ;
+par_decl:               par_type par_ident                              { $$ = createNewNode($1,$2,0,0,0,PAR_DECL);}
+        ;
+par_ident:              ident                                           { $$ = createNewNode($1,0,0,0,0,PAR_IDENT);}
+        ;
+block:                  '{' var_decl_st stm_st '}'                      { $$ = createNewNode($2,$3,0,0,0,BLOCK);}
+        ;
+stm_st:                 epsilon                                         { $$ = createNewNode($1,0,0,0,0,STM_ST_1);}
+        |               stm stm_st                                      { $$ = createNewNode($1,$2,0,0,0,STM_ST_2);}
+        ;
+stm:                    empty                                           { $$ = createNewNode($1,0,0,0,0,STM);}
+        |               expr                                            { $$ = createNewNode($1,0,0,0,0,STM);}
+        |               break                                           { $$ = createNewNode($1,0,0,0,0,STM);}
+        |               return                                          { $$ = createNewNode($1,0,0,0,0,STM);}
+        |               if                                              { $$ = createNewNode($1,0,0,0,0,STM);}
+        |               switch                                          { $$ = createNewNode($1,0,0,0,0,STM);}
+        |               while                                           { $$ = createNewNode($1,0,0,0,0,STM);}
+        |               compound                                        { $$ = createNewNode($1,0,0,0,0,STM);}
+        ;
+empty:                  ';'                                             { $$ = createNewNode(0,0,0,0,0,EMPTY);}
+        ;
+expr:                   expression ';'                                  { $$ = createNewNode($1,0,0,0,0,EXPR);}
+        ;
+break:                  _break ';'                                      { $$ = createNewNode(0,0,0,0,0,BREAK);}
+        ;
+return:                 _return ';'                                     { $$ = createNewNode(0,0,0,0,0,RETURN_1);}
+        |               _return expression ';'                          { $$ = createNewNode($2,0,0,0,0,RETURN_2);}
+        ;
+if:                     _if '(' cond ')' stm %prec _if                  { $$ = createNewNode($3,$5,0,0,0,IF_1);}
+        |               _if '(' cond ')' stm _else stm                  { $$ = createNewNode($3,$5,$7,0,0,IF_2);}
+        ;
+cond:                   expression                                      { $$ = createNewNode($1,0,0,0,0,COND);}
+        ;
+switch:                 _switch '(' cond ')' '{' case case_st '}'       { $$ = createNewNode($3,$6,$7,0,0,SWITCH);}
+        ;
+case_st:                epsilon                                         { $$ = createNewNode($1,0,0,0,0,CASE_ST_1);}
+        |               case case_st                                    { $$ = createNewNode($1,$2,0,0,0,CASE_ST_2);}
+        ;
+case:                   case_label ':' stm stm_st                       { $$ = createNewNode($1,$3,$4,0,0,CASE);}
+        ;
+case_label:             _case char_constant                             { $$ = createNewNode($2,0,0,0,0,CASE_LABEL_1);}
+        |               _case int_constant                              { $$ = createNewNode($2,0,0,0,0,CASE_LABEL_1);}
+        |               _default                                        { $$ = createNewNode(0,0,0,0,0,CASE_LABEL_2);}
+        ;
+while:                  _while '(' cond ')' stm                         { $$ = createNewNode($3,$5,0,0,0,WHILE);}
+        ;
+compound:               '{' var_decl_st stm_st '}'                      { $$ = createNewNode($2,$3,0,0,0,COMPOUND);}
+        ;
+expression_st:          epsilon                                         { $$ = createNewNode($1,0,0,0,0,EXPRESSION_ST_1);}
+        |               ',' expression expression_st                    { $$ = createNewNode($2,$3,0,0,0,EXPRESSION_ST_2);}
+        ;
+expression:             equality                                        { $$ = createNewNode($1,0,0,0,0,EXPRESSION_1);}
+        |               variable '=' expression                         { $$ = createNewNode($1,$3,0,0,0,EXPRESSION_2);}
+        ;
+equality:               relation                                        { $$ = createNewNode($1,0,0,0,0,EQUALITY_1);}
+        |               equality _gl relation                           { $$ = createNewNode($1,$3,0,0,0,EQUALITY_2);}
+        |               equality _ngl relation                          { $$ = createNewNode($1,$3,0,0,0,EQUALITY_3);}
+        ;
+relation:               shift                                           { $$ = createNewNode($1,0,0,0,0,RELATION_1);}
+        |               relation '<' shift                              { $$ = createNewNode($1,$3,0,0,0,RELATION_2);}
+        |               relation '>' shift                              { $$ = createNewNode($1,$3,0,0,0,RELATION_3);}
+        |               relation _klgl shift                            { $$ = createNewNode($1,$3,0,0,0,RELATION_4);}
+        |               relation _grgl shift                            { $$ = createNewNode($1,$3,0,0,0,RELATION_5);}
+        ;
+shift:                  add_sub                                         { $$ = createNewNode($1,0,0,0,0,SHIFT_1);}
+        |               shift _shl add_sub                              { $$ = createNewNode($1,$3,0,0,0,SHIFT_2);}
+        |               shift _shr add_sub                              { $$ = createNewNode($1,$3,0,0,0,SHIFT_3);}
+        ;
+add_sub:                mult_div                                        { $$ = createNewNode($1,0,0,0,0,ADD_SUB_1);}
+        |               add_sub '+' mult_div                            { $$ = createNewNode($1,$3,0,0,0,ADD_SUB_2);}
+        |               add_sub '-' mult_div                            { $$ = createNewNode($1,$3,0,0,0,ADD_SUB_3);}
+        ;
+mult_div:               primitive                                       { $$ = createNewNode($1,0,0,0,0,MULT_DIV_1);}
+        |               mult_div '*' primitive                          { $$ = createNewNode($1,$3,0,0,0,MULT_DIV_2);}
+        |               mult_div '/' primitive                          { $$ = createNewNode($1,$3,0,0,0,MULT_DIV_3);}
+        |               mult_div '%' primitive                          { $$ = createNewNode($1,$3,0,0,0,MULT_DIV_4);}
+        ;
+primitive:              operand                                         { $$ = createNewNode($1,0,0,0,0,PRIMITIVE_1);}
+        |               '+' operand                                     { $$ = createNewNode($2,0,0,0,0,PRIMITIVE_2);}
+        |               '-' operand                                     { $$ = createNewNode($2,0,0,0,0,PRIMITIVE_3);}
+        |               '(' expression ')'                              { $$ = createNewNode($2,0,0,0,0,PRIMITIVE_4);}
+        ;
+operand:                unsigned_constant                               { $$ = createNewNode($1,0,0,0,0,OPERAND);}
+        |               variable                                        { $$ = createNewNode($1,0,0,0,0,OPERAND);}
+        |               function_call                                   { $$ = createNewNode($1,0,0,0,0,OPERAND);}
+        ;
+variable:               var_ident qualifying                            { $$ = createNewNode($1,$2,0,0,0,VARIABLE);}
+        ;
+qualifying:             epsilon                                         { $$ = createNewNode($1,0,0,0,0,QUALIFYING_1);}
+        |               qualifying '.' var_ident                        { $$ = createNewNode($1,$3,0,0,0,QUALIFYING_2);}
+        |               qualifying '[' expression expression_st ']'     { $$ = createNewNode($1,$3,$4,0,0,QUALIFYING_3);}
+        ;
+function_call:          func_ident '(' ')'                              { $$ = createNewNode($1,0,0,0,0,FUNCTION_CALL_1);}
+        |               func_ident '(' expression expression_st ')'     { $$ = createNewNode($1,$3,$4,0,0,FUNCTION_CALL_2);}
+        ;
+
+
+%%
+
+struct TNode* createNewNode(struct TNode* n1, struct TNode* n2, struct TNode* n3, struct TNode* n4, struct TNode* n5, int type)
+{
+  struct TNode* newNode = (struct TNode*)malloc(sizeof(struct TNode));
+
+  newNode->n1 = n1;
+  newNode->n2 = n2;
+  newNode->n3 = n3;
+  newNode->n4 = n4;
+  newNode->n5 = n5;
+  newNode->type = type;
+
+  return newNode;
+}
+        
+
+
+
+
+
+void out(struct TNode* n)
+{ 
+  if(n != 0)
+  {
+    switch(n->type)
+    { 
+        
+        case PROGRAM                    : out(n->n1); gen(n->type); printf("program \n"); break;
+        case DECL_ST_1                  : out(n->n1); gen(n->type); printf("{decl}* 1"); break;
+        case DECL_ST_2                  : out(n->n1); out(n->n2); gen(n->type); printf("{decl}* 2"); break;
+        case DECL                       : out(n->n1); gen(n->type); printf("decl "); break;
+        case STRUCT_DECL                : out(n->n1); out(n->n2); gen(n->type); printf("struct_decl "); break;
+        case VAR_DECL_ST_1              : out(n->n1); gen(n->type); printf("{var_decl}* 1"); break;
+        case VAR_DECL_ST_2              : out(n->n1); out(n->n2); gen(n->type); printf("{var_decl}* 2"); break;
+        case VAR_PART_ST_1              : out(n->n1); gen(n->type); printf("{var_part}* 3"); break;
+        case VAR_PART_ST_2              : out(n->n1); out(n->n2); gen(n->type); printf("{var_part}* 4"); break;
+        case VAR_PART_ALL_ST_1          : out(n->n1); gen(n->type); printf("{var_part_all}* "); break;
+        case VAR_PART_ALL_ST_2          : out(n->n1); out(n->n2); gen(n->type); printf("{var_part_all}* "); break;
+        case VAR_DECL_1                 : out(n->n1); out(n->n2); gen(n->type); printf("var_decl 1 "); break;
+        case VAR_DECL_2                 : out(n->n1); gen(n->type); printf("var_decl 2 "); break;
+        case VAR_DECL_3                 : out(n->n1); out(n->n2); gen(n->type); printf("var_decl 3 "); break;
+        case VAR_DECL_4                 : out(n->n1); out(n->n2); gen(n->type); printf("var_decl 4 "); break; 
+        case DEF_PART                   : out(n->n1); gen(n->type); gen(IDENTIFIER); printf("ident: %s ",(char*)n->n2); printf("def_part "); break;
+        case STRUCT_PART                : out(n->n1); gen(n->type); printf("struct_part "); break;
+        case BASE_TYPE                  : gen(n->type); printf("base_type "); break;
+        case VAR_PART_1                 : out(n->n1); out(n->n2); gen(n->type); printf("var_part "); break;
+        case VAR_PART_2                 : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("var_part "); break;
+        case VAR_PART_ALL_1             : out(n->n1); gen(n->type); printf("var_part_all "); break;
+        case VAR_PART_ALL_2             : out(n->n1); out(n->n2); gen(n->type); printf("var_part_all "); break;
+        case VAR_PART_ALL_3             : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("var_part_all "); break;
+        case VAR_IDENT                  : gen(IDENTIFIER); printf("var_ident "); break;
+        case DIM_ST_1                   : out(n->n1); gen(n->type); printf("{dim}* "); break;
+        case DIM_ST_2                   : out(n->n1); out(n->n2); gen(n->type); printf("{dim}* "); break;
+        case ARRAY_PART                 : out(n->n1); gen(n->type); printf("array_part "); break;
+        case DIM                        : gen(n->type); printf("dim "); break;
+        case INIT_PART                  : out(n->n1); gen(n->type); printf("init_part "); break;
+        case CONSTANT_1                 : out(n->n1); gen(n->type); printf("constant "); break;
+        case CONSTANT_2                 : out(n->n1); gen(n->type); printf("constant(+) "); break;
+        case CONSTANT_3                 : out(n->n1); gen(n->type); printf("constant(-) "); break;
+        case UNSIGNED_CONSTANT          : out(n->n1); gen(n->type); printf("unsigned_constant "); break;
+        case CHAR_CONSTANT              : gen(n->type); printf("char_constant "); break;
+        case INT_CONSTANT               : gen(n->type); printf("int_constant "); break;
+        case FLOAT_CONSTANT		: gen(n->type); printf("float_constant "); break;
+        case COMPLEX_CONSTANT_OPT       : out(n->n1); gen(n->type); printf("complex_constant_opt "); break;
+        case COMPLEX_CONSTANT_ST_1      : out(n->n1); gen(n->type); printf("{complex_constant}* "); break;
+        case COMPLEX_CONSTANT_ST_2      : out(n->n1); out(n->n2); gen(n->type); printf("{complex_constant}* "); break;
+        case COMPLEX_CONSTANT_1         : out(n->n1); out(n->n2); gen(n->type); printf("complex_constant "); break;
+        case COMPLEX_CONSTANT_2         : out(n->n1); gen(n->type); printf("complex_constant "); break;
+        case FUNC_DECL                  : out(n->n1); gen(n->type); printf("func_decl "); break;
+        case PROTOTYPE_1                : out(n->n1); out(n->n2); gen(n->type); printf("prototype "); break;
+        case PROTOTYPE_2                : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("prototype "); break;
+        case PROTOTYPE_3                : out(n->n1); out(n->n2); gen(n->type); printf("prototype "); break;
+        case PROTOTYPE_4                : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("prototype "); break;
+        case PROTOTYPE_5                : out(n->n1); gen(n->type); printf("prototype "); break;
+        case PROTOTYPE_6                : out(n->n1); out(n->n2); gen(n->type); printf("prototype "); break;
+        case RET_TYPE                   : out(n->n1); gen(n->type); printf("ret_type "); break;
+        case FUNC_IDENT                 : gen(IDENTIFIER); printf("func_ident "); break;
+        case PAR_TYPE_ST_1              : out(n->n1); gen(n->type); printf("{par_type}* "); break;
+        case PAR_TYPE_ST_2              : out(n->n1); out(n->n2); gen(n->type); printf("{par_type}* "); break;
+        case PAR_TYPE_1                 : out(n->n1); gen(n->type); printf("par_type "); break;
+        case PAR_TYPE_2                 : out(n->n1); gen(n->type); printf("par_type "); break;
+        case IMPLEMENTATION_1           : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("implementation "); break;
+        case IMPLEMENTATION_2           : out(n->n1); out(n->n2); out(n->n3); out(n->n4); out(n->n5); gen(n->type); printf("implementation "); break;
+        case IMPLEMENTATION_3           : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("implementation "); break;
+        case IMPLEMENTATION_4           : out(n->n1); out(n->n2); out(n->n3); out(n->n4); out(n->n5); gen(n->type); printf("implementation "); break;
+        case IMPLEMENTATION_5           : out(n->n1); out(n->n2); gen(n->type); printf("implementation "); break;
+        case IMPLEMENTATION_6           : out(n->n1); out(n->n2); out(n->n3); out(n->n4); gen(n->type); printf("implementation "); break;
+        case PAR_DECL_ST_1              : out(n->n1); gen(n->type); printf("{par_decl}* "); break;
+        case PAR_DECL_ST_2              : out(n->n1); out(n->n2); gen(n->type); printf("{par_decl}* "); break;
+        case PAR_DECL                   : out(n->n1); out(n->n2); gen(n->type); printf("par_decl "); break;
+        case PAR_IDENT                  : gen(IDENTIFIER); printf("par_ident "); break;
+        case BLOCK                      : out(n->n1); out(n->n2); gen(n->type); printf("block "); break;
+        case STM_ST_1                   : out(n->n1); gen(n->type); printf("{stm}* "); break;
+        case STM_ST_2                   : out(n->n1); out(n->n2); gen(n->type); printf("{stm}* "); break;
+        case STM                        : out(n->n1); gen(n->type); printf("stm "); break;
+        case EMPTY                      : gen(n->type); printf("empty "); break;
+        case EXPR                       : out(n->n1); gen(n->type); printf("expr "); break;
+        case BREAK                      : gen(n->type); printf("break "); break;
+        case RETURN_1                   : gen(n->type); printf("return "); break;
+        case RETURN_2                   : out(n->n1); gen(n->type); printf("return "); break;
+        case IF_1                       : out(n->n1); out(n->n2); gen(n->type); printf("if "); break;
+        case IF_2                       : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("if "); break;
+        case COND                       : out(n->n1); gen(n->type); printf("cond "); break;
+        case SWITCH                     : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("switch "); break;
+        case CASE_ST_1                  : out(n->n1); gen(n->type); printf("{case}* "); break;
+        case CASE_ST_2                  : out(n->n1); out(n->n2); gen(n->type); printf("{case}* "); break;
+        case CASE                       : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("case "); break;
+        case CASE_LABEL_1               : out(n->n1); gen(n->type); printf("case_label "); break;
+        case CASE_LABEL_2               : gen(n->type); printf("case_label "); break;
+        case WHILE                      : out(n->n1); out(n->n2); gen(n->type); printf("while "); break;
+        case COMPOUND                   : out(n->n1); out(n->n2); gen(n->type); printf("compound "); break;
+        case EXPRESSION_ST_1            : out(n->n1); gen(n->type); printf("{expression}* "); break;
+        case EXPRESSION_ST_2            : out(n->n1); out(n->n2); gen(n->type); printf("{expression}* "); break;
+        case EXPRESSION_1               : out(n->n1); gen(n->type); printf("expression "); break;
+        case EXPRESSION_2               : out(n->n1); out(n->n2); gen(n->type); printf("expression "); break;
+        case EQUALITY_1                 : out(n->n1); gen(n->type); printf("equality "); break;
+        case EQUALITY_2                 : out(n->n1); out(n->n2); gen(n->type); printf("equality(==) "); break;
+        case EQUALITY_3                 : out(n->n1); out(n->n2); gen(n->type); printf("equality(!=) "); break;
+        case RELATION_1                 : out(n->n1); gen(n->type); printf("relation "); break;
+        case RELATION_2                 : out(n->n1); out(n->n2); gen(n->type); printf("relation(<) "); break;
+        case RELATION_3                 : out(n->n1); out(n->n2); gen(n->type); printf("relation(>) "); break;
+        case RELATION_4                 : out(n->n1); out(n->n2); gen(n->type); printf("relation(<=) "); break;
+        case RELATION_5                 : out(n->n1); out(n->n2); gen(n->type); printf("relation(>=) "); break;
+        case SHIFT_1                    : out(n->n1); gen(n->type); printf("shift "); break;
+        case SHIFT_2                    : out(n->n1); out(n->n2); gen(n->type); printf("shift(<<) "); break;
+        case SHIFT_3                    : out(n->n1); out(n->n2); gen(n->type); printf("shift(>>) "); break;
+        case ADD_SUB_1                  : out(n->n1); gen(n->type); printf("add_sub "); break;
+        case ADD_SUB_2                  : out(n->n1); out(n->n2); gen(n->type); printf("add_sub(+) "); break;
+        case ADD_SUB_3                  : out(n->n1); out(n->n2); gen(n->type); printf("add_sub(-) "); break;
+        case MULT_DIV_1                 : out(n->n1); gen(n->type); printf("mult_div "); break;
+        case MULT_DIV_2                 : out(n->n1); out(n->n2); gen(n->type); printf("mult_div(*) "); break;
+        case MULT_DIV_3                 : out(n->n1); out(n->n2); gen(n->type); printf("mult_div(/) "); break;
+        case MULT_DIV_4                 : out(n->n1); out(n->n2); gen(n->type); printf("mult_div(p) "); break;
+        case PRIMITIVE_1                : out(n->n1); gen(n->type); printf("primitive "); break;
+        case PRIMITIVE_2                : out(n->n1); gen(n->type); printf("primitive(+) "); break;
+        case PRIMITIVE_3                : out(n->n1); gen(n->type); printf("primitive(-) "); break;
+        case PRIMITIVE_4                : out(n->n1); gen(n->type); printf("primitive "); break;
+        case OPERAND                    : out(n->n1); gen(n->type); printf("operand "); break;
+        case VARIABLE                   : out(n->n1); out(n->n2); gen(n->type); printf("variable "); break;
+        case QUALIFYING_1               : out(n->n1); gen(n->type); printf("qualifying "); break;
+        case QUALIFYING_2               : out(n->n1); out(n->n2); gen(n->type); printf("qualifying "); break;
+        case QUALIFYING_3               : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("qualifying "); break;
+        case FUNCTION_CALL_1            : out(n->n1); gen(n->type); printf("function_call "); break;
+        case FUNCTION_CALL_2            : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("function_call "); break;
+        case EPSILON                    : gen(n->type); printf("epsilon "); break;
+    }
+  }
+}
+
+void gen(unsigned u)
+{
+	*pos = u;
+	if (u==IDENTIFIER) pos++; // Platz lassen für Namenslistenindex des Identifiers
+	pos++;
+}
+
+
+int yyerror(char* s)
+{
+  printf("[parser] %s\n",s);
+  exit(-1);
+  return 0;
+}

@@ -1,0 +1,8 @@
+char char_in();
+int int_in();
+long long_in();
+float float_in();
+char char_out(char);
+int int_out(int);
+long long_out(long int);
+float float_out(float);

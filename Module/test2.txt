@@ -1,0 +1,12 @@
+int main()
+{
+    if (1!=0)
+	if (1!=0)
+	{
+	    int e;
+	    e=1 . 23 e - 45;
+	} else
+	{
+	    int y;
+	}
+}
