@@ -78,24 +78,27 @@ void LifeClient::loop()
 */
 void LifeClient::makeStep()
 {
-	LocalBoard* board_a = new LocalBoard(x2-x1+2,y2-y1+2);		// board wird zum cachen verwendet
+	LocalBoard* board_a = new LocalBoard((x2-x1+2), (y2-y1+2));		// board wird zum cachen verwendet
 	unsigned neighbours_alive;
+	int x_,y_;
 	// daten holen
-	for (int x=x1-1;x<x2+1;x++)
+	for (int x=(x1-1);x<(x2+1);x++)
 	{
-		for (int y=y1-1;y<y2+1;y++)
+		for (int y=(y1-1);y<(y2+1);y++)
 		{
-			if (y==-1) 			y=BOARD_HEIGHT-1;
-			else if (y==BOARD_HEIGHT) 	y=0;
-			if (x==-1) 			x=BOARD_WIDTH-1;
-			else if (x==BOARD_WIDTH) 	x=0;
+			if (y==-1) 			y_=BOARD_HEIGHT-1;
+			else if (y==BOARD_HEIGHT) 	y_=0;
+			else				y_=y;
+			if (x==-1) 			x_=BOARD_WIDTH-1;
+			else if (x==BOARD_WIDTH) 	x_=0;
+			else				x_=x;
 			
 			int message;					// todo: evt reihenfolge vertauscht?! wenn ja, einfach laufende nummer ins paket packen
 			int req[3];
 			req[ 0 ] = 1;			// Anfrage eines Punktes
-			req[ 1 ] = x;
-			req[ 2 ] = y;
-			cout<<"G";
+			req[ 1 ] = x_;
+			req[ 2 ] = y_;
+// 			cout<<"G";
 			net->request( server, &req, 12, &message, sizeof(message) );
 			board_a->setPos(x-(x1-1), y-(y1-1), (life_status_t)message);
 		}
@@ -140,7 +143,7 @@ void LifeClient::makeStep()
 				else
 					req[ 3 ] = board_a->readPos(x,y);
 			}
-			cout<<"S";
+// 			cout<<"S";
 			net->request( server, &req, 16, &message, sizeof(message) );
 		}
 	}
