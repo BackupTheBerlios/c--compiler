@@ -79,7 +79,7 @@ TType ConstList::getType(unsigned u)
 	TConstListEntry* cur = last;
 	while(1)
 	{
-		if (cur->ct = u) return cur->t;
+		if (cur->ct == u) return cur->t;
 		cur = cur->next;
 		if (cur==0) return (TType)0;
 	}
