@@ -37,7 +37,7 @@ class Board
 	 	 * @param y is the vertical position of the element
          * @return dead or alive if element exists, else invalid
          */
-        virtual enum life_status_t readPos(size_t x,size_t y){return invalid;};
+        virtual enum life_status_t readPos(size_t x,size_t y){};
 
         /**
          * Sets a element to a life status. If position or status is invalid,

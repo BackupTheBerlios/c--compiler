@@ -39,11 +39,12 @@ LifeClient::~LifeClient()
 */
 int LifeClient::startUp()
 {
-	int message[ 4 ];
-	int req = 'X';
+	int message[ 4 ] = { 0,0,0,0 };
+	int req = 'Y';
+	
 
 	// beim server anmelden
-	net->request( server, &req, 4, &message, 20 );
+	net->request( server, &req, 4, &message, 16 );
 
 	// grenzen setzen
 	x1 = message[ 0 ];
@@ -60,20 +61,25 @@ int LifeClient::startUp()
 */
 void LifeClient::loop()
 {
-	char message;
+	int message = 0;
 	int req[2];	// request next Step
 	req[0] = 'N';
 	req[1] = -1;
- 	net->request( server, &req, 8, &message, sizeof(message) );
-	
+	cout<<"A";
+ 	net->request( server, &req, 8, &message, 4);
+	cout<<"B";
 	int step = 0;
-	while (message==1)	// if Server sends 1, we calculate the next Step
+	while (message!=0)	// if Server sends 1, we calculate the next Step
 	{
+		cout<<"*";
 		makeStep();
+		req[0] = 'N';
 		req[1] = step++;
-		net->request( server, &req, 8,  &message, sizeof(message) );
+		message = 0;
+		
+		net->request( server, &req, 8,  &message, 4 );
+		cout<<"server sends: "<<message<<" from "<<server.getAddr()<<endl;
 	}
-	cout<<"server sends: "<<message<<endl;
 }
 
 /**
@@ -107,6 +113,7 @@ void LifeClient::makeStep()
 			if (message==invalid)
 				cout<<"x_: "<<x_<<", y_: "<<y<<", error!\n";
  			board_a->setPos( (x-(x1-1)), (y-(y1-1)), (life_status_t)message);
+
 		}
 	}
 	
@@ -137,6 +144,7 @@ void LifeClient::makeStep()
 			req[ 2 ] = (y-1)+y1;
 			
 // 			cout<<"set-req an Server - x: "<<req[ 1 ]<<", y: "<<req[ 2 ]<<", abhaengig von cache_board: x: "<<x<<", y: "<<y<<endl;
+
 			// transmit positions to server
 			life_status_t status=board_a->readPos(x,y);
 			if (neighbours_alive==3 && status==dead)
@@ -152,8 +160,6 @@ void LifeClient::makeStep()
 				else
 					req[ 3 ] = status;
 			}
-
-// 			cout<<"S";
 			net->request( server, &req, 16, &message, sizeof(message) );
 
 		}

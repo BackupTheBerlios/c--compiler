@@ -17,8 +17,8 @@ int main()
 		for ( int y = 0;y < BOARD_HEIGHT;y++ )
 			board_a->setPos(x,y,alive);*/
 	board_a->restoreBoard("test.board");
-			
-	BoardServer* boardserver = new BoardServer((IPNetwork *)net,1,(Board *)board_a,(Board *)board_b,100);
+	
+	BoardServer* boardserver = new BoardServer((IPNetwork *)net,1,board_a,board_b,10);
 	
 	boardserver->start();
 }

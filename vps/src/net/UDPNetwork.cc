@@ -35,7 +35,8 @@ ssize_t UDPNetwork::request(const Server& server, void* req, size_t reqlen, void
 		FD_ZERO(&fds);
 		FD_SET(sockfd, &fds);
 		int ret = select(sockfd+1, &fds, NULL, NULL, &to);
-		if (ret) return recv(sockfd, res, reslen, 0);
+		socklen_t slen = sizeof(sockaddr);
+		if (ret) return recvfrom(sockfd, res, reslen, 0, (sockaddr*)&server, &slen);
 		
 		// timeout...
 		cout<<"[udpnetwork] timeout in request()\n";

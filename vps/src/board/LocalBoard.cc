@@ -42,7 +42,7 @@ void LocalBoard::restoreBoard(char* filename)
 	if (width!=BOARD_WIDTH || height!=BOARD_HEIGHT)
 	{
 		cout<<"Board in file doesn't match BoardSize!\n";
-		exit(-1);
+		//exit(-1);
 	}
 	boardFile.get(stat);	// read over newline
 	for (unsigned x=0;x<width;x++)
