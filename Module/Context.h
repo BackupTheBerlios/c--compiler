@@ -43,12 +43,12 @@ private:
 	TType lasttype;  //letzter Basistyp
 	
 	unsigned* cpos;
-	int cblock;     // aktueller block
-	int blockmax;   // letzte vergebene blocknummer
-	int decl;       // variablendeklarationszähler
+	unsigned cblock;     // aktueller block
+	unsigned blockmax;   // letzte vergebene blocknummer
+	unsigned decl;       // variablendeklarationszähler
 	bool func;   // funcdecl ?
 	bool retu;   // return Statement?
-	int ex;          // expression count
+	unsigned ex;          // expression count
 	bool proto;  // prototype
 	bool call;    // func-call?
 	unsigned cc; //Konstenzaehler

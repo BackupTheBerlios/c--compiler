@@ -20,9 +20,9 @@ void Context::context(struct TNode* n)
 {
 unsigned v;
 unsigned cur;
-unsigned vararray[64];
-unsigned* varidx = vararray;
-unsigned varinsertcount;
+// unsigned vararray[64];
+// unsigned* varidx = vararray;
+// unsigned varinsertcount;
 
 
 if(n != 0)
