@@ -1,5 +1,7 @@
 #include "Register.h"
 
+#define nodebug
+
 Register::Register()
 {
 	mark = 0;
@@ -43,7 +45,9 @@ TReg Register::getReg(TOperand* temp, TReg& r)
 	if (!found)
 	{
 		i = minpos;				// ->wurde lange nicht mehr benutzt, wird ausgelagert
-		spillreglist.append(reglist[i].var, (TReg)i);	// wenn kein register mehr frei ->am laengsten nicht mehr benutztes wird ausgelagert
+		if (reglist[i].var!=0) spillreglist.append(reglist[i].var, (TReg)i);	// wenn kein register mehr frei ->am laengsten nicht mehr benutztes wird ausgelagert
+		if (reglist[i+1].var!=0 && temp->vtype>=slong)
+			if (reglist[i+1].var->vtype<=sint) spillreglist.append(reglist[i+1].var, (TReg)(i+1));	// breites Register benoetigt, also noch eins auslagern
 	}
 	reglist[i].var = temp;
 	reglist[i].mark = mark++;
@@ -52,8 +56,14 @@ TReg Register::getReg(TOperand* temp, TReg& r)
 		reglist[i+1].var = temp;
 		reglist[i+1].mark = mark;
 	}
-	if (i>=regusable) cout<<"Register "<<i<<" wurde vergeben!\n";
+	if (i>=regusable) cout<<"Register "<<i<<">regusable wurde vergeben!\n";
+	if (i%2==1 && temp->vtype>=slong) cout<<"Register::getReg - error in alignment!\n";
 	r = (TReg)i;
+	#ifndef nodebug
+	cout<<"\ngetReg() - "<<temp->label<<endl;
+	spillreglist.out();
+	out();
+	#endif
 	return (TReg)i;
 }
 
@@ -70,6 +80,11 @@ void Register::freeReg(TOperand* temp)
 				reglist[i+1].var = 0;
 				reglist[i+1].mark = 0;
 			}
+			#ifndef nodebug
+			cout<<"\nfreeReg() - "<<temp->label<<endl;
+			spillreglist.out();
+			out();
+			#endif
 			return;
 		}
 	}
@@ -83,7 +98,6 @@ void Register::freeReg(TOperand* temp)
 
 void Register::changeReg(TOperand* dest, TOperand* src)		// Register wird von op2 auf op1 geaendert
 {
-// 	cout<<"ChangeReg "<<dest->label<<", "<<src->label<<"!\n";
 	if ( (src->vtype>=slong && dest->vtype<=sint) || (src->vtype<=sint && dest->vtype>=slong) ) { cout<<"changeReg() error, types not compatible!\n"; return; }
 	for(int i=0; i<regusable; i++)
 	{
@@ -96,6 +110,11 @@ void Register::changeReg(TOperand* dest, TOperand* src)		// Register wird von op
 				reglist[i+1].var = dest;
 				reglist[i+1].mark = mark;
 			}
+			#ifndef nodebug
+			cout<<"\nChangeReg "<<dest->label<<", "<<src->label<<"!\n";
+			spillreglist.out();
+			out();
+			#endif
 			return;
 		}
 	}
@@ -110,10 +129,17 @@ void Register::changeReg(TOperand* dest, TOperand* src)		// Register wird von op
 	else
 		spillreglist.append(dest,label);	// ... und neuen operanden einfuegen
 
+	#ifndef nodebug
+	cout<<"\nChangeReg "<<dest->label<<", "<<src->label<<"!\n";
+	spillreglist.out();
+	out();
+	#endif
 }
 
 void Register::biggerReg(TOperand* op)
 {
+	unsigned minmark = 0xFFFFFFFF;
+	unsigned minpos;
 	for(int i=0; i<regusable; i++)
 	{
 		if (reglist[i].var == op)	// op gefunden
@@ -124,6 +150,11 @@ void Register::biggerReg(TOperand* op)
 				reglist[i+1].var = op;
 				reglist[i+1].mark = mark;
 				bsm<<"mov.w\tr"<<i+1<<", r"<<rnull<<endl;	// oberes Register wird null gesetzt
+				#ifndef nodebug
+				cout<<"\nBiggerReg "<<op->label<<"!\n";
+				spillreglist.out();
+				out();
+				#endif
 				return;
 			}
 			for(int j=0; j<regusable-1; j++)
@@ -138,21 +169,49 @@ void Register::biggerReg(TOperand* op)
 					reglist[i].mark = 0;
 					bsm<<"mov.w\tr"<<j+1<<", r"<<rnull<<endl;	// oberes Register wird null gesetzt
 					bsm<<"mov.w\tr"<<j<<", r"<<i<<endl;		// außerdem muß noch das alte kleine Register ins niederwertige neue verschoben werden
+					#ifndef nodebug
+					cout<<"\nBiggerReg "<<op->label<<"!\n";
+					spillreglist.out();
+					out();
+					#endif
 					return;
 				}
+				if (reglist[j].mark<minmark && j%2==0)
+				{
+					minpos = j;
+					minmark = reglist[j].mark;
+				}
 			}
-			// kein passendes Register gefunden, auslagern
-			spillreglist.append (op, (TReg) i);
-			reglist[i].mark = 0;
+
+			// kein passendes Register gefunden, auslagern und an diese Stelle den neuen grossen Operanden packen
+			TType minpostype;
+			if (reglist[minpos].var!=0)	// wenn minpos nicht leer ist, auslagern
+			{
+				spillreglist.append (reglist[minpos].var, (TReg) minpos);
+				minpostype=reglist[minpos].var->vtype;
+			}
+			if (reglist[minpos+1].var!=0 && minpostype<=sint)	// wenn minpos+1 nicht leer ist und der typ von minpos nicht long oder float war, auslagern
+				spillreglist.append (reglist[minpos+1].var, (TReg) (minpos+1));
+			
+			reglist[minpos].mark = mark++;
+			reglist[minpos].var = op;
+			reglist[minpos+1].mark = mark;
+			reglist[minpos+1].var = op;
 			reglist[i].var = 0;
+			reglist[i].mark = 0;
+			bsm<<"mov.w\tr"<<minpos+1<<", r"<<rnull<<endl;	// oberes Register wird null gesetzt
+			bsm<<"mov.w\tr"<<minpos<<", r"<<i<<endl;	// außerdem muß noch das alte kleine Register ins niederwertige neue verschoben werden
+			#ifndef nodebug
+			cout<<"\nBiggerReg "<<op->label<<"!\n";
+			spillreglist.out();
+			out();
+			#endif
+			return;
 		}
 	}
-	if (!spillreglist.isValid(op))		// pruefen, ob operand ausgelagert ist
-	{
-		cout<<"biggerReg() error - "<<op->label<<" not found!\n";
-		out();
-		exit(-1);
-	}
+	cout<<"biggerReg() error - "<<op->label<<" not found!\n";
+	out();
+	exit(-1);
 	return;
 }
 
@@ -169,7 +228,6 @@ void Register::smallerReg(TOperand* op)
 				reglist[i].mark = mark++;
 				return;
 			}
-			cout<<"smallerReg() error\n";
 		}
 	}
 	if (!spillreglist.isValid(op))		// pruefen, ob operand ausgelagert ist
@@ -191,7 +249,6 @@ TReg Register::whichReg(TOperand* temp)
 			return (TReg)i;
 		}
 	}
-	// 	cout<<"Register::whichReg ->Operand nicht in Registern vorhanden!\n";
 	if (spillreglist.isValid(temp))		// pruefen, ob operand ausgelagert ist
 	{
 		TReg r;
@@ -207,6 +264,7 @@ TReg Register::whichReg(TOperand* temp)
 		return r;
 	}
 	cout<<"Register::whichReg error - "<<temp->label<<" not found!\n";
+	spillreglist.out();
 	out();
 	exit(-1);
 	return unknown;
@@ -218,7 +276,7 @@ void Register::out()
 	cout<<"Registerausgabe\n";
 	for(int i=0; i<regusable; i++)
 	{
-		if (reglist[i].var!=0) cout<<i<<" "<<reglist[i].var<<endl;
+		if (reglist[i].var!=0) cout<<i<<" "<<reglist[i].var->label<<endl;
 	}
 }
 

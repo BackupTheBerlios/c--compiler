@@ -117,12 +117,10 @@ bool RegList::isValid(struct TOperand *op)
 	TRegListEntry* curr=start;
 	while (curr!=0)
 	{
-		// 		cout<<op->no<<endl;
 		if (curr->op==op)
 			return true;
 		curr=curr->next;
 	}
-	// 	cout<<"not valid!\n";
 	return false;
 }
 

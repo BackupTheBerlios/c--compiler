@@ -31,11 +31,6 @@ void invalidate();
 void out();
 unsigned count();
 
-
-// void insert (struct TOperand*, unsigned n);	// element wird an n gesetzt
-// struct TOperand* getelem(struct TOperand*);	// Schreibt das Re
-// void out();
-
 private:
 	
 	unsigned elems;
