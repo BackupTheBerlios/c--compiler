@@ -12,7 +12,7 @@ FunctionList::FunctionList()
 }
 
 
-unsigned FunctionList::insert(char* n, TType* sig, TType ret, unsigned num, bool proto)
+unsigned FunctionList::insert(char* n, TType* sig, TType ret, unsigned num, bool proto, unsigned maxsp)
 {
 	if (no!=0) 
 	{
@@ -36,6 +36,7 @@ unsigned FunctionList::insert(char* n, TType* sig, TType ret, unsigned num, bool
 	last->num = num;
 	last->next = 0;
 	last->proto = proto;
+	last->maxsp = maxsp;
 	last++;
 	return (no++)+MAX_NO_OF_VARIABLES+1;
 }
@@ -68,7 +69,7 @@ void FunctionList::out()
 	{
 		cout<<"Name: "<<cur->name<<" Sig: ";
 		for(unsigned i=0;i<cur->num;i++) cout<<*(cur->signature+i)<<" ";
-		cout<<" Ret: "<<cur->rettype<<" Proto: "<<cur->proto<<"\n";
+		cout<<" Ret: "<<cur->rettype<<" Proto: "<<cur->proto<<" Max-SP: "<<cur->maxsp<<"\n";
 		cur++;
 		if (cur==start+no) return;
 	}

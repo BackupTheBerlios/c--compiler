@@ -29,6 +29,8 @@ public:
 	
 	void insrev(unsigned);
 	
+	unsigned align(unsigned, unsigned);
+	
 
 private:
 	
@@ -53,6 +55,10 @@ private:
 	bool call;    // func-call?
 	unsigned cc; //Konstenzaehler
 	bool minus; // minuszeichen?
+	unsigned sp; // der quasi-stackpointer (zur Adressberechnung)
+	unsigned gp; // pointer fuer globale variablen (auch zur Adressberechnung)
+	Stack bl; // Speichergroesse der Bloecke
+	unsigned maxsp; // max. grosse des Speicherbereichs einer Funktion
 	
 	unsigned caselabels[MAX_NO_OF_CASE_LABELS];
 	unsigned labelcount;

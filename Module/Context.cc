@@ -14,7 +14,10 @@ Context::Context()
   cc = 0;
   cpos = start;
   minus = false;
-  
+  sp = 0;
+  gp = 0;
+  maxsp = 0;
+    
   labelcount=0; 
   startcount.push((unsigned)0);
   startc=0;
@@ -33,68 +36,91 @@ if(n != 0)
     {
 
         case PROGRAM                    : {
-	        			  	b.push(1); 
-	        			  	context(n->n1); 
-	        			  	cout<<"\nNamensliste:\n"; nl.out(); 
-	        			  	cout<<"\nFunktionsliste:\n"; fl.out(); 
-	        			  	cout<<"\nKonstantenliste:\n";cl.out();
-	        			  	char* n = fl.checkForUnImplemented();
-	        			  	if (n!=0) 
-	        			  	{
-		        			  	cout<<"[context] missing implementation for prototype "<<n<<"\n";
-		        			  	exit(-1);
-	        			  	}
-	        			  	if (fl.isDefined("main",0,true)==0) 
-	        			  	{
-		        			  	cout<<"[context] function main not implemented\n";
-		        			  	exit(-1);
-	        			  	}
-	        			  	break;
-        			  	}
+                                            b.push(1); 
+                                            context(n->n1); 
+                                            cout<<"\nNamensliste:\n"; nl.out(); 
+                                            cout<<"\nFunktionsliste:\n"; fl.out(); 
+                                            cout<<"\nKonstantenliste:\n";cl.out();
+                                            char* n = fl.checkForUnImplemented();
+                                            if (n!=0) 
+                                            {
+                                                cout<<"[context] missing implementation for prototype "<<n<<"\n";
+                                                exit(-1);
+                                            }
+                                            if (fl.isDefined("main",0,true)==0) 
+                                            {
+                                                cout<<"[context] function main not implemented\n";
+                                                exit(-1);
+                                            }
+                                            break;
+                                        }
         case DECL_ST_1                  : context(n->n1); break;
         case DECL_ST_2                  : context(n->n1); context(n->n2); break;
         case DECL                       : context(n->n1); break;
         case STRUCT_DECL                : context(n->n1); context(n->n2);  break;
-        case VAR_DECL_ST_1              : context(n->n1); /*Dekl.-Blockende*/
-                                          cblock=++blockmax;
-                                          b.push(cblock); //aktuelle Blocknummer auf den Stack                                           
-                                          while(1)
-                                          {
-	                                    
-                                            char* c = s.first();                                            
-                                            TType t = stype.firsttype();
-                                            if (c==0) break;
-	                                                                        
-                                            //if (t==svoid) cout<<"Typestack leer!";
-                                            int tmpblock;
-                                            
-                                            if (s.count()<decl) 
-                                            { 
-                                            	tmpblock = cblock;
-                                            } else if (s.count()==decl) 
+        case VAR_DECL_ST_1              : 
+                                        {
+                                            context(n->n1); /*Dekl.-Blockende*/
+                                            cblock=++blockmax;
+                                            b.push(cblock); //aktuelle Blocknummer auf den Stack                                           
+                                            unsigned oldsp = sp;
+                                            while(1)
                                             {
-                                              f.push(c); 
-                                              ft.push(t);
-                                              unsigned idx = fl.isProto(f.top(),par.count());
-                                              if (idx!=0) ins(idx); else ins(fl.nextId()); 
-                                              func = false;  
-                                              continue;
-                                      	    } else { tmpblock = 1; } // diese deklaration kommt aus dem hauptblock
-                                            
-                                            
-                                            if (nl.isDefined(c,tmpblock)>0) 
-                                            {
-                                              cout<<"[context] variable "<<c<<" in block "<<tmpblock<<" is already defined";
-                                              exit(-1);
+                                                
+                                                
+                                                char* c = s.first();                                            
+                                                TType t = stype.firsttype();
+                                                if (c==0) break;
+                                                                                
+                                                //if (t==svoid) cout<<"Typestack leer!";
+                                                int tmpblock;
+                                                bool isGlobal = false;
+                                                
+                                                if (s.count()<decl) 
+                                                { 
+                                                    tmpblock = cblock;
+                                                } else if (s.count()==decl) 
+                                                {
+                                                  f.push(c); 
+                                                  ft.push(t);
+                                                  unsigned idx = fl.isProto(f.top(),par.count());
+                                                  if (idx!=0) ins(idx); else ins(fl.nextId()); 
+                                                  func = false;  
+                                                  continue;
+                                                    } else { tmpblock = 1; isGlobal = true; } // diese deklaration kommt aus dem hauptblock
+                                                
+                                                
+                                                if (nl.isDefined(c,tmpblock)>0) 
+                                                {
+                                                  cout<<"[context] variable "<<c<<" in block "<<tmpblock<<" is already defined";
+                                                  exit(-1);
+                                                }
+                                                
+                                                // Adressberechnung
+                                                unsigned length = (t>=slong)?4:t+1;
+                                                unsigned idx = 0;
+                                                if (isGlobal) // fuer globale var. aus dem hauptblock...
+                                                {
+                                                    gp = align(gp, length);
+                                                    idx = nl.insert(c, tmpblock, t, gp, true);
+                                                    gp+=length;
+                                                } else      // fuer lokale var. in funktionen....
+                                                {
+                                                    sp = align(sp, length);                                            
+                                                    idx = nl.insert(c, tmpblock, t, sp, false);                      
+                                                    sp+=length;
+                                                }
+                                                
+                                                ins(idx);                                            
+                                                
                                             }
-                                            
-                                            unsigned idx = nl.insert(c,tmpblock,t);           
-                                            ins(idx);                                            
-                                            
-                                          }
+                                          // Groesse eines jeden blocks merken
+                                          if (sp>maxsp) maxsp=sp;
+                                          bl.push(sp-oldsp);
                                           decl = 0;
                                           //nl.out();
-                                          break;
+                                        }
+                                        break;
         case VAR_DECL_ST_2              : decl++; // Deklarationen mitzählen, um sie von denen des hauptblocks zu unterscheiden
                                           context(n->n1); context(n->n2);  break;
         case VAR_PART_ST_1              : context(n->n1); break;
@@ -125,14 +151,15 @@ if(n != 0)
         case UNSIGNED_CONSTANT          : context(n->n1); break;
         case CHAR_CONSTANT              : if(minus) cl.insert(-(char)n->n1, ++cc);  else { cl.insert((char)n->n1, ++cc); lastconst = (char)n->n1; break; }
         case INT_CONSTANT               : if(minus) cl.insert(-(int)n->n1, ++cc); else { cl.insert((int)n->n1, ++cc); lastconst = (int)n->n1; break; }
-        case FLOAT_CONSTANT		: if(minus) cl.insert(-*(double*)n->n1, ++cc); else cl.insert(*(double*)n->n1, ++cc); break;
+        case FLOAT_CONSTANT             : if(minus) cl.insert(-*(double*)n->n1, ++cc); else cl.insert(*(double*)n->n1, ++cc); break;
         case COMPLEX_CONSTANT_OPT       : context(n->n1); break;
         case COMPLEX_CONSTANT_ST_1      : context(n->n1); break;
         case COMPLEX_CONSTANT_ST_2      : context(n->n1); context(n->n2); break;
         case COMPLEX_CONSTANT_1         : 
         case COMPLEX_CONSTANT_2         : cout<<"[context] Complex initialisers not implemented!\n"; exit(-1); break;
         case FUNC_DECL                  : { 
-                                          func = true; 
+                                          func = true;
+                                          sp = 0; // stackpointer resetten 
                                           context(n->n1);
                                           
                                           char* c = f.top();
@@ -174,11 +201,12 @@ if(n != 0)
                                             cout<<"[context] function "<<c<<" with same signature already defined";
                                             exit(-1);
                                           }
-                                          fl.insert(c,sig-num, ret,num,proto);
+                                          fl.insert(c, sig-num, ret, num, proto, maxsp);
                                           proto = false;
                                           f.pop(1);                                          
                                           ft.pop(1);
                                           func = false;
+                                          maxsp = 0;
                                           
                                           
                                         }
@@ -230,37 +258,49 @@ if(n != 0)
         case IF_2                       : context(n->n1); context(n->n2); context(n->n3); break;
         case COND                       : context(n->n1); break;
         case SWITCH                     : 
-        				{
-        					startcount.push(startc); 
-        					startc=labelcount; 
-        					context(n->n1); context(n->n2); context(n->n3); 
-        					labelcount = startc; 
-        					startc=startcount.topi(0); 
-        					startcount.pop(1); 
-        					break;
-					}
+                                        {
+                                            startcount.push(startc); 
+                                            startc=labelcount; 
+                                            context(n->n1); context(n->n2); context(n->n3); 
+                                            labelcount = startc; 
+                                            startc=startcount.topi(0); 
+                                            startcount.pop(1); 
+                                            break;
+                                        }
         case CASE_ST_1                  : context(n->n1); break;
         case CASE_ST_2                  : context(n->n1); context(n->n2); break;
         case CASE                       : context(n->n1); context(n->n2); context(n->n3);break;
-        case CASE_LABEL_2		: lastconst = 0xFFFFFFFF;
+        case CASE_LABEL_2               : lastconst = 0xFFFFFFFF;
         case CASE_LABEL_1               : 
-        				{
-	        				context(n->n1); 
-        					for(unsigned i=startc;i<labelcount;i++)
-        					{
-	        					if (lastconst==caselabels[i]) 
-	        					{
-		        					if (lastconst==0xFFFFFFFF) 
-		        						cout<<"[context] default case label already definied\n";
-		        					else 	cout<<"[context] case label with value "<<lastconst<<" already definied\n";
-		        					exit(-1);
-	        					}
-        					}
-        					caselabels[labelcount++]=lastconst; 
-        					break;
-					}        
+                                        {
+                                            context(n->n1); 
+                                            for(unsigned i=startc;i<labelcount;i++)
+                                            {
+                                                if (lastconst==caselabels[i]) 
+                                                {
+                                                    if (lastconst==0xFFFFFFFF) 
+                                                        cout<<"[context] default case label already definied\n";
+                                                    else    cout<<"[context] case label with value "<<lastconst<<" already definied\n";
+                                                    exit(-1);
+                                                }
+                                            }
+                                            caselabels[labelcount++]=lastconst; 
+                                            break;
+                                        }        
         case WHILE                      : context(n->n1); context(n->n2); break;
-        case COMPOUND                   : context(n->n1); context(n->n2); /*Blockende*/ b.pop(1); cblock = b.topi(0);   break;
+        case COMPOUND                   : 
+                                        {
+                                            context(n->n1); 
+                                            context(n->n2); 
+                                            b.pop(1); 
+                                            cblock = b.topi(0);  
+                                            
+                                            // alle Variablen aus dem gerade verlassenen Block sind tot, also Speicher wieder
+                                            // freigeben und Stackpointer zurückschieben
+                                            sp -= bl.topi(0); 
+                                            bl.pop(1); 
+                                            break;
+                                        }
         case EXPRESSION_ST_1            : context(n->n1); break;
         case EXPRESSION_ST_2            : context(n->n1); context(n->n2); break;
         case EXPRESSION_1               : context(n->n1); ex++; break;
@@ -302,9 +342,9 @@ if(n != 0)
                                             unsigned nlidx = nl.isDefined(c,cur);
                                             if (nlidx!=0)
                                             {
-                                              	ins(nlidx); // Namenslistenindex in Traversierung einfügen
-                                              	
-	                                    	break;
+                                                ins(nlidx); // Namenslistenindex in Traversierung einfügen
+                                                
+                                            break;
                                             }
                                             cur = b.topi(v);
                                             if (cur==0) { printf("[context] variable %s in block %d undefined",c, cblock); exit(-1); }
@@ -353,14 +393,19 @@ if(n != 0)
 
 void Context::ins(unsigned index)
 {
-	while(*cpos!=IDENTIFIER) cpos++;
-	*(++cpos) = index;
+    while(*cpos!=IDENTIFIER) cpos++;
+    *(++cpos) = index;
 }
 
 void Context::insrev(unsigned index)
 {
-	unsigned* cposold=cpos;
-	while(*cpos!=0) cpos--;
-	*cpos = index;
-	cpos=cposold;
+    unsigned* cposold=cpos;
+    while(*cpos!=0) cpos--;
+    *cpos = index;
+    cpos=cposold;
 }
+
+unsigned Context::align(unsigned size, unsigned alignm) 
+{
+	return ((size+alignm-1)/alignm)*alignm;
+} 

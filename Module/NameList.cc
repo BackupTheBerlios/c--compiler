@@ -12,11 +12,13 @@ NameList::NameList()
 	last = start;
 }
 
-unsigned NameList::insert(char* n, unsigned b, TType type)
+unsigned NameList::insert(char* n, unsigned b, TType type, unsigned add, bool isGlobal)
 {
 	last->name = n;
 	last->block = b;
 	last->type = type;
+	last->add = add;
+	last->isGlobal = isGlobal;
 	
 	last++;
 	return (no++)+1;
@@ -43,7 +45,7 @@ void NameList::out()
 	
 	while(1)
 	{
-		cout<<"Name: "<<cur->name<<" Block: "<<cur->block<<" Type: "<<cur->type<<"\n";
+		cout<<"Name: "<<cur->name<<" Block: "<<cur->block<<" Type: "<<cur->type<<" Addr: "<<cur->add<<" Global: "<<cur->isGlobal<<"\n";
 		cur++;
 		if (cur==start+no) return;
 	}

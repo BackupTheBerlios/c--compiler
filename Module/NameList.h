@@ -13,13 +13,14 @@ struct TNameListEntry
 	char* name;
 	unsigned block;
 	TType type;
-	
+	unsigned add;
+	bool isGlobal;
 	
 };
 
 NameList();
 
-unsigned insert(char*, unsigned, TType);
+unsigned insert(char*, unsigned, TType, unsigned, bool);
 
 TType typeOf(char*, unsigned);
 
