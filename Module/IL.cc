@@ -509,7 +509,7 @@ TOperand* IL::conid(unsigned i)
 	TOperand* tmp = (TOperand*)malloc(sizeof(TOperand));
 	
 	tmp->type = constant;
-	tmp->vtype = cl.getType(i+2);			// todo: bug suchen, index berichtigen
+	tmp->vtype = cl.getType(i);
 	tmp->label = (char*)malloc(6+10);
 	strcpy(tmp->label,"const_");
 	sprintf (tmp->label+6,"%u",cl.getAddr(i));
