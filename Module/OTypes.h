@@ -123,7 +123,10 @@
 #define FUNC_START 120 // Beschmuh-Symbol um rechtzeitig festzustellen wann eine func-decl beginnt
 #define ELSE 121 // nochn Beschmuh-Symbol fuer das label beim else
 #define WHILE_COND 122 // nochn Beschmuh-Symbol um festzustellen, ob das cond zu einem while gehoert
-#define COND_START 123 // nochn Beschmuh-Symbol um festzustellen, wo ein cond beginnt
+
+#define SWITCH_COND 123 // nochn Beschmuh-Symbol um festzustellen, ob das cond zu einem switch gehoert
+
+#define COND_START 124 // nochn Beschmuh-Symbol um festzustellen, wo ein cond beginnt
 
 
 // maximale Bezeichnerlänge mit Block-ID

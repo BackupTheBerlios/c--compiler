@@ -382,7 +382,7 @@ void out(struct TNode* n)
         case IF_1                       : out(n->n1); out(n->n2); gen(n->type); printf("if "); break;
         case IF_2                       : out(n->n1); out(n->n2); gen(ELSE); out(n->n3); gen(n->type); printf("if "); break;
         case COND                       : gen(COND_START); out(n->n1); gen(n->type); printf("cond "); break;
-        case SWITCH                     : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("switch "); break;
+        case SWITCH                     : out(n->n1); gen(SWITCH_COND); out(n->n2);  out(n->n3); gen(n->type); printf("switch "); break;
         case CASE_ST_1                  : out(n->n1); gen(n->type); printf("{case}* "); break;
         case CASE_ST_2                  : out(n->n1); out(n->n2); gen(n->type); printf("{case}* "); break;
         case CASE                       : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("case "); break;

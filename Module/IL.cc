@@ -19,6 +19,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 	unsigned funcidx = 0;
 	unsigned varidx = 0;
 	bool func = false;
+	bool relation = false;
 
 	while(start<end)
 	{
@@ -129,6 +130,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				op.pop(1);
 				char* dst = op.top();
 				TType dstt = op.toptype();
+
 				//cout<<src<<" dst:"<<dst<<endl;
 				checkConvAssign(src,srct,dstt);
 
@@ -197,6 +199,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case RELATION_2:
 			{
+				relation = true;
 				char* temp=tempid();
 				char* src=op.top();
 				op.pop(1);
@@ -209,6 +212,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case RELATION_3:
 			{
+				relation = true;
 				char* temp=tempid();
 				char* src=op.top();
 				op.pop(1);
@@ -221,6 +225,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case RELATION_4:
 			{
+				relation = true;
 				char* temp=tempid();
 				char* src=op.top();
 				op.pop(1);
@@ -232,6 +237,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case RELATION_5:
 			{
+				relation = true;
 				char* temp=tempid();
 				char* src=op.top();
 				op.pop(1);
@@ -243,6 +249,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case EQUALITY_2:
 			{
+				relation = true;
 				char* temp=tempid();
 				char* src=op.top();
 				op.pop(1);
@@ -254,6 +261,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case EQUALITY_3:
 			{
+				relation = true;
 				char* temp=tempid();
 				char* src=op.top();
 				op.pop(1);
@@ -277,6 +285,12 @@ char* IL::genIL(unsigned* start, unsigned* end)
 
 				// wenn man hier angelangt ist(im zwischencode), beginnt der true-block
 				// cout<<"\ntrue-block\n";
+
+				if (relation) 
+				{
+					op.push(tempid());
+					outcopy(op.top(),"1");
+				}
 				condition=false;
 				break;
 			}
@@ -285,6 +299,8 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				char* e=labelid();
 				label.push(e);
 				outlabel(e);
+				//Endlabel
+				breakst.push(labelid());
 				break;
 			}
 			case WHILE:
@@ -292,10 +308,14 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				// sprung zum start der while-schleife
 				outjump("0",label.top(),jmpa);
 				label.pop(1);
-
 				// austritt aus der schleife
 				outlabel(cond.top());
 				cond.pop(1);
+				
+				//Breaklabel setzen
+				outlabel(breakst.top());
+				//Breaklabel entfernen
+				breakst.pop(1);
 				break;
 			}
 			case INIT_PART:
@@ -386,6 +406,65 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				op.pop(1);
 				op.push(t, tt);
 				break;
+			}
+			case CASE_LABEL_1:
+			{
+				outlabel(label.top());
+				label.pop(1);
+				label.push(labelid());
+				char* temp=tempid();
+				char* src=op.top();
+				op.pop(1);
+				char* dst=op.top();
+				
+				outbin(temp,src,sub,dst);
+				outjump(temp,label.top(),jmpne);
+				break;
+			}
+			case CASE_LABEL_2:
+			{
+				outlabel(label.top());
+				label.pop(1);
+				label.push(labelid());
+				break;
+			}
+			
+			case SWITCH:
+			{
+				// übriggebliebenes case-jump label...
+				outlabel(label.top()); 
+				label.pop(1);
+				
+				//Breaklabel setzen
+				outlabel(breakst.top());
+				//Breaklabel entfernen
+				breakst.pop(1);
+				
+				op.pop(1);
+				break;
+			}
+			case SWITCH_COND:
+			{
+				
+				outlabel(cond.top());
+				cond.pop(1);
+				
+				// Label fürs Ende des Switch-Block
+				breakst.push(labelid());
+				// Label fürs erste case
+				label.push(labelid());
+				
+				break;
+			}
+			case BREAK:
+			{
+				char* b = breakst.top();
+				if (b==0) 
+				{
+					cout<<"[code-il] break statement not within loop or switch\n";
+					exit(-1);
+				}
+				outgoto(breakst.top(),false);
 			}
 		}
 		start++;

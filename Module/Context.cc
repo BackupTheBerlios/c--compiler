@@ -211,14 +211,14 @@ if(n != 0)
         case EMPTY                      : break;
         case EXPR                       : context(n->n1);break;
         case BREAK                      : break;
-        case RETURN_1                   : if (ft.top()!=tvoid) 
+        case RETURN_1                   : if (ft.toptype()!=svoid) 
                                           {
                                             cout<<"[context] undefined return in non-void function "<<f.top()<<"\n";
                                             exit(-1);
                                           }                                           
                                           break;
         case RETURN_2                   : context(n->n1); 
-                                          if (ft.top()==tvoid) 
+                                          if (ft.toptype()==svoid) 
                                           {
                                             cout<<"[context] void function "<<f.top()<<" can not return anything\n"; 
                                             exit(-1);

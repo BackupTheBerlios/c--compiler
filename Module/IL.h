@@ -70,6 +70,7 @@ private:
 	Stack op;
 	Stack label;
 	Stack cond;
+	Stack breakst;
 	bool condition;
 	unsigned condinsert;
 	unsigned tempcount;
