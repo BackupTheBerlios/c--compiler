@@ -40,7 +40,7 @@ void ConstList::insert(int c, unsigned ct)
 	{
 		last = (TConstListEntry*)malloc(sizeof(TConstListEntry));
 		last->val.i = c;
-		last->t = sint;
+		last->t = ((c>32767)||(c<-32768))?slong:sint;
 		last->next = 0;
 		last->ct = ct;
 	}
@@ -48,7 +48,7 @@ void ConstList::insert(int c, unsigned ct)
 	{
 		TConstListEntry* tmp = (TConstListEntry*)malloc(sizeof(TConstListEntry));
 		tmp->val.i = c;
-		tmp->t = sint;
+		tmp->t = ((c>32767)||(c<-32768))?slong:sint;
 		tmp->ct = ct;
 		tmp->next = last;
 		last = tmp;

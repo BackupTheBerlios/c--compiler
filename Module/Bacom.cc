@@ -80,7 +80,7 @@ void Bacom::genAsm()
 			// Paramter ins lokale Frame der aufgerufenen Funktion schreiben
 			unsigned offs = para++;
 			unsigned add = fl.getParaAdd(op2->no, offs);
-			outstr(op1->vtype, regs.whichReg(op1), rsp, -(36+add));
+			outstr(op1->vtype, regs.whichReg(op1), rsp, -(40+add)); //40
 			break;
 		}
 		
@@ -104,6 +104,7 @@ void Bacom::genAsm()
 				outadd(sint, rsp, rnull, "const_two");
 				
 			}
+			
 
 			// Rücksprungadresse abräumen 
 			outloa( sint, rnull, rsp, 0 );
@@ -211,7 +212,7 @@ void Bacom::genAsm()
 				// Parameter liegen schon auf dem Stack
 				
 				// Platz machen für Rückgabewert
-				outsub(sint, rsp, rnull, "const_four");
+				outsub(sint, rsp, rnull, "const_eight");
 				
 				// Rücksprungadresse sichern
 				outlic(rglobal, rnull);  // Instruction counter laden
@@ -244,6 +245,7 @@ void Bacom::genAsm()
 				regs.getReg(op1, r);
 				//cout<<"getretstr: "<<op1->vtype<<endl;
 				outloa(op1->vtype, r, rsp, 0); 
+				outadd(sint, rsp, rnull, "const_four");
 
 				break;
 			}
@@ -395,8 +397,8 @@ void Bacom::genAsm()
 			bsm << "b";
 		else if ( cl.getType(i) == sint )
 			bsm << "w";
-// 		else if ( cl.getType(i) == slong )
-// 			bsm << "l";
+		else if ( cl.getType(i) == slong )
+			bsm << "l";
 		else if ( cl.getType(i) == sfloat )
 			bsm << "f";
 		else cout<<"[Bacom] error in constantlist\n";
