@@ -114,22 +114,22 @@ void Bacom::genAsm()
 
 		case jmpgr_: 	// greater zero
 			{
-				cout << "[bacom] noch nicht implementiert\n";
+				cout << "[bacom] jmpgr noch nicht implementiert\n";
 				break;
 			}
 		case jmple_: 	// less zero
 			{
-				cout << "[bacom] noch nicht implementiert\n";
+				cout << "[bacom] jmple noch nicht implementiert\n";
 				break;
 			}
 		case jmpeq_: 	// equal zero
 			{
-				cout << "[bacom] noch nicht implementiert\n";
+				cout << "[bacom] jmpeq noch nicht implementiert\n";
 				break;
 			}
 		case jmpne_: 	// not equal
 			{
-				cout << "[bacom] noch nicht implementiert\n";
+				cout << "[bacom] jmpne noch nicht implementiert\n";
 				break;
 			}
 		case mult_:
@@ -184,12 +184,12 @@ void Bacom::genAsm()
 			}
 		case sminus_:
 			{
-				cout << "[bacom] noch nicht implementiert\n";
+				cout << "[bacom] sminus noch nicht implementiert\n";
 				break;
 			}
 		case splus_:
 			{
-				cout << "[bacom] noch nicht implementiert\n";
+				cout << "[bacom] splus noch nicht implementiert\n";
 				break;
 			}
 		case call_:
@@ -233,6 +233,7 @@ void Bacom::genAsm()
 				// spillcode fehlt noch
 				regs.getReg(op1, r);
 				outstr(op1->vtype, r, rsp, 0); 
+
 				break;
 			}
 		case char_:	// todo: abschneiden
@@ -303,6 +304,12 @@ void Bacom::genAsm()
 				regs.getReg(op1, r);
 				outcvt(op1->vtype, regs.whichReg( op1 ), regs.whichReg( op2 ) );
 				regs.freeReg( op2 );
+				break;
+			}
+		case intout:
+			{
+				outintout(regs.whichReg( op2 ));
+				regs.changeReg( op1, op2);
 				break;
 			}
 		default:
@@ -531,6 +538,11 @@ void Bacom::outbra(TReg r, int offs)
 void Bacom::outlic(TReg r, TReg s, int offs)
 {
 	cout<<"lic.w "<<Register::toString(r)<<", "<<Register::toString(s)<<"+"<<offs<<endl;
+}
+
+void Bacom::outintout(TReg r)
+{
+	cout<<"out.w "<<Register::toString(r)<<endl;
 }
 
 char* Bacom::concat(char* pre, unsigned numb)

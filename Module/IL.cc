@@ -372,6 +372,40 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				op.push(t);
 				break;
 			}
+			case FUNCTION_CALL_INT_OUT:
+			{
+				TOperand* m = op.topOp();
+				TOperand* p = tempid(sint);
+				op.pop(1);
+				checkConvAssign(m, p);
+				outio(intout, p, m);
+				op.push(p);
+				break;
+			}
+/*			case FUNCTION_CALL_CHAR_OUT:
+			{
+				TOperand* m = op.topOp();
+				TOperand* p = tempid(schar);
+				outio(charout, p, m);
+				op.pop(1);
+				break;
+			}
+			case FUNCTION_CALL_LONG_OUT:
+			{
+				TOperand* m = op.topOp();
+				TOperand* p = tempid(slong);
+				outio(longout, p, m);
+				op.pop(1);
+				break;
+			}
+			case FUNCTION_CALL_FLOAT_OUT:
+			{
+				TOperand* m = op.topOp();
+				TOperand* p = tempid(sfloat);
+				outio(floatout, p, m);
+				op.pop(1);
+				break;
+			}*/
 			case FUNC_START:
 			{
 				func = true;
@@ -764,6 +798,7 @@ TType IL::checkConvAssign(TOperand*& m1, TOperand*& m2)
 	
 	if (t1!=t2)
 	{
+		cout<<"t1: "<<t1<<"t2: "<<t2<<endl;
 		if ((t1<=slong)&&(t2==sfloat))
 		{
 			TOperand* t = tempid(sfloat);
@@ -828,4 +863,13 @@ void IL::outconvert(TOperand* m1, TOperand* m2, TType to)
 		ilList.append(op);
 	}
 
+}
+
+void IL::outio(TOpType type, TOperand* p, TOperand* m)
+{
+	struct TOp* op=(TOp*)malloc(sizeof(TOp));
+	op->TOpType=type;
+	op->operand1=p;
+	op->operand2=m;
+	ilList.append(op);
 }

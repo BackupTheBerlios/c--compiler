@@ -129,6 +129,11 @@
 #define COND_START 124 // nochn Beschmuh-Symbol um festzustellen, wo ein cond beginnt
 #define SWITCH_START 125
 
+#define FUNCTION_CALL_INT_OUT 126
+#define FUNCTION_CALL_CHAR_OUT 127
+#define FUNCTION_CALL_LONG_OUT 128
+#define FUNCTION_CALL_FLOAT_OUT 129
+
 
 // maximale Bezeichnerlänge mit Block-ID
 #define VAR_LENGTH_ID 64
@@ -226,7 +231,11 @@ enum	TOpType {
     char_,
     int_,
     long_,
-    float_
+    float_,
+    intout,
+    charout,
+    longout,
+    floatout
 };
 
 enum TJmp {

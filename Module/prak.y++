@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <string.h>
 #include "OTypes.h"
 
 using namespace std;
@@ -274,7 +275,16 @@ qualifying:             epsilon                                         { $$ = c
         |               qualifying '[' expression expression_st ']'     { $$ = createNewNode($1,$3,$4,0,0,QUALIFYING_3);}
         ;
 function_call:          func_ident '(' ')'                              { $$ = createNewNode($1,0,0,0,0,FUNCTION_CALL_1);}
-        |               func_ident '(' expression expression_st ')'     { $$ = createNewNode($1,$3,$4,0,0,FUNCTION_CALL_2);}
+        |               func_ident '(' expression expression_st ')'     { if (strstr((char*)$1->n1,"int_out"))
+                                                                            $$ = createNewNode($1,$3,$4,0,0,FUNCTION_CALL_INT_OUT);
+                                                                          else if (strstr((char*)$1->n1,"char_out"))
+                                                                            $$ = createNewNode($1,$3,$4,0,0,FUNCTION_CALL_CHAR_OUT);
+                                                                          else if (strstr((char*)$1->n1,"long_out"))
+                                                                            $$ = createNewNode($1,$3,$4,0,0,FUNCTION_CALL_LONG_OUT);
+                                                                          else if (strstr((char*)$1->n1,"float_out"))
+                                                                            $$ = createNewNode($1,$3,$4,0,0,FUNCTION_CALL_FLOAT_OUT);
+                                                                          else
+                                                                            $$ = createNewNode($1,$3,$4,0,0,FUNCTION_CALL_2);}
         ;
 
 
@@ -423,6 +433,10 @@ void out(struct TNode* n)
         case QUALIFYING_3               : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("qualifying "); break;
         case FUNCTION_CALL_1            : out(n->n1); gen(n->type); printf("function_call "); break;
         case FUNCTION_CALL_2            : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("function_call "); break;
+        case FUNCTION_CALL_INT_OUT      : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("function_call_int_out "); break;
+        case FUNCTION_CALL_CHAR_OUT     : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("function_call_char_out "); break;
+        case FUNCTION_CALL_LONG_OUT     : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("function_call_long_out "); break;
+        case FUNCTION_CALL_FLOAT_OUT    : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("function_call_float_out "); break;
         case EPSILON                    : gen(n->type); printf("epsilon "); break;
     }
   }

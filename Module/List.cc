@@ -213,6 +213,22 @@ void List::out()
 			case float_:
 			cout<<"tofloat";
 			break;
+			
+			case intout:
+			cout<<"intout";
+			break;
+			
+			case charout:
+			cout<<"charout";
+			break;
+			
+			case longout:
+			cout<<"longout";
+			break;
+			
+			case floatout:
+			cout<<"floatout";
+			break;
 		}
 		
 		for (int i=0;i<3;i++)
