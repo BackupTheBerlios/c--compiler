@@ -2,6 +2,12 @@
 #define UDPNETWORK_H
 
 #include "net/IPNetwork.h"
+#include <sys/time.h>
+#include <iostream>
+using namespace std;
+
+// 5 Sekunden Timeout
+#define timeout_sec 5
 
 /**
  * The UdpNetwork Class will be used to communicate through the network.
@@ -56,6 +62,9 @@ public:
 	 * @return the length of the message that was sent
 	 */
 	ssize_t reply(const Client& client, void* res, size_t reslen);
+
+	timeval to;
+	
 };
 
 #endif
