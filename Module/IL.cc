@@ -508,7 +508,9 @@ TOperand* IL::conid(unsigned i)
 	
 	tmp->type = constant;
 	tmp->vtype = cl.getType(i);
-	tmp->add = cl.getAddr(i);
+	tmp->label = (char*)malloc(6+10);
+	strcpy(tmp->label,"const_");
+	sprintf (tmp->label+6,"%u",cl.getAddr(i));
 	
 	return tmp;
 }

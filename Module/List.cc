@@ -225,8 +225,8 @@ void List::out()
 			cout<<"\t";
 			if (co->type==lvar) cout<<"lb+";
 			if (co->type==gvar) cout<<"g:";
-			if (co->type==constant) cout<<"c:";
-			if ((co->type==labelstring) || (co->type==temp)) cout<<co->label; else cout<<co->add;
+// 			if (co->type==constant) cout<<"c:";
+			if ((co->type==labelstring) || (co->type==temp) || (co->type==constant)) cout<<co->label; else cout<<co->add;
 		
 		}
 	

@@ -265,7 +265,7 @@ enum TReg {
 	r11,
 	r12,
 	rlb,     // lokale basis
-	rconst,  // startadresse fuer Konstanten
+	rnull,  // Nullregister
 	rglobal, // startadresse fuer globale Variablen
 	unknown  // Fehler
 };

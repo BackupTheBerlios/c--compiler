@@ -8,6 +8,7 @@ ConstList::ConstList()
 {
 	last = 0;
 	curadd = 0;
+	nmb = 0;
 }
 void ConstList::insert(char c, unsigned ct)
 {
@@ -18,7 +19,8 @@ void ConstList::insert(char c, unsigned ct)
 		last->t = schar;
 		last->next = 0;
 		last->ct = ct;
-	} else
+	}
+	else
 	{
 		TConstListEntry* tmp = (TConstListEntry*)malloc(sizeof(TConstListEntry));
 		tmp->val.c = c;
@@ -28,11 +30,12 @@ void ConstList::insert(char c, unsigned ct)
 		last = tmp;
 	}
 	last->add = curadd++;
+	nmb++;
 }
 
 void ConstList::insert(int c, unsigned ct)
 {
-	
+
 	if (last==0)
 	{
 		last = (TConstListEntry*)malloc(sizeof(TConstListEntry));
@@ -40,7 +43,8 @@ void ConstList::insert(int c, unsigned ct)
 		last->t = sint;
 		last->next = 0;
 		last->ct = ct;
-	} else
+	}
+	else
 	{
 		TConstListEntry* tmp = (TConstListEntry*)malloc(sizeof(TConstListEntry));
 		tmp->val.i = c;
@@ -49,11 +53,12 @@ void ConstList::insert(int c, unsigned ct)
 		tmp->next = last;
 		last = tmp;
 	}
-	
-	
+
+
 	curadd = align(curadd,2);
 	last->add = curadd;
 	curadd+=2;
+	nmb++;
 }
 
 void ConstList::insert(double c, unsigned ct)
@@ -65,7 +70,8 @@ void ConstList::insert(double c, unsigned ct)
 		last->t = sfloat;
 		last->next = 0;
 		last->ct = ct;
-	} else
+	}
+	else
 	{
 		TConstListEntry* tmp = (TConstListEntry*)malloc(sizeof(TConstListEntry));
 		tmp->val.f = c;
@@ -77,6 +83,7 @@ void ConstList::insert(double c, unsigned ct)
 	curadd = align(curadd,4);
 	last->add = curadd;
 	curadd+=4;
+	nmb++;
 }
 
 
@@ -110,12 +117,33 @@ unsigned ConstList::getAddr(unsigned u)
 }
 
 
+char* ConstList::getVal(unsigned u)
+{
+	if (last==0)  return 0;
+	TConstListEntry* cur = last;
+	while(1)
+	{
+		if (cur->ct == u)
+		{
+			char* n=(char*)malloc(10);
+			if (cur->t==schar) sprintf (n,"%c",cur->val.c);
+			else if (cur->t==sint) sprintf (n,"%i",cur->val.i);
+			else if (cur->t==sfloat) sprintf (n,"%f",cur->val.f);
+			else sprintf (n,"%u",cur->val.u);
+			return n;
+		}
+		cur = cur->next;
+		if (cur==0) return 0;
+	}
+	return 0;
+}
+
 
 void ConstList::out()
 {
 	if (last==0) { cout<<"<<leer>>"; return; }
 	TConstListEntry* cur = last;
-	
+
 	while(1)
 	{
 		cout<<"No: "<<cur->ct<<" Val: ";
@@ -128,12 +156,22 @@ void ConstList::out()
 	}
 }
 
-unsigned ConstList::align(unsigned size, unsigned alignm) 
+unsigned ConstList::align(unsigned size, unsigned alignm)
 {
 	return ((size+alignm-1)/alignm)*alignm;
-} 
+}
 
 unsigned ConstList::getSize()
 {
 	return curadd;
 }
+
+unsigned ConstList::getCount()
+{
+	return nmb;
+}
+
+// unsigned ConstList::getVal(i)
+// {
+// 	return nmb;
+// }

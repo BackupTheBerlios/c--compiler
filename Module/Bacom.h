@@ -2,12 +2,13 @@
 #define bacom_h
 #include "OTypes.h"
 #include "List.h"
+#include "ConstList.h"
 #include "Register.h" 
 #include <iostream>
 using namespace std;
 
 extern List ilList;
-
+extern ConstList cl;
 
 class Bacom
 {

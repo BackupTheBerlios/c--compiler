@@ -44,12 +44,16 @@ unsigned align(unsigned, unsigned);
 // Gibt die Grösse zurück, die für alle Konstanten benötigt wird
 unsigned getSize();
 
+// Gibt die Anzahl der Konstanten zurueck
+unsigned getCount();
+
+char* getVal(unsigned);
 
 private:
 	
 	struct TConstListEntry* last;
 	unsigned curadd;
-	
+	unsigned nmb;
 	
 };
 

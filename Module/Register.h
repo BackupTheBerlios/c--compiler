@@ -29,6 +29,9 @@ TReg whichReg(TOperand*);
 // gibt das Register wieder frei
 void freeReg(TOperand*);
 
+// aendert Register von einem auf den anderen Operanden
+void changeReg(TOperand*, TOperand*);
+
 static TReg typeToReg(TOperandType);
 
 void out();
