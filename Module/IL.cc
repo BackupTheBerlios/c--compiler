@@ -252,7 +252,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				op.pop(1);
 				TOperand* dst=op.topOp();
 				outbin(temp,src,sub,dst);
-				// ergebnis darf muß gleich 0 sein, ansonsten sprung
+				// ergebnis muß gleich 0 sein, ansonsten sprung
 				outjump(temp,cond.topOp(),jmpne);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
 				break;
 			}
@@ -507,10 +507,10 @@ TOperand* IL::conid(unsigned i)
 	TOperand* tmp = (TOperand*)malloc(sizeof(TOperand));
 	
 	tmp->type = constant;
-	tmp->vtype = cl.getType(i);
+	tmp->vtype = cl.getType(i+2);			// todo: bug suchen, index berichtigen
 	tmp->label = (char*)malloc(6+10);
 	strcpy(tmp->label,"const_");
-	sprintf (tmp->label+6,"%u",cl.getAddr(i+2));
+	sprintf (tmp->label+6,"%u",cl.getAddr(i+2));	// todo: bug suchen, index berichtigen
 	
 	return tmp;
 }
@@ -712,19 +712,26 @@ TType IL::checkConv(TOperand*& m1, TOperand*& m2)
 	
 	if (t1!=t2)
 	{
-		if ((t1==sfloat)&&(t2==sint))
+		if ( t1==sfloat || t2==sfloat )		// konvertieren nach float
 		{
 			TOperand* m3 = tempid(sfloat);
 			outconvert(m2,m3,sfloat);
 			m2 = m3;
 			return sfloat;
 		}
-		else if ((t1==sint)&&(t2==sfloat))
+		else if ( t1==slong || t2==slong )
 		{
-			TOperand* m3 = tempid(sfloat);
-			outconvert(m1,m3,sfloat);
+			TOperand* m3 = tempid(slong);
+			outconvert(m1,m3,slong);
 			m1 = m3;
-			return sfloat;
+			return slong;
+		}
+		else if ( t1==sint || t2==sint )
+		{
+			TOperand* m3 = tempid(sint);
+			outconvert(m1,m3,sint);
+			m1 = m3;
+			return sint;
 		}
 		else
 			cout<<"[code-il] warning: types not equal t1: "<<t1<<" t2: "<<t2<<endl;
