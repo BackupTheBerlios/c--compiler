@@ -834,8 +834,8 @@ TType IL::checkConv(TOperand*& m1, TOperand*& m2)
 		if ( t1==sfloat || t2==sfloat )		// konvertieren nach float
 		{
 			TOperand* m3 = tempid(sfloat);
-			outconvert(m2,m3,sfloat);
-			m2 = m3;
+			outconvert(m1,m3,sfloat);
+			m1 = m3;
 			return sfloat;
 		}
 		else if ( t1==slong || t2==slong )

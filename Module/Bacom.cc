@@ -291,7 +291,7 @@ void Bacom::genAsm()
 			{
 				if (op2->vtype<=sint)		// wenn convert von int/char, dann in ein doppelregister stecken
 				{
-					outmov(regs.biggerReg(op2), rnull);
+					outmov(regs.biggerReg(op2), rnull);	// hoeherwertiges Register nullen
 					op2->vtype=slong;	// op2 wird long, damit changeReg weiß, dass op2 nun auch breites Register hat
 					regs.changeReg( op1, op2 );
 				}
@@ -308,7 +308,7 @@ void Bacom::genAsm()
 			{
 				if (op2->vtype<=sint)		// wenn convert von int, dann zuerst in ein doppelregister stecken
 				{
-					outmov(regs.biggerReg(op2), rnull);
+					outmov(regs.biggerReg(op2), rnull);	// hoeherwertiges Register nullen
 				}
 				// danach convert zu float
 				TReg r;

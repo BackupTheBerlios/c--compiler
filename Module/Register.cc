@@ -69,7 +69,7 @@ void Register::freeReg(TOperand* temp)
 
 void Register::changeReg(TOperand* dest, TOperand* src)		// Register wird von op2 auf op1 geaendert
 {
-	if ( (src->vtype>=slong && dest->vtype<=sint) || (src->vtype<=sint && dest->vtype>=slong) ) { cout<<"changeReg() error\n"; return; }
+	if ( (src->vtype>=slong && dest->vtype<=sint) || (src->vtype<=sint && dest->vtype>=slong) ) { cout<<"changeReg() error, types not compatible!\n"; return; }
 	for(int i=0; i<regusable; i++)
 	{
 		if (reglist[i].var == src)
@@ -84,7 +84,7 @@ void Register::changeReg(TOperand* dest, TOperand* src)		// Register wird von op
 			return;
 		}
 	}
-	cout<<"changeReg() error\n";
+	cout<<"changeReg() error: Register not found!\n";
 }
 
 TReg Register::biggerReg(TOperand* op)
@@ -118,6 +118,7 @@ TReg Register::biggerReg(TOperand* op)
 	}
 	// todo: spillcode einfuegen
 	cout<<"biggerReg() error - op not found!\n";
+	return unknown;
 }
 
 void Register::smallerReg(TOperand* op)
