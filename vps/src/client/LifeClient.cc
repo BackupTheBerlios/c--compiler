@@ -22,9 +22,10 @@ LifeClient::LifeClient(IPNetwork* net, char* servername, short port)
 		exit(-1);
 	}
 	cout<<"successful!\n";
-};
+	cout<<"[client] x1: "<<x1<<" x2: "<<x2<<" y1: "<<y1<<" y2: "<<y2<<endl;	
+}
 
-LifeClient::~LifeClient(){};
+LifeClient::~LifeClient(){}
 
 
 /**
@@ -34,21 +35,26 @@ LifeClient::~LifeClient(){};
 */
 int LifeClient::startUp()
 {
-	char message[20];
-	char req[]="hello server";
-	net->request(server,(void *)req,13,message,20);
-	cout<<"[client] received: "<<message<<endl;
+	int message[4];
+	char req[]="X";
 	
+	// beim server anmelden
+	net->request(server, (void*)req, 1, (void*)message, 20);
 	
+	// grenzen setzen
+	x1 = message[0];
+	x2 = message[1];
+	y1 = message[2];
+	y2 = message[3];		
 	return 0;
-};
+}
 
 /**
 * Loops until server signals end of the simulation, and calls makeStep() for the next simulation cycle
 */
-void LifeClient::loop(){};
+void LifeClient::loop(){}
 
 /**
 * Calculate status for the next timestep on the given boardpart
 */
-void LifeClient::makeStep(){};
+void LifeClient::makeStep(){}

@@ -48,12 +48,23 @@ ssize_t UDPNetwork::receive(Client& client, void* req, size_t reqlen){
 	//recvfrom, blocks until a message arrives
 	socklen_t slen = sizeof(sockaddr);
 	ssize_t i = recvfrom(sockfd, req, reqlen, 0, (sockaddr*)&client, &slen);
+	if (i==-1)
+	{
+		cout<<"[udpnetwork] receive(): recvfrom failed.\n";
+		exit(-1);
+	}
+		
 	return i;
 }
 
 ssize_t UDPNetwork::reply(const Client& client, void* res, size_t reslen){
 	//sendto
 	ssize_t i = sendto(sockfd, res, reslen, 0, (sockaddr*)&client, sizeof(sockaddr));
+	if (i==-1)
+	{
+		cout<<"[udpnetwork] reply(): sendto failed.\n";
+		exit(-1);
+	}
 	return i;
 }
 

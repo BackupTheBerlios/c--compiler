@@ -14,18 +14,12 @@ using namespace std;
 int main()
 {
 	UDPNetwork* net = new UDPNetwork(7654);
-	LocalBoard* board_a = new LocalBoard(BOARD_WIDTH,BOARD_HEIGHT);
+	LocalBoard* board_a = new LocalBoard(100,100);
 	LocalBoard* board_b = new LocalBoard(BOARD_WIDTH,BOARD_HEIGHT);
 	BoardServer* boardserver = new BoardServer((IPNetwork *)net,4,(Board *)board_a,(Board *)board_b);
-
-	// UDP-Test
-	IPAddress client("localhost", 7654);
-	char message[20];
-	net->receive(client,message,20);
-	cout<<"[server] received: "<<message<<endl;
-	char rep[]="hello client";
-	net->reply(client,rep,20);
-
+	
+	boardserver->start();
+	
 	// test fuers board, kommt spaeter in den client
 	Color alivecol = White;
 	Color deadcol  = Blue2;
@@ -34,7 +28,7 @@ int main()
 /*	for (int x=0;x<BOARD_WIDTH;x++)
 		for (int y=0;y<BOARD_HEIGHT;y++)
 			board_a->setPos(x , y, (((rand()%RANDOM)==2) ? alive : dead) );*/
-/*	board_a->restoreBoard("test.board");
+/*	board_a->restoreBoard("test.board"); 
 
 	XWindow* w=new XWindow(BOARD_WIDTH*ZOOM, BOARD_HEIGHT*ZOOM, "Game of Life");
 

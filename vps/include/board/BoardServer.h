@@ -4,9 +4,11 @@
 #include "board/Board.h"
 #include "net/IPAddress.h"
 #include "net/IPNetwork.h"
+#include <iostream>
+using namespace std;
 
 class BoardServer
-{
+{ 
 public:
 	/**
 	 * Constructor gets an IPNetwork over which communication will take 
@@ -18,14 +20,12 @@ public:
 	 * @param board_b is just another Board
 	 * @param timesteps is the amount simulationcycles, 0 means infinity timesteps
 	 */
-	BoardServer(IPNetwork* net,int clientcount, Board* board_a, Board* board_b, int timesteps=0)
-	{
-	};
-
+	BoardServer(IPNetwork* net,int clientcount, Board* board_a, Board* board_b, int timesteps=0);
+	
 	/**
 	 * Frees all memory, which was allocated with new inside this class.
 	 */
-	~BoardServer(){};
+	~BoardServer();
 
 	void start();
 
@@ -35,8 +35,10 @@ private:
 	IPNetwork* net;
 	Board* board_a;
 	Board* board_b; 	//one board for timestep n for reading, and one for timestep n+1 for writing
-	//List<IPAddress *> addresses;    //any kind of list of client addresses
-
+	IPAddress addresses[10];
+	int client;
+	int clients;
+	
 	/**
 	 * This function is called, when a client connects to the server for the first time.
 	 * It stores the address of the client and determines the part of the board the client
