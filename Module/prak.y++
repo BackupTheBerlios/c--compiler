@@ -276,13 +276,13 @@ qualifying:             epsilon                                         { $$ = c
         ;
 function_call:          func_ident '(' ')'                              { $$ = createNewNode($1,0,0,0,0,FUNCTION_CALL_1);}
         |               func_ident '(' expression expression_st ')'     { if (strstr((char*)$1->n1,"int_out"))
-                                                                            $$ = createNewNode($1,$3,$4,0,0,FUNCTION_CALL_INT_OUT);
+                                                                            $$ = createNewNode($3,$4,0,0,0, FUNCTION_CALL_INT_OUT);
                                                                           else if (strstr((char*)$1->n1,"char_out"))
-                                                                            $$ = createNewNode($1,$3,$4,0,0,FUNCTION_CALL_CHAR_OUT);
+                                                                            $$ = createNewNode($3,$4,0,0,0, FUNCTION_CALL_CHAR_OUT);
                                                                           else if (strstr((char*)$1->n1,"long_out"))
-                                                                            $$ = createNewNode($1,$3,$4,0,0,FUNCTION_CALL_LONG_OUT);
+                                                                            $$ = createNewNode($3,$4,0,0,0, FUNCTION_CALL_LONG_OUT);
                                                                           else if (strstr((char*)$1->n1,"float_out"))
-                                                                            $$ = createNewNode($1,$3,$4,0,0,FUNCTION_CALL_FLOAT_OUT);
+                                                                            $$ = createNewNode($3,$4,0,0,0, FUNCTION_CALL_FLOAT_OUT);
                                                                           else
                                                                             $$ = createNewNode($1,$3,$4,0,0,FUNCTION_CALL_2);}
         ;

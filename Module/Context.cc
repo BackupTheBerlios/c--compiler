@@ -394,10 +394,10 @@ if(n != 0)
                                           insrev(idx);
                                           }
         break;
-	case FUNCTION_CALL_INT_OUT	: context(n->n1); context(n->n2); context(n->n3); s.pop(1); break;
-	case FUNCTION_CALL_CHAR_OUT	: context(n->n1); context(n->n2); context(n->n3); s.pop(1); break;
-	case FUNCTION_CALL_LONG_OUT	: context(n->n1); context(n->n2); context(n->n3); s.pop(1); break;
-	case FUNCTION_CALL_FLOAT_OUT	: context(n->n1); context(n->n2); context(n->n3); s.pop(1); break;
+	case FUNCTION_CALL_INT_OUT	: context(n->n1); context(n->n2); s.pop(1); break;
+	case FUNCTION_CALL_CHAR_OUT	: context(n->n1); context(n->n2); s.pop(1); break;
+	case FUNCTION_CALL_LONG_OUT	: context(n->n1); context(n->n2); s.pop(1); break;
+	case FUNCTION_CALL_FLOAT_OUT	: context(n->n1); context(n->n2); s.pop(1); break;
         case EPSILON                    :  break;
     }
   }
