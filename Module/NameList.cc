@@ -93,4 +93,3 @@ bool NameList::isGlobal(unsigned u)
 	if (u==0) return 0;
 	return (start+u-1)->isGlobal;
 }
-

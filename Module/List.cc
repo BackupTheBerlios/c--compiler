@@ -223,7 +223,7 @@ void List::out()
 			if (i==2) co = curr->op->operand3;
 			if (co==0) break;
 			cout<<"\t";
-			if (co->type==lvar) cout<<"sp+";
+			if (co->type==lvar) cout<<"lb+";
 			if (co->type==gvar) cout<<"g:";
 			if (co->type==constant) cout<<"c:";
 			if ((co->type==labelstring) || (co->type==temp)) cout<<co->label; else cout<<co->add;

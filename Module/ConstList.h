@@ -20,6 +20,7 @@ struct TConstListEntry
 	TType t;
 	struct TConstListEntry* next;
 	unsigned ct;
+	unsigned add;
 };
 
 ConstList();
@@ -30,16 +31,25 @@ void insert(int, unsigned);
 
 void insert(double, unsigned);
 
+unsigned getAddr(unsigned);
+
 tvalue getValue(unsigned);
 
 TType getType(unsigned);
 
 void out();
 
+unsigned align(unsigned, unsigned);
+
+// Gibt die Grösse zurück, die für alle Konstanten benötigt wird
+unsigned getSize();
+
 
 private:
 	
 	struct TConstListEntry* last;
+	unsigned curadd;
+	
 	
 };
 

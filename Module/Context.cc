@@ -41,6 +41,10 @@ if(n != 0)
                                             cout<<"\nNamensliste:\n"; nl.out(); 
                                             cout<<"\nFunktionsliste:\n"; fl.out(); 
                                             cout<<"\nKonstantenliste:\n";cl.out();
+                                            cout<<"\n[context] Groesse Konstanten : "<<cl.getSize()<<endl;
+                                            cout<<"[context] Groesse Globale Var: "<<gp<<endl;
+                                            
+            
                                             char* n = fl.checkForUnImplemented();
                                             if (n!=0) 
                                             {
@@ -118,7 +122,7 @@ if(n != 0)
                                           if (sp>maxsp) maxsp=sp;
                                           bl.push(sp-oldsp);
                                           decl = 0;
-                                          //nl.out();
+                                         
                                         }
                                         break;
         case VAR_DECL_ST_2              : decl++; // Deklarationen mitzählen, um sie von denen des hauptblocks zu unterscheiden
@@ -407,5 +411,5 @@ void Context::insrev(unsigned index)
 
 unsigned Context::align(unsigned size, unsigned alignm) 
 {
-	return ((size+alignm-1)/alignm)*alignm;
+    return ((size+alignm-1)/alignm)*alignm;
 } 

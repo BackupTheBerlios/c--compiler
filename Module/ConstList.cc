@@ -7,6 +7,7 @@ using namespace std;
 ConstList::ConstList()
 {
 	last = 0;
+	curadd = 0;
 }
 void ConstList::insert(char c, unsigned ct)
 {
@@ -26,11 +27,12 @@ void ConstList::insert(char c, unsigned ct)
 		tmp->next = last;
 		last = tmp;
 	}
-	
+	last->add = curadd++;
 }
 
 void ConstList::insert(int c, unsigned ct)
 {
+	
 	if (last==0)
 	{
 		last = (TConstListEntry*)malloc(sizeof(TConstListEntry));
@@ -48,7 +50,12 @@ void ConstList::insert(int c, unsigned ct)
 		last = tmp;
 	}
 	
+	
+	curadd = align(curadd,2);
+	last->add = curadd;
+	curadd+=2;
 }
+
 void ConstList::insert(double c, unsigned ct)
 {
 	if (last==0)
@@ -67,7 +74,9 @@ void ConstList::insert(double c, unsigned ct)
 		tmp->next = last;
 		last = tmp;
 	}
-	
+	curadd = align(curadd,4);
+	last->add = curadd;
+	curadd+=4;
 }
 
 
@@ -87,6 +96,20 @@ TType ConstList::getType(unsigned u)
 }
 
 
+unsigned ConstList::getAddr(unsigned u)
+{
+	if (last==0)  return 0;
+	TConstListEntry* cur = last;
+	while(1)
+	{
+		if (cur->ct == u) return cur->add;
+		cur = cur->next;
+		if (cur==0) return 0;
+	}
+	return 0;
+}
+
+
 
 void ConstList::out()
 {
@@ -99,9 +122,18 @@ void ConstList::out()
 		if (cur->t==schar) cout<<cur->val.c<<"\tType: Char";
 		else if (cur->t==sint) cout<<cur->val.i<<"\tType: Int";
 		else if (cur->t==sfloat) cout<<cur->val.f<<"\tType: Float";
-		cout<<endl;
+		cout<<" Addr: "<<cur->add<<endl;
 		cur = cur->next;
 		if (cur==0) return;
 	}
 }
 
+unsigned ConstList::align(unsigned size, unsigned alignm) 
+{
+	return ((size+alignm-1)/alignm)*alignm;
+} 
+
+unsigned ConstList::getSize()
+{
+	return curadd;
+}

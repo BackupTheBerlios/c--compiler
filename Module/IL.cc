@@ -493,19 +493,9 @@ char* IL::genIL(unsigned* start, unsigned* end)
 
 TOperand* IL::varid(unsigned i)
 {
-	/*
-	char* c = nl.getIdent(i);
-	if (c==0) return 0;
-	unsigned block = nl.getBlock(i);
-	char* n = (char*)malloc(VAR_LENGTH_ID);
-	sprintf(n,"_");
-	strcpy(n+1,c);
-	sprintf(n+strlen(c)+1,"%u",block);
-	*/
 	TOperand* tmp = (TOperand*)malloc(sizeof(TOperand));
 	
 	tmp->type = nl.isGlobal(i)?gvar:lvar;
-	
 	tmp->vtype = nl.getType(i);
 	tmp->add = nl.getAddr(i);
 	
@@ -514,26 +504,13 @@ TOperand* IL::varid(unsigned i)
 
 TOperand* IL::conid(unsigned i)
 {
-	/*
-	TType t = cl.getType(i);
-	if (t==undeclared) return 0;
-	
-	char* n = (char*)malloc(VAR_LENGTH_ID);
-	if (t==sint) strcpy(n,"int");
-	if (t==schar) strcpy(n,"char");
-	if (t==sfloat) strcpy(n,"float");
-	if (t==slong) strcpy(n,"long");
-
-	sprintf(n+strlen(n),"%u",i);
-	*/
 	TOperand* tmp = (TOperand*)malloc(sizeof(TOperand));
 	
 	tmp->type = constant;
-	
-	tmp->add = 99;
+	tmp->vtype = cl.getType(i);
+	tmp->add = cl.getAddr(i);
 	
 	return tmp;
-
 }
 
 TOperand* IL::tempid(TType t)
