@@ -17,6 +17,7 @@ using namespace std;
 extern NameList nl;
 extern ConstList cl;
 extern FunctionList fl;
+extern List ilList;
 
 class IL
 {
@@ -67,7 +68,6 @@ private:
 	
 	TType checkConv(char*&, char*&, TType, TType);
 	
-	List ilList;
 	
 	Stack op;
 	Stack label;

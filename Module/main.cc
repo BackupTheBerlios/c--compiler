@@ -8,6 +8,8 @@
 #include "NameList.h"
 #include "ConstList.h"
 #include "FunctionList.h"
+#include "List.h"
+#include "Bacom.h"
 using namespace std;
 
 extern void yyparse();
@@ -22,7 +24,8 @@ NameList nl;
 FunctionList fl;
 Context c;
 IL il;
-
+List ilList;
+Bacom bc;
 
 int main(int argc, char* arv[])
 {
@@ -39,6 +42,9 @@ int main(int argc, char* arv[])
 	
 	il.genIL(start, pos);
 	cout<<"\n[code-il] OK\n";
+	
+	bc.genAsm();
+	cout<<"\n[bacom] OK\n";
 	
 }
 
