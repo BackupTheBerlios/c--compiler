@@ -214,12 +214,22 @@ void List::out()
 			cout<<"tofloat";
 			break;
 		}
-		if (curr->op->operand1!=0)
-			cout<<"\t"<<curr->op->operand1;
-		if (curr->op->operand2!=0)
-			cout<<",\t"<<curr->op->operand2;
-		if (curr->op->operand3!=0)
-			cout<<",\t"<<curr->op->operand3;
+		
+		for (int i=0;i<3;i++)
+		{
+			TOperand* co;
+			if (i==0) co = curr->op->operand1;
+			if (i==1) co = curr->op->operand2;
+			if (i==2) co = curr->op->operand3;
+			if (co==0) break;
+			cout<<"\t";
+			if (co->type==lvar) cout<<"sp+";
+			if (co->type==gvar) cout<<"g:";
+			if (co->type==constant) cout<<"c:";
+			if ((co->type==labelstring) || (co->type==temp)) cout<<co->label; else cout<<co->add;
+		
+		}
+	
 		cout<<";"<<endl;
 		curr=curr->next;
 	}

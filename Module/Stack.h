@@ -26,11 +26,14 @@ void pop (int n);
 
 
 void push (char* name);
+void push (TOperand* t) { push((char*)t); }
 void push (unsigned block);
 void push (char*, TType);
 void push (TType);
 
 char* top ();
+TOperand* topOp() { return (TOperand*)top(); }
+
 unsigned topi (unsigned);
 TType toptype();
 

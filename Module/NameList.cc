@@ -82,5 +82,15 @@ TType NameList::getType(unsigned u)
 	return (start+u-1)->type;
 }
 
+unsigned NameList::getAddr(unsigned u)
+{
+	if (u==0) return 0;
+	return (start+u-1)->add;
+}
 
+bool NameList::isGlobal(unsigned u)
+{
+	if (u==0) return 0;
+	return (start+u-1)->isGlobal;
+}
 

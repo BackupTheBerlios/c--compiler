@@ -32,41 +32,41 @@ char* genIL(unsigned*, unsigned*);
 
 private:
 
-	char* varid(unsigned);
+	TOperand* varid(unsigned);
 	
-	char* conid(unsigned);
+	TOperand* conid(unsigned);
 	
-	char* tempid();
+	TOperand* tempid(TType);
 	
-	char* labelid();
+	TOperand* labelid();
 
-	char* condlabelid();
+	TOperand* condlabelid();
 
-	char* funcid(unsigned);	
+	TOperand* funcid(unsigned);	
 	
-	void outcopy(char*, char*);
+	void outcopy(TOperand*, TOperand*);
 	
-	void outbin(char*, char*, TBinOp, char*);
+	void outbin(TOperand*, TOperand*, TBinOp, TOperand*);
 	
-	void outun(char*, TUnOp, char*);
+	void outun(TOperand*, TUnOp, TOperand*);
 
-	void outgoto(char*, bool);
+	void outgoto(TOperand*, bool);
 	
-	void outlabel(char*);
+	void outlabel(TOperand*);
 
-	void outjump(char*,char*,TJmp);
+	void outjump(TOperand*,TOperand*,TJmp);
 	
-	void outret(char*);
+	void outret(TOperand*);
 	
-	void outgetret(char*);
+	void outgetret(TOperand*);
 	
-	void outpush(char*);
+	void outpush(TOperand*);
 	
-	void outconvert(char*, char*, TType);
+	void outconvert(TOperand*, TOperand*, TType);
 	
-	TType checkConvAssign(char*&, TType, TType);
+	TType checkConvAssign(TOperand*&, TOperand*&);
 	
-	TType checkConv(char*&, char*&, TType, TType);
+	TType checkConv(TOperand*&, TOperand*&);
 	
 	
 	Stack op;

@@ -14,8 +14,8 @@ char* IL::genIL(unsigned* start, unsigned* end)
 {
 	cout<<endl;
 	unsigned constcount = 1;
-	char* lastident = 0;
-	char* funcident = 0;
+	TOperand* lastident = 0;
+	TOperand* funcident = 0;
 	unsigned funcidx = 0;
 	unsigned varidx = 0;
 	bool func = false;
@@ -25,8 +25,8 @@ char* IL::genIL(unsigned* start, unsigned* end)
 	unsigned const falseidx = 0xFFFFFFE;
 	cl.insert(0,falseidx);
 	cl.insert(1,trueidx);
-	char* truevar = conid(trueidx);
-	char* falsevar = conid(falseidx);
+	TOperand* truevar = conid(trueidx);
+	TOperand* falsevar = conid(falseidx);
 	
 	
 
@@ -58,100 +58,88 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case VARIABLE:
 			{
-				op.push(lastident, nl.getType(varidx));
+				op.push(lastident);
 				break;
 			}
 			case VAR_DECL_ST_2:	break;
 			case MULT_DIV_2:
 			{
-				char* m1 = op.top();
-				TType t1 = op.toptype();
+				TOperand* m1 = op.topOp();
 				op.pop(1);
-				char* m2 = op.top();
-				TType t2 = op.toptype();
+				TOperand* m2 = op.topOp();
 				op.pop(1);
-				TType tt = checkConv(m1,m2,t1,t2);
-				char* p = tempid();
+				TType tt = checkConv(m1,m2);
+				TOperand* p = tempid(tt);
 				outbin(p, m2, mult, m1);
-				op.push(p,tt);
+				op.push(p);
 				break;
 			}
 			case MULT_DIV_3:
 			{
-				char* m1 = op.top();
-				TType t1 = op.toptype();
+				TOperand* m1 = op.topOp();
 				op.pop(1);
-				char* m2 = op.top();
-				TType t2 = op.toptype();
+				TOperand* m2 = op.topOp();
 				op.pop(1);
-				TType tt = checkConv(m1,m2,t1,t2);
-				char* p = tempid();
+				TType tt = checkConv(m1,m2);
+				TOperand* p = tempid(tt);
 				outbin(p, m2, divi, m1);
-				op.push(p,tt);
+				op.push(p);
 				break;
 			}
 			case MULT_DIV_4:
 			{
-				char* m1 = op.top();
-				TType t1 = op.toptype();
+				TOperand* m1 = op.topOp();
 				op.pop(1);
-				char* m2 = op.top();
-				TType t2 = op.toptype();
+				TOperand* m2 = op.topOp();
 				op.pop(1);
-				TType tt = checkConv(m1,m2,t1,t2);
-				char* p = tempid();
+				TType tt = checkConv(m1,m2);
+				TOperand* p = tempid(tt);
 				outbin(p, m2, mod, m1);
-				op.push(p,tt);
+				op.push(p);
 				break;
 			}
 			case ADD_SUB_2:
 			{
-				char* m1 = op.top();
-				TType t1 = op.toptype();
+				TOperand* m1 = op.topOp();
 				op.pop(1);
-				char* m2 = op.top();
-				TType t2 = op.toptype();
+				TOperand* m2 = op.topOp();
 				op.pop(1);
-				TType tt = checkConv(m1,m2,t1,t2);
-				char* p = tempid();
+				TType tt = checkConv(m1,m2);
+				TOperand* p = tempid(tt);
 				outbin(p, m2, add, m1);
-				op.push(p,tt);
+				op.push(p);
 				break;
 			}
 			case ADD_SUB_3:
 			{
-				char* m1 = op.top();
-				TType t1 = op.toptype();
+				TOperand* m1 = op.topOp();
 				op.pop(1);
-				char* m2 = op.top();
-				TType t2 = op.toptype();
+				TOperand* m2 = op.topOp();
 				op.pop(1);
-				TType tt = checkConv(m1,m2,t1,t2);
-				char* p = tempid();
+				TType tt = checkConv(m1,m2);
+				TOperand* p = tempid(tt);
 				outbin(p, m2, sub, m1);
-				op.push(p,tt);
+				op.push(p);
 				break;
 			}
 			case EXPRESSION_2:
 			{
-				char* src = op.top();
-				TType srct = op.toptype();
+				TOperand* src = op.topOp();
 				op.pop(1);
-				char* dst = op.top();
-				TType dstt = op.toptype();
-
+				TOperand* dst = op.topOp();
+				
 				//cout<<src<<" dst:"<<dst<<endl;
-				checkConvAssign(src,srct,dstt);
+				checkConvAssign(src,dst);
 
 				outcopy(dst,src);
 				break;
 			}
 			case SHIFT_2:
 			{
-				char* m1 = op.top();
+				TOperand* m1 = op.topOp();
 				TType t1 = op.toptype();
 				op.pop(1);
-				char* m2 = op.top();
+				TOperand* m2 = op.topOp();
 				TType t2 = op.toptype();
 				if ((t1==sfloat)||(t2==sfloat))
 				{
@@ -159,17 +147,17 @@ char* IL::genIL(unsigned* start, unsigned* end)
 					exit(-1);
 				}
 				op.pop(1);
-				char* p = tempid();
+				TOperand* p = tempid(t1);
 				outbin(p, m2, shiftl, m1);
-				op.push(p,t1);
+				op.push(p);
 				break;
 			}
 			case SHIFT_3:
 			{
-				char* m1 = op.top();
+				TOperand* m1 = op.topOp();
 				TType t1 = op.toptype();
 				op.pop(1);
-				char* m2 = op.top();
+				TOperand* m2 = op.topOp();
 				TType t2 = op.toptype();
 				op.pop(1);
 				if ((t1==sfloat)||(t2==sfloat))
@@ -177,107 +165,107 @@ char* IL::genIL(unsigned* start, unsigned* end)
 					cout<<"[code-il] float-shift not permitted";
 					exit(-1);
 				}
-				char* p = tempid();
+				TOperand* p = tempid(t1);
 				outbin(p, m2, shiftr, m1);
-				op.push(p,t1);
+				op.push(p);
 				break;
 			}
 			case IF_1: //if ohne else
 			{
-				outlabel(cond.top());
+				outlabel(cond.topOp());
 				cond.pop(1);
 				break;
 			}
 			case IF_2: //if mit else
 			{
-				outlabel(label.top());
+				outlabel(label.topOp());
 				label.pop(1);
 				break;
 			}
 			case ELSE:
 			{
 				// hier endet der true-block, false-block ueberspringen
-				char* l=labelid();
+				TOperand* l=labelid();
 				label.push(l);
 				outgoto(l,false);
 
 				//Sprungmarke für cond=false setzen
-				outlabel(cond.top());
+				outlabel(cond.topOp());
 				cond.pop(1);
 				break;
 			}
 			case RELATION_2:
 			{
 				relation = true;
-				char* temp=tempid();
-				char* src=op.top();
+				TOperand* temp=tempid(slong);
+				TOperand* src=op.topOp();
 				op.pop(1);
-				char* dst=op.top();
+				TOperand* dst=op.topOp();
 				outbin(temp,dst,sub,src);
 				// ergebnis darf nicht groesser oder gleich 0 sein
-				outjump(temp,cond.top(),jmpgr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
-				outjump(temp,cond.top(),jmpeq);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				outjump(temp,cond.topOp(),jmpgr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				outjump(temp,cond.topOp(),jmpeq);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
 				break;
 			}
 			case RELATION_3:
 			{
 				relation = true;
-				char* temp=tempid();
-				char* src=op.top();
+				TOperand* temp=tempid(slong);
+				TOperand* src=op.topOp();
 				op.pop(1);
-				char* dst=op.top();
+				TOperand* dst=op.topOp();
 				outbin(temp,src,sub,dst);
 				// ergebnis darf nicht groesser oder gleich 0 sein
-				outjump(temp,cond.top(),jmpgr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
-				outjump(temp,cond.top(),jmpeq);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				outjump(temp,cond.topOp(),jmpgr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				outjump(temp,cond.topOp(),jmpeq);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
 				break;
 			}
 			case RELATION_4:
 			{
 				relation = true;
-				char* temp=tempid();
-				char* src=op.top();
+				TOperand* temp=tempid(slong);
+				TOperand* src=op.topOp();
 				op.pop(1);
-				char* dst=op.top();
+				TOperand* dst=op.topOp();
 				outbin(temp,dst,sub,src);
 				// ergebnis darf nicht groesser 0 sein
-				outjump(temp,cond.top(),jmpgr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				outjump(temp,cond.topOp(),jmpgr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
 				break;
 			}
 			case RELATION_5:
 			{
 				relation = true;
-				char* temp=tempid();
-				char* src=op.top();
+				TOperand* temp=tempid(slong);
+				TOperand* src=op.topOp();
 				op.pop(1);
-				char* dst=op.top();
+				TOperand* dst=op.topOp();
 				outbin(temp,src,sub,dst);
 				// ergebnis darf nicht groesser 0 sein
-				outjump(temp,cond.top(),jmpgr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				outjump(temp,cond.topOp(),jmpgr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
 				break;
 			}
 			case EQUALITY_2:
 			{
 				relation = true;
-				char* temp=tempid();
-				char* src=op.top();
+				TOperand* temp=tempid(slong);
+				TOperand* src=op.topOp();
 				op.pop(1);
-				char* dst=op.top();
+				TOperand* dst=op.topOp();
 				outbin(temp,src,sub,dst);
 				// ergebnis darf muß gleich 0 sein, ansonsten sprung
-				outjump(temp,cond.top(),jmpne);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				outjump(temp,cond.topOp(),jmpne);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
 				break;
 			}
 			case EQUALITY_3:
 			{
 				relation = true;
-				char* temp=tempid();
-				char* src=op.top();
+				TOperand* temp=tempid(slong);
+				TOperand* src=op.topOp();
 				op.pop(1);
-				char* dst=op.top();
+				TOperand* dst=op.topOp();
 				outbin(temp,src,sub,dst);
 				// ergebnis darf nicht gleich 0 sein, ansonsten sprung
-				outjump(temp,cond.top(),jmpeq);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				outjump(temp,cond.topOp(),jmpeq);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
 				break;
 			}
 			case COND_START:
@@ -297,24 +285,24 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				condition=false;
 				if ((!switchcond)&&(!relation))
 				{
-					char* src = op.top();
-					char* temp = tempid();
+					TOperand* src = op.topOp();
+					TOperand* temp = tempid(slong);
 					
 					outbin(temp,src,sub,truevar);
 					
-					outjump(temp,cond.top(),jmpne);	
+					outjump(temp,cond.topOp(),jmpne);	
 				}
 				if ((relation)&&(switchcond)) 
 				{
-					op.push(tempid());
-					outcopy(op.top(), truevar);
+					op.push(tempid(slong));
+					outcopy(op.topOp(), truevar);
 				}
 				relation = false;
 				break;
 			}
 			case WHILE_COND:
 			{
-				char* e=labelid();
+				TOperand* e=labelid();
 				label.push(e);
 				outlabel(e);
 				//Endlabel
@@ -324,26 +312,24 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case WHILE:
 			{
 				// sprung zum start der while-schleife
-				outgoto(label.top(),false);
+				outgoto(label.topOp(),false);
 				label.pop(1);
 				// austritt aus der schleife
-				outlabel(cond.top());
+				outlabel(cond.topOp());
 				cond.pop(1);
 				
 				//Breaklabel setzen
-				outlabel(breakst.top());
+				outlabel(breakst.topOp());
 				//Breaklabel entfernen
 				breakst.pop(1);
 				break;
 			}
 			case INIT_PART:
 			{
-				char* dst = lastident;
-				TType dstt = nl.getType(varidx);
-				char* src = op.top();
-				TType srct = op.toptype();
+				TOperand* dst = lastident;
+				TOperand* src = op.topOp();
 				op.pop(1);
-				checkConvAssign(src,srct,dstt);
+				checkConvAssign(src,dst);
 				outcopy(dst,src);
 				break;
 			}
@@ -351,9 +337,10 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			{
 				outgoto(funcident, true);
 				
-				char* t  = tempid();
+				TOperand* t  = tempid(fl.getReturnType(funcidx));
+				
 				outgetret(t);
-				op.push(t,fl.getReturnType(funcidx));
+				op.push(t);
 				break;
 			}
 			case FUNCTION_CALL_2:
@@ -361,18 +348,19 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				unsigned i = fl.getNum(funcidx);
 				for (unsigned j=0;j<i;j++)
 				{
-					char* s = op.top();
-					TType t1 = op.toptype();
-					TType t2 = fl.getSigType(funcidx, j);
-					checkConvAssign(s,t1,t2);
+					TOperand* s = op.topOp();
+					TOperand* tmp = (TOperand*)malloc(sizeof(TOperand*));
+					tmp->vtype = fl.getSigType(funcidx, j);
+					checkConvAssign(s,tmp);
 					outpush(s);
 					op.pop(1);
 				}
+				
 				outgoto(funcident, true);
 				
-				char* t  = tempid();
+				TOperand* t  = tempid(fl.getReturnType(funcidx));
 				outgetret(t);
-				op.push(t,fl.getReturnType(funcidx));
+				op.push(t);
 				break;
 			}
 			case FUNC_START:
@@ -387,65 +375,66 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case IMPLEMENTATION_5:
 			case IMPLEMENTATION_6:
 			{
-				outret("null");
+				outret(falsevar);
 				break;
 			}
 			case INT_CONSTANT:
 			{
-				op.push(conid(constcount++),sint);
+				op.push(conid(constcount++));
 				break;
 			}
 			case FLOAT_CONSTANT:
 			{
-				op.push(conid(constcount++),sfloat);
+				op.push(conid(constcount++));
 				break;
 			}
 			case CHAR_CONSTANT:
 			{
-				op.push(conid(constcount++),schar);
+				op.push(conid(constcount++));
 				break;
 			}
 			case RETURN_1:
 			{
-				outret("null");
+				outret(falsevar);
 				break;
 			}
 			case RETURN_2:
 			{
-				char* s = op.top();
-				TType t1 = op.toptype();
-				TType t2 = fl.getReturnType(funcidx);
-				checkConvAssign(s,t1,t2);
+				TOperand* s = op.topOp();
+				
+				TOperand* tmp = (TOperand*)malloc(sizeof(TOperand*));
+				tmp->vtype = fl.getReturnType(funcidx);
+				checkConvAssign(s, tmp);
 				outret(s);
 				op.pop(1);
 				break;
 			}
 			case PRIMITIVE_3:
 			{
-				char* t = tempid();
-				outun(t, sminus, op.top());
-				TType tt = op.toptype();
+				TOperand* t = tempid(slong);
+				outun(t, sminus, op.topOp());
+				
 				op.pop(1);
-				op.push(t, tt);
+				op.push(t);
 				break;
 			}
 			case CASE_LABEL_1:
 			{
-				outlabel(label.top());
+				outlabel(label.topOp());
 				label.pop(1);
 				label.push(labelid());
-				char* temp=tempid();
-				char* src=op.top();
+				TOperand* temp=tempid(slong);
+				TOperand* src=op.topOp();
 				op.pop(1);
-				char* dst=op.top();
+				TOperand* dst=op.topOp();
 				
 				outbin(temp,src,sub,dst);
-				outjump(temp,label.top(),jmpne);
+				outjump(temp,label.topOp(),jmpne);
 				break;
 			}
 			case CASE_LABEL_2:
 			{
-				outlabel(label.top());
+				outlabel(label.topOp());
 				label.pop(1);
 				label.push(labelid());
 				break;
@@ -458,11 +447,11 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case SWITCH:
 			{
 				// übriggebliebenes case-jump label...
-				outlabel(label.top()); 
+				outlabel(label.topOp()); 
 				label.pop(1);
 				
 				//Breaklabel setzen
-				outlabel(breakst.top());
+				outlabel(breakst.topOp());
 				//Breaklabel entfernen
 				breakst.pop(1);
 				
@@ -473,7 +462,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case SWITCH_COND:
 			{
 				
-				outlabel(cond.top());
+				outlabel(cond.topOp());
 				cond.pop(1);
 				
 				// Label fürs Ende des Switch-Block
@@ -485,13 +474,13 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case BREAK:
 			{
-				char* b = breakst.top();
+				TOperand* b = breakst.topOp();
 				if (b==0) 
 				{
 					cout<<"[code-il] break statement not within loop or switch\n";
 					exit(-1);
 				}
-				outgoto(breakst.top(),false);
+				outgoto(breakst.topOp(),false);
 			}
 		}
 		start++;
@@ -502,8 +491,9 @@ char* IL::genIL(unsigned* start, unsigned* end)
 }
 
 
-char* IL::varid(unsigned i)
+TOperand* IL::varid(unsigned i)
 {
+	/*
 	char* c = nl.getIdent(i);
 	if (c==0) return 0;
 	unsigned block = nl.getBlock(i);
@@ -511,11 +501,20 @@ char* IL::varid(unsigned i)
 	sprintf(n,"_");
 	strcpy(n+1,c);
 	sprintf(n+strlen(c)+1,"%u",block);
-	return n;
+	*/
+	TOperand* tmp = (TOperand*)malloc(sizeof(TOperand));
+	
+	tmp->type = nl.isGlobal(i)?gvar:lvar;
+	
+	tmp->vtype = nl.getType(i);
+	tmp->add = nl.getAddr(i);
+	
+	return tmp;
 }
 
-char* IL::conid(unsigned i)
+TOperand* IL::conid(unsigned i)
 {
+	/*
 	TType t = cl.getType(i);
 	if (t==undeclared) return 0;
 	
@@ -526,21 +525,32 @@ char* IL::conid(unsigned i)
 	if (t==slong) strcpy(n,"long");
 
 	sprintf(n+strlen(n),"%u",i);
+	*/
+	TOperand* tmp = (TOperand*)malloc(sizeof(TOperand));
 	
-	return n;
+	tmp->type = constant;
+	
+	tmp->add = 99;
+	
+	return tmp;
 
 }
 
-char* IL::tempid()
+TOperand* IL::tempid(TType t)
 {
 	char* n = (char*)malloc(VAR_LENGTH_ID);
 	strcpy(n,"temp");
 	sprintf (n+4,"%u",tempcount++);
-
-	return n;
+	
+	TOperand* tmp = (TOperand*)malloc(sizeof(TOperand));
+	tmp->type = temp;
+	tmp->vtype = t;
+	tmp->label = n;
+	
+	return tmp;
 }
 
-char* IL::funcid(unsigned i)
+TOperand* IL::funcid(unsigned i)
 {
 	char* c = fl.getIdent(i);
 	if (c==0) return 0;
@@ -548,35 +558,49 @@ char* IL::funcid(unsigned i)
 	char* n = (char*)malloc(VAR_LENGTH_ID);
 	strcpy(n,c);
 	sprintf(n+strlen(c),"%u",num);
-
-	return n;
+	
+	TOperand* tmp = (TOperand*)malloc(sizeof(TOperand));
+	tmp->type = labelstring;
+	tmp->label = n;
+	
+	return tmp;
 }
 
-char* IL::labelid()
+TOperand* IL::labelid()
 {
+	
 	char* n = (char*)malloc(VAR_LENGTH_ID);
 	strcpy(n,"label");
 	sprintf (n+5,"%u",labelcount++);
-
-	return n;
+	
+	TOperand* tmp = (TOperand*)malloc(sizeof(TOperand));
+	tmp->type = labelstring;
+	tmp->label = n;
+	
+	return tmp;
 }
 
-char* IL::condlabelid()
+TOperand* IL::condlabelid()
 {
 	char* n = (char*)malloc(VAR_LENGTH_ID);
 	strcpy(n,"condlabel");
 	sprintf (n+9,"%u",condlabelcount++);
-
-	return n;
+	
+	TOperand* tmp = (TOperand*)malloc(sizeof(TOperand));
+	tmp->type = labelstring;
+	tmp->label = n;
+	
+	return tmp;
 }
 
-void IL::outcopy(char* l, char* r)
+void IL::outcopy(TOperand* l, TOperand* r)
 {
 
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=mov_;
-	op->operand1=l;
-	op->operand2=r;
+	
+	op->operand1=(TOperand*)l;
+	op->operand2=(TOperand*)r;
 
 	if (condition)
 	{
@@ -589,7 +613,7 @@ void IL::outcopy(char* l, char* r)
 	}
 }
 
-void IL::outbin(char* l, char* x, TBinOp o, char* y)
+void IL::outbin(TOperand* l, TOperand* x, TBinOp o, TOperand* y)
 {
 	unsigned a;
 	switch(o)
@@ -604,19 +628,19 @@ void IL::outbin(char* l, char* x, TBinOp o, char* y)
 	}
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=a;
-	op->operand1=l;
-	op->operand2=x;
-	op->operand3=y;
+	op->operand1=(TOperand*)l;
+	op->operand2=(TOperand*)x;
+	op->operand3=(TOperand*)y;
 	ilList.append(op);
 }
 
-void IL::outun(char* l, TUnOp u, char* y)
+void IL::outun(TOperand* l, TUnOp u, TOperand* y)
 {
 	if (u==sminus)
 	{
 		struct TOp* op=(TOp*)malloc(sizeof(TOp));
 		op->TOpType=sminus_;
-		op->operand1=y;
+		op->operand1=(TOperand*)y;
 		ilList.append(op);
 	}
 }
@@ -630,23 +654,23 @@ void IL::outun(char* l, TUnOp u, char* y)
  * Ohne gesetzes call ein normaler Sprung, wie zb. bei
  * if/else/while/break usw.
  */
-void IL::outgoto(char* label, bool call)
+void IL::outgoto(TOperand* label, bool call)
 {
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=call?call_:goto_;
-	op->operand1=label;
+	op->operand1 = (TOperand*)label;
 	ilList.append(op);
 }
 
-void IL::outlabel(char* label)
+void IL::outlabel(TOperand* label)
 {
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=label_;
-	op->operand1=label;
+	op->operand1 = (TOperand*)label;
 	ilList.append(op);
 }
 
-void IL::outjump(char* cc,char* jmp,TJmp type)
+void IL::outjump(TOperand* cc,TOperand* jmp,TJmp type)
 {
 	unsigned a;
 	switch(type)
@@ -658,61 +682,65 @@ void IL::outjump(char* cc,char* jmp,TJmp type)
 	}
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=a;
-	op->operand1=cc;
-	op->operand2=jmp;
+	op->operand1=(TOperand*)cc;
+	op->operand2=(TOperand*)jmp;
 	ilList.append(op);
 }
 
-void IL::outret(char* l)
+void IL::outret(TOperand* l)
 {
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=ret_;
-	op->operand1=l;
+	op->operand1=(TOperand*)l;
 	ilList.append(op);
 }
 
-void IL::outpush(char* l)
+void IL::outpush(TOperand* l)
 {
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=push_;
-	op->operand1=l;
+	op->operand1=(TOperand*)l;
 	ilList.append(op);
 }
 
-void IL::outgetret(char* l)
+void IL::outgetret(TOperand* l)
 {
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=getret_;
-	op->operand1=l;
+	op->operand1=(TOperand*)l;
 	ilList.append(op);	
 }
 
-TType IL::checkConv(char*& m1, char*& m2, TType t1, TType t2)
+TType IL::checkConv(TOperand*& m1, TOperand*& m2)
 {
+	TType t1 = m1->vtype;
+	TType t2 = m2->vtype;
 	// es duerfen nur temp. variablen als operanden verwendet werden!
-	if (*m1=='_') 
+	if (((TOperand*)m1)->type!=temp)
 	{
-		char* t = tempid();
+		TOperand* t = tempid(t1);
 		outcopy(t, m1);
 		m1 = t;
-	} if  (*m2=='_')
+	} if (((TOperand*)m2)->type!=temp)
 	{
-		char* t = tempid();
+		TOperand* t = tempid(t2);
 		outcopy(t, m2);
 		m2 = t;
 	}
+	
+	
 	if (t1!=t2)
 	{
 		if ((t1==sfloat)&&(t2==sint))
 		{
-			char* m3 = tempid();
+			TOperand* m3 = tempid(sfloat);
 			outconvert(m2,m3,sfloat);
 			m2 = m3;
 			return sfloat;
 		}
 		else if ((t1==sint)&&(t2==sfloat))
 		{
-			char* m3 = tempid();
+			TOperand* m3 = tempid(sfloat);
 			outconvert(m1,m3,sfloat);
 			m1 = m3;
 			return sfloat;
@@ -724,27 +752,30 @@ TType IL::checkConv(char*& m1, char*& m2, TType t1, TType t2)
 	return t1;
 }
 
-TType IL::checkConvAssign(char*& m1, TType t1, TType t2)
+TType IL::checkConvAssign(TOperand*& m1, TOperand*& m2)
 {
+	TType t1 = m1->vtype;
+	TType t2 = m2->vtype;
 	// es duerfen nur temp. variablen als operanden verwendet werden!
-	if (*m1=='_') 
+	if (((TOperand*)m1)->type!=temp) 
 	{
-		char* t = tempid();
+		TOperand* t = tempid(t1);
 		outcopy(t, m1);
 		m1 = t;
 	}
+	
 	if (t1!=t2)
 	{
 		if ((t1<=slong)&&(t2==sfloat))
 		{
-			char* t = tempid();
+			TOperand* t = tempid(sfloat);
 			outconvert(m1,t,sfloat);
 			m1 = t;
 			return sfloat;
 		}
 		else if ((t1==sfloat)&&(t2<=slong))
 		{
-			char* t = tempid();
+			TOperand* t = tempid(sint);
 			outconvert(m1,t,t2);
 			m1 = t;
 			return sint;
@@ -757,7 +788,7 @@ TType IL::checkConvAssign(char*& m1, TType t1, TType t2)
 	}
 	return t1;
 }
-void IL::outconvert(char* m1, char* m2, TType to)
+void IL::outconvert(TOperand* m1, TOperand* m2, TType to)
 {
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	unsigned a;
@@ -766,8 +797,8 @@ void IL::outconvert(char* m1, char* m2, TType to)
 	if (to==slong) a = long_;
 	if (to==sfloat) a = float_;
 	op->TOpType=a;
-	op->operand1=m2;
-	op->operand2=m1;
+	op->operand1=(TOperand*)m2;
+	op->operand2=(TOperand*)m1;
 	if (condition)
 	{
 		ilList.insert(op,condinsert+1);

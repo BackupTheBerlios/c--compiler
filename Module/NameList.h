@@ -34,6 +34,10 @@ unsigned getBlock(unsigned);
 
 TType getType(unsigned);
 
+unsigned getAddr(unsigned);
+
+bool isGlobal(unsigned);
+
 
 private:
 	struct TNameListEntry* start;

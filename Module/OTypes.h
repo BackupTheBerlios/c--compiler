@@ -157,13 +157,46 @@ struct TNode
 	int type;
 };
 
+enum TType {
+    schar,
+    sint,
+    slong,
+    sfloat,
+    svoid,
+    sstruct,
+    undeclared
+};
+
+enum TOperandType 
+{
+	temp,
+	lvar,  // lokale Variable
+	gvar,  // globale 
+	constant,
+	labelstring
+};
+
+struct TOperand
+{
+	TOperandType type;  
+	TType vtype;
+	union 
+	{
+		char* label;
+		unsigned add;
+	};
+};
+
 struct TOp
 {
 	int TOpType;
-	char* operand1;
-	char* operand2;
-	char* operand3;
+	TOperand* operand1;
+	TOperand* operand2;
+	TOperand* operand3;
 };
+
+
+
 
 enum	TOpType {
     mov_,
@@ -199,15 +232,6 @@ enum TJmp {
     jmpne,
 };
 
-enum TType {
-    schar,
-    sint,
-    slong,
-    sfloat,
-    svoid,
-    sstruct,
-    undeclared
-};
 
 enum TBinOp {
     mult,
