@@ -689,6 +689,18 @@ void IL::outgetret(char* l)
 
 TType IL::checkConv(char*& m1, char*& m2, TType t1, TType t2)
 {
+	// es duerfen nur temp. variablen als operanden verwendet werden!
+	if (*m1=='_') 
+	{
+		char* t = tempid();
+		outcopy(t, m1);
+		m1 = t;
+	} if  (*m2=='_')
+	{
+		char* t = tempid();
+		outcopy(t, m2);
+		m2 = t;
+	}
 	if (t1!=t2)
 	{
 		if ((t1==sfloat)&&(t2==sint))
@@ -714,6 +726,13 @@ TType IL::checkConv(char*& m1, char*& m2, TType t1, TType t2)
 
 TType IL::checkConvAssign(char*& m1, TType t1, TType t2)
 {
+	// es duerfen nur temp. variablen als operanden verwendet werden!
+	if (*m1=='_') 
+	{
+		char* t = tempid();
+		outcopy(t, m1);
+		m1 = t;
+	}
 	if (t1!=t2)
 	{
 		if ((t1<=slong)&&(t2==sfloat))
