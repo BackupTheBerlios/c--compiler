@@ -19,8 +19,8 @@ void Bacom::genAsm()
 	outloa(sint, rsp, rnull, "const_stack");
 	outloa(sint, rglobal, rnull, "const_global");
 	
-	// offset bis zum naechsten lokalen frame = 32
-	unsigned para = 32;
+	// offset bis zum naechsten lokalen frame = 36
+	unsigned para = 0;
 	for ( unsigned i = 1; i <= ilList.count(); i++ )
 	{
 		TOp* e = ilList.getelem( i );
@@ -33,7 +33,7 @@ void Bacom::genAsm()
 
 		case label_:
 			{
-				para = 32;
+				para = 0;
 				bsm<<op1->label<<":\n";
 				if (op1->type == funclabel)
 				{
@@ -47,7 +47,7 @@ void Bacom::genAsm()
 					// Registerzuordnungen löschen
 					regs.invalidate();
 
-					// Lokale Basis neu setzen (alignment fehlt noch!)
+					// Lokale Basis neu setzen
 					outmov(rlb, rsp);
 
 					// Platz schaffen fuer lokales Frame, sp um Framegroesse weiterschieben
@@ -67,12 +67,19 @@ void Bacom::genAsm()
 
 					if ( op2->type==constant)		// wenn type==constant, dann aus Konstantenliste laden
 						outloa( op1->vtype, r, rnull , op2->label );
-					else
+					else if (op2->type==gvar)
 						outloa( op1->vtype, r, Register::typeToReg( op2->type ), op2->add );
+					else if (op2->type==lvar)
+						outloa( op1->vtype, r, Register::typeToReg( op2->type ), -(op2->add) );
+					
+					
 
 				} else	// a:=t;
 				{
-					outstr( op1->vtype, regs.whichReg( op2 ), ( ( op1->type == gvar ) ? rglobal : rlb ), op1->add );
+					if (op1->type==gvar)
+						outstr( op1->vtype, regs.whichReg( op2 ), rglobal,  op1->add );
+					else 
+						outstr( op1->vtype, regs.whichReg( op2 ), rlb,  -(op1->add) );
 					regs.freeReg( op2 );
 				}
 
@@ -83,8 +90,9 @@ void Bacom::genAsm()
 		case push_:
 		{
 			// Paramter ins lokale Frame der aufgerufenen Funktion schreiben
-			outstr(op1->vtype, regs.whichReg(op1), rsp, para);
-			para+=((op1->vtype>=slong)?4:(op1->vtype+1));
+			unsigned offs = para++;
+			unsigned add = fl.getParaAdd(op2->no, offs);
+			outstr(op1->vtype, regs.whichReg(op1), rsp, -(36+add));
 			break;
 		}
 		

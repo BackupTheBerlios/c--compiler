@@ -156,6 +156,10 @@
 // maximale Anzahl Case-Labels
 #define MAX_NO_OF_CASE_LABELS 4096
 
+// maximale Anzahl Parameter
+#define MAX_NO_OF_PARAMETERS 16
+
+
 
 
 struct TNode

@@ -2,6 +2,7 @@
 #define functionlist_h
 
 #include "OTypes.h"
+#include "Stack.h"
 
 class FunctionList
 {
@@ -19,6 +20,7 @@ struct TFunctionListEntry
 	unsigned maxsp; // Groesse des Variablensblocks im lokalen Frame
 	unsigned frame_constant;
 	unsigned sig_constant;
+	unsigned para[MAX_NO_OF_PARAMETERS];
 };
 
 FunctionList();
@@ -45,6 +47,10 @@ char* checkForUnImplemented();
 unsigned getFrameConstant(unsigned);
 unsigned getSigConstant(unsigned);
 
+void setParaAdd(unsigned, unsigned, unsigned);
+unsigned getParaAdd(unsigned, unsigned);
+
+
 void setMainFunc(unsigned i) { mainfunc = i; }
 unsigned getMainFunc() { return mainfunc; }
 
@@ -55,6 +61,7 @@ private:
 	struct TFunctionListEntry* start;
 	unsigned no;
 	unsigned mainfunc;
+	Stack par;
 	
 };
 

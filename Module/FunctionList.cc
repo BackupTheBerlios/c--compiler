@@ -151,6 +151,16 @@ unsigned FunctionList::getSigConstant(unsigned u)
 	return pos->sig_constant;
 }
 
+void FunctionList::setParaAdd(unsigned u, unsigned i, unsigned add)
+{
+	TFunctionListEntry* pos = start+u-MAX_NO_OF_VARIABLES-1;
+	pos->para[i] = add;
+}
 
+unsigned FunctionList::getParaAdd(unsigned u, unsigned i)
+{
+	TFunctionListEntry* pos = start+u-MAX_NO_OF_VARIABLES-1;
+	return pos->para[i];
+}
 
 

@@ -35,7 +35,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 	mainfunc->type = funclabel;
 	mainfunc->no = fl.getMainFunc();
 	
-	
+	TOperand* lastfunclabel;
 	
 	
 
@@ -53,7 +53,8 @@ char* IL::genIL(unsigned* start, unsigned* end)
 					if (func)
 					{
 						func = false;
-						/*if (!fl.isProto(idx))*/ outlabel(funcident);
+						outlabel(funcident);
+						lastfunclabel = funcident;
 					}
 				}
 				else
@@ -387,14 +388,15 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case FUNCTION_CALL_2:
 			{
 				int i = fl.getNum(funcidx)-1;
+				int j = i;
 				for (;i>=0;i--)
 				{
 					TOperand* s = op.topOp();
 					TOperand* tmp = (TOperand*)malloc(sizeof(TOperand));
-					tmp->vtype = fl.getSigType(funcidx, i);
+					tmp->vtype = fl.getSigType(funcidx, j-i);
 					checkConvAssign(s, tmp);
 					
-					outpush(s);
+					outpush(s, funcident);
 					op.pop(1);
 				}
 				
@@ -490,7 +492,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case IMPLEMENTATION_5:
 			case IMPLEMENTATION_6:
 			{
-				outret(0, funcident);
+				outret(0, lastfunclabel);
 				break;
 			}
 			case INT_CONSTANT:
@@ -510,7 +512,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case RETURN_1:
 			{
-				outret(0, funcident);
+				outret(0, lastfunclabel);
 				break;
 			}
 			case RETURN_2:
@@ -520,7 +522,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				TOperand* tmp = (TOperand*)malloc(sizeof(TOperand*));
 				tmp->vtype = fl.getReturnType(funcidx);
 				checkConvAssign(s, tmp);
-				outret(s, funcident);
+				outret(s, lastfunclabel);
 				op.pop(1);
 				break;
 			}
@@ -794,11 +796,12 @@ void IL::outret(TOperand* l, TOperand* f)
 	ilList.append(op);
 }
 
-void IL::outpush(TOperand* l)
+void IL::outpush(TOperand* l, TOperand* f)
 {
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=push_;
 	op->operand1=(TOperand*)l;
+	op->operand2=(TOperand*)f;
 	ilList.append(op);
 }
 

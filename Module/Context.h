@@ -67,7 +67,7 @@ private:
 	unsigned lastconst;
 	unsigned startc;
 	unsigned func_constants;
-
+	
 
 
 

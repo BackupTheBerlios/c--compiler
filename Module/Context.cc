@@ -159,7 +159,7 @@ if(n != 0)
         case CONSTANT_3                 : minus = true; context(n->n1); minus = false; break;
         case UNSIGNED_CONSTANT          : context(n->n1); break;
         case CHAR_CONSTANT              : if(minus) cl.insert(-(char)n->n1, ++cc);  else { cl.insert((char)n->n1, ++cc); lastconst = (char)n->n1; break; }
-        case INT_CONSTANT               : if(minus) cl.insert(-(int)n->n1, ++cc); else { cl.insert((int)n->n1, ++cc); lastconst = (int)n->n1; break; }
+        case INT_CONSTANT               : if(minus) cl.insert(-(int)n->n1, ++cc); else { cl.insert((int)n->n1, ++cc); lastconst = (long)n->n1; break; }
         case FLOAT_CONSTANT             : if(minus) cl.insert(-*(double*)n->n1, ++cc); else cl.insert(*(double*)n->n1, ++cc); break;
         case COMPLEX_CONSTANT_OPT       : context(n->n1); break;
         case COMPLEX_CONSTANT_ST_1      : context(n->n1); break;
@@ -193,14 +193,18 @@ if(n != 0)
                                           retu = false;
                                           //strcpy(sig,"\0");
                                           unsigned num = 0;
+                                          
+                                          TType para[MAX_NO_OF_PARAMETERS];
                                           while(1)
                                           {   
                                             TType tmp = par.toptype();                                            
                                             if (tmp==undeclared) break;
                                             *(sig++)=tmp;
                                             par.pop(1);
-                                            num++;
+                                            para[num] = tmp;                                
+                                            num++;                                            
                                           }
+                                          cout<<endl;
                                           //cout<<"Name: "<<c<<" SIG: "<<sig<<"\n";
                                         
                                           
@@ -210,7 +214,15 @@ if(n != 0)
                                             cout<<"[context] function "<<c<<" with same signature already defined";
                                             exit(-1);
                                           }
-                                          fl.insert(c, sig-num, ret, num, proto, maxsp, func_constants, func_constants+1);
+                                          unsigned no = fl.insert(c, sig-num, ret, num, proto, maxsp, func_constants, func_constants+1);
+                                          unsigned parsize = 0;
+                                          for (int i=num-1; i>=0; i--)
+                                          {
+	                                          int length = (para[i]>=slong)?4:(para[i]+1);
+	                                          parsize = align(parsize, length);
+	                                          fl.setParaAdd(no, i, parsize);
+	                                          parsize += length;                                          
+                                          }
                                           icl.insert((int)align(maxsp,4), func_constants++);
                                           icl.insert((int)num, func_constants++);
                                           
@@ -219,7 +231,7 @@ if(n != 0)
                                           ft.pop(1);
                                           func = false;
                                           maxsp = 0;
-                                          
+                                                                                
                                           
                                         }
                                           break;

@@ -60,7 +60,7 @@ private:
 	
 	void outgetret(TOperand*);
 	
-	void outpush(TOperand*);
+	void outpush(TOperand*, TOperand*);
 	
 	void outconvert(TOperand*, TOperand*, TType);
 	
