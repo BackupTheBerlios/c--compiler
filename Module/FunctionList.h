@@ -32,6 +32,8 @@ unsigned getNum(unsigned);
 
 unsigned nextId();
 
+unsigned isProto(char*, unsigned);
+
 char* checkForUnImplemented();
 
 private:

@@ -23,7 +23,7 @@ unsigned FunctionList::insert(char* n, char* sig, char* ret, unsigned num, bool 
 			if ((strcmp(cur->name,n)==0)&&(cur->num==num)&&(cur->proto)) 
 			{
 				cur->proto = 0;
-				break;
+				return c;
 			}
 			cur++;
 			c++;
@@ -99,6 +99,24 @@ char* FunctionList::checkForUnImplemented()
 	{
 		if (cur->proto==1) return cur->name;
 		cur++;
+		if (cur==start+no) return 0;
+	}
+}
+
+
+unsigned FunctionList::isProto(char* n, unsigned num)
+{	
+	if (no==0) return 0;
+	TFunctionListEntry* cur = start;
+	unsigned c = MAX_NO_OF_VARIABLES+1;
+	while(1)
+	{
+		//cout<<"name: "<<n<<" Sig: "<<sig<<"  curname: "<<cur->name<<" cursig: "<<cur->signature<<"\n";
+		// NOCH KEINE AUSWERTUNG DER SIGNATUR
+		//if ((strcmp(cur->name,n)==0)&&(strcmp(cur->signature,sig)==0)) return true; 
+		if ((strcmp(cur->name,n)==0)&&(cur->num==num)&&(cur->proto)) return c;
+		cur++;
+		c++;
 		if (cur==start+no) return 0;
 	}
 }
