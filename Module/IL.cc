@@ -141,13 +141,14 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				op.pop(1);
 				TOperand* m2 = op.topOp();
 				TType t2 = m2->vtype;
+				op.pop(1);
 				if ((t1==sfloat)||(t2==sfloat))
 				{
 					cout<<"[code-il] float-shift not permitted";
 					exit(-1);
 				}
-				op.pop(1);
-				TOperand* p = tempid(t1);
+				TType tt = checkConv(m1,m2);
+				TOperand* p = tempid(tt);
 				outbin(p, m2, shiftl, m1);
 				op.push(p);
 				break;
@@ -165,7 +166,8 @@ char* IL::genIL(unsigned* start, unsigned* end)
 					cout<<"[code-il] float-shift not permitted";
 					exit(-1);
 				}
-				TOperand* p = tempid(t1);
+				TType tt = checkConv(m1,m2);
+				TOperand* p = tempid(tt);
 				outbin(p, m2, shiftr, m1);
 				op.push(p);
 				break;

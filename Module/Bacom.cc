@@ -164,12 +164,16 @@ void Bacom::genAsm()
 			}
 		case shiftl_:
 			{
-				cout << "[bacom] noch nicht implementiert\n";
+				regs.changeReg( op1, op2 ); 						// Registerdeskriptor aendern (op2 wird zu op1)
+				outshl(op1->vtype, regs.whichReg( op1 ), regs.whichReg( op3 ));		// Dann wird der op1 um op3 stellen nach links geshiftet
+				regs.freeReg( op3 );
 				break;
 			}
 		case shiftr_:
 			{
-				cout << "[bacom] noch nicht implementiert\n";
+				regs.changeReg( op1, op2 ); 						// Registerdeskriptor aendern (op2 wird zu op1)
+				outshr(op1->vtype, regs.whichReg( op1 ), regs.whichReg( op3 ));		// Dann wird der op1 um op3 stellen nach rechts geshiftet
+				regs.freeReg( op3 );
 				break;
 			}
 		case sminus_:
@@ -408,6 +412,26 @@ void Bacom::outdiv( TType type, TReg dest, TReg src )
 		cout << "l";
 	else if ( type == sfloat )
 		cout << "f";
+	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+}
+
+void Bacom::outshl( TType type, TReg dest, TReg src )
+{
+	cout << "shl.";
+	if ( type == sint )
+		cout << "w";
+	else if ( type == slong )
+		cout << "l";
+	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+}
+
+void Bacom::outshr( TType type, TReg dest, TReg src )
+{
+	cout << "shr.";
+	if ( type == sint )
+		cout << "w";
+	else if ( type == slong )
+		cout << "l";
 	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
 }
 
