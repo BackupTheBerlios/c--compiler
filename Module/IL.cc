@@ -453,6 +453,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case SWITCH_START:
 			{
 				switchcond = true;
+				break;
 			}
 			case SWITCH:
 			{
