@@ -58,7 +58,7 @@ int LifeClient::startUp()
 */
 void LifeClient::loop()
 {
-	int message;
+	char message;
 	int req[2];	// request next Step
 	req[0] = 'N';
 	req[1] = -1;
@@ -71,6 +71,7 @@ void LifeClient::loop()
 		req[1] = step++;
 		net->request( server, &req, 8,  &message, sizeof(message) );
 	}
+	cout<<"server sends: "<<message<<endl;
 }
 
 /**
@@ -100,6 +101,7 @@ void LifeClient::makeStep()
 			req[ 2 ] = y_;
 // 			cout<<"G";
 			net->request( server, &req, 12, &message, sizeof(message) );
+			cout<<message<<" ";
 			board_a->setPos(x-(x1-1), y-(y1-1), (life_status_t)message);
 		}
 	}
@@ -143,8 +145,10 @@ void LifeClient::makeStep()
 				else
 					req[ 3 ] = board_a->readPos(x,y);
 			}
+
 // 			cout<<"S";
 			net->request( server, &req, 16, &message, sizeof(message) );
+
 		}
 	}
 	

@@ -16,6 +16,9 @@ int main()
 	UDPNetwork* net = new UDPNetwork(7654);
 	LocalBoard* board_a = new LocalBoard(BOARD_WIDTH,BOARD_HEIGHT);
 	LocalBoard* board_b = new LocalBoard(BOARD_WIDTH,BOARD_HEIGHT);
+	
+	board_a->restoreBoard("test.board");
+			
 	BoardServer* boardserver = new BoardServer((IPNetwork *)net,1,(Board *)board_a,(Board *)board_b,10);
 	
 	boardserver->start();

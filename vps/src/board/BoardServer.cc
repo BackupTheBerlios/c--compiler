@@ -37,7 +37,7 @@ void BoardServer::start()
 			net->receive(all, &hello, sizeof(char));
 			if (hello=='X') 
 			{
-				// in all steht die sourceaddr!
+				// in all steht die source:addr!
 				logon(&all);
 				break;
 			}
@@ -51,7 +51,7 @@ void BoardServer::start()
 	notifyAll();
 	
 	// Und los gehts
-	for( ; timestep<timesteps; timestep++)
+	for( timestep = 0 ; timestep<timesteps; timestep++)
 	{
 		cout<<"[boardserver] step "<<timestep<<endl;
 		notcomplete = true;
@@ -63,19 +63,20 @@ void BoardServer::start()
 			
 			if (msg[0]==2)  //setPos
 			{
-				cout<<"S";
+				//cout<<"S";
 				board_b->setPos(msg[1], msg[2], (life_status_t)msg[3]);
 				char anything;
 				net->reply(all, &anything, 1);
 			}
 			else if (msg[0]==1) //getPos
 			{
-				cout<<"G";
+				//cout<<"G";
 				int val = board_a->readPos(msg[1], msg[2]);
+				cout<<val<<" ";
 				net->reply(all, &val, sizeof(life_status_t));
 			} else if (msg[0]=='N') //barrier
 			{
-				cout<<"N";
+				//cerr<<"N";
 				barrier(&all, msg[1]);
 			} else
 			{
@@ -87,10 +88,12 @@ void BoardServer::start()
 		// Berechnungsschritt fertig
 		cout<<"[boardserver] step "<<timestep<<" completed"<<endl;
 		// boards tauschen
+		cout<<"a: "<<board_a<<" b: "<<board_b<<endl;
 		Board* temp = board_a;
 		board_a = board_b;
 		board_b = temp;
 		
+		cout<<"a: "<<board_a<<" b: "<<board_b<<endl;
 		// Clients benachrichtigen
 		notifyAll();
 		
@@ -140,7 +143,7 @@ void BoardServer::barrier(IPAddress* ip,int timestep)
 		cout<<"[boardserver] received message from timestep "<<timestep<<" but we are in "<<this->timestep<<endl;
 		//exit(-1);
 	}
-	for(int i; i<clients; i++)
+	for(int i=0; i<clients; i++)
 	{
 		if (addresses[i] == *ip)
 		{
