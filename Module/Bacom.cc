@@ -125,22 +125,22 @@ void Bacom::genAsm()
 
 		case jmpgr_: 	// greater zero
 			{
-				outjmp(rnull, op1->label, jmpgr);
+				outjmp(rnull, op2->label, jmpgr);
 				break;
 			}
 		case jmple_: 	// less zero
 			{
-				outjmp(rnull, op1->label, jmple);
+				outjmp(rnull, op2->label, jmple);
 				break;
 			}
 		case jmpeq_: 	// equal zero
 			{
-				outjmp(rnull, op1->label, jmpeq);
+				outjmp(rnull, op2->label, jmpeq);
 				break;
 			}
 		case jmpne_: 	// not equal
 			{
-				outjmp(rnull, op1->label, jmpne);
+				outjmp(rnull, op2->label, jmpne);
 				break;
 			}
 		case mult_:
@@ -549,14 +549,14 @@ void Bacom::outbra(TReg r, int offs)
 void Bacom::outjmp(TReg r, char* c, TJmp type)
 {
 	if (type==jmple)
-		cout<<"ble ";
+		bsm<<"ble ";
 	else if (type==jmpne)
-		cout<<"bne ";
+		bsm<<"bne ";
 	else if (type==jmpgr)
-		cout<<"bgr ";
+		bsm<<"bgr ";
 	else if (type==jmpeq)
-		cout<<"beq ";
-	cout<<Register::toString( r )<<"+"<<c<<endl;
+		bsm<<"beq ";
+	bsm<<Register::toString( r )<<"+"<<c<<endl;
 }
 
 void Bacom::outlic(TReg r, TReg s, int offs)
