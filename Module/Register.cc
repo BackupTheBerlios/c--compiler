@@ -7,6 +7,8 @@ Register::Register()
 
 TReg Register::getReg(TOperand* temp, TReg& r)
 {
+	// known bug: wenn regusable ungerade, kann einem long oder float das letzte nicht alignete register zugeordnet werden
+	// ausserdem muss regusable min so gross gewaehlt werden, dass 2 long reinpassen (bei verwendung von long oder float im programm)
 	unsigned i;
 	bool found = false;
 	unsigned minmark = 0xFFFFFFFF;
@@ -38,7 +40,8 @@ TReg Register::getReg(TOperand* temp, TReg& r)
 			minmark = reglist[i].mark;
 		}
 	}
-	if (!found) {
+	if (!found)
+	{
 		i = minpos;				// ->wurde lange nicht mehr benutzt, wird ausgelagert
 		spillreglist.append(reglist[i].var, (TReg)i);	// wenn kein register mehr frei ->am laengsten nicht mehr benutztes wird ausgelagert
 	}
@@ -71,11 +74,16 @@ void Register::freeReg(TOperand* temp)
 		}
 	}
 	if (!spillreglist.del(temp))		// evt. noch ausgelagert, muss auch geloescht werden, Fehler, wenn auch dort nicht vorhanden
-		cout<<"freeReg() error\n";
+	{
+		cout<<"freeReg() error - "<<temp->label<<" not found!\n";
+		out();
+		exit(-1);
+	}
 }
 
 void Register::changeReg(TOperand* dest, TOperand* src)		// Register wird von op2 auf op1 geaendert
 {
+// 	cout<<"ChangeReg "<<dest->label<<", "<<src->label<<"!\n";
 	if ( (src->vtype>=slong && dest->vtype<=sint) || (src->vtype<=sint && dest->vtype>=slong) ) { cout<<"changeReg() error, types not compatible!\n"; return; }
 	for(int i=0; i<regusable; i++)
 	{
@@ -92,10 +100,16 @@ void Register::changeReg(TOperand* dest, TOperand* src)		// Register wird von op
 		}
 	}
 	char* label=spillreglist.where(src);
+
 	if (!spillreglist.del(src))		// evt ausgelagert, dort loeschen
-		cout<<"changeReg() error: Register not found!\n";
+	{
+		cout<<"changeReg() error: "<<src->label<<" not found!\n";
+		out();
+		exit(-1);
+	}
 	else
 		spillreglist.append(dest,label);	// ... und neuen operanden einfuegen
+
 }
 
 void Register::biggerReg(TOperand* op)
@@ -127,10 +141,18 @@ void Register::biggerReg(TOperand* op)
 					return;
 				}
 			}
+			// kein passendes Register gefunden, auslagern
+			spillreglist.append (op, (TReg) i);
+			reglist[i].mark = 0;
+			reglist[i].var = 0;
 		}
 	}
 	if (!spillreglist.isValid(op))		// pruefen, ob operand ausgelagert ist
-		cout<<"biggerReg() error - op not found!\n";
+	{
+		cout<<"biggerReg() error - "<<op->label<<" not found!\n";
+		out();
+		exit(-1);
+	}
 	return;
 }
 
@@ -151,7 +173,11 @@ void Register::smallerReg(TOperand* op)
 		}
 	}
 	if (!spillreglist.isValid(op))		// pruefen, ob operand ausgelagert ist
-		cout<<"smallerReg() error - op not found!\n";
+	{
+		cout<<"smallerReg() error - "<<op->label<<" not found!\n";
+		out();
+		exit(-1);
+	}
 	return;
 }
 
@@ -165,7 +191,7 @@ TReg Register::whichReg(TOperand* temp)
 			return (TReg)i;
 		}
 	}
-// 	cout<<"Register::whichReg ->Operand nicht in Registern vorhanden!\n";
+	// 	cout<<"Register::whichReg ->Operand nicht in Registern vorhanden!\n";
 	if (spillreglist.isValid(temp))		// pruefen, ob operand ausgelagert ist
 	{
 		TReg r;
@@ -180,7 +206,9 @@ TReg Register::whichReg(TOperand* temp)
 		spillreglist.del(temp);
 		return r;
 	}
-	cout<<"Register::whichReg error!\n";
+	cout<<"Register::whichReg error - "<<temp->label<<" not found!\n";
+	out();
+	exit(-1);
 	return unknown;
 }
 

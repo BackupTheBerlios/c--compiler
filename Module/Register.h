@@ -7,7 +7,7 @@
 using namespace std;
 
 #define regmax 16     // Gesamtanzahl der Register
-#define regusable 12  // Anzahl frei nutzbarer Register
+#define regusable 4  // Anzahl frei nutzbarer Register
 
 extern ofstream bsm;
 

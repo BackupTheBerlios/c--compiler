@@ -27,6 +27,12 @@ bool RegList::del (struct TOperand* op)
 	{
 		if (curr->op==op)
 		{
+			if (elems==1)
+			{
+				elems=0;
+				start=0;
+				end=0;
+			}
 			if (curr==start)
 			{
 				start=curr->next;
@@ -55,7 +61,7 @@ void RegList::append (struct TOperand *op, TReg r)
 	char* x=(char*)malloc(10);
 	strcpy(x,"spill_");
 	sprintf (x+6,"%u",maxcount++);
-	
+
 	bsm<<"// Spillcode: Auslagern"<<endl;
 	bsm<<"str.";
 	if (op->vtype==schar) bsm<<"b";
@@ -63,14 +69,14 @@ void RegList::append (struct TOperand *op, TReg r)
 	else if (op->vtype==slong) bsm<<"l";
 	else if (op->vtype==sfloat) bsm<<"f";
 	bsm<<"\tr"<<r<<", r"<<rnull<<" + "<<x<<endl;
-	
+
 	spilldata<<x<<":\tds.";
 	if (op->vtype==schar) spilldata<<"b";
 	else if (op->vtype==sint) spilldata<<"w";
 	else if (op->vtype==slong) spilldata<<"l";
 	else if (op->vtype==sfloat) spilldata<<"f";
 	spilldata<<"\t1"<<endl;
-	
+
 	TRegListEntry* e = (TRegListEntry*)malloc(sizeof(TRegListEntry));
 	e->op = op;
 	e->label=x;
@@ -90,7 +96,7 @@ void RegList::append (struct TOperand *op, TReg r)
 void RegList::append (struct TOperand *op, char* label)
 {
 	TRegListEntry* e = (TRegListEntry*)malloc(sizeof(TRegListEntry));
-	
+
 	e->op = op;
 	e->label=label;
 	e->next = 0;
@@ -111,11 +117,12 @@ bool RegList::isValid(struct TOperand *op)
 	TRegListEntry* curr=start;
 	while (curr!=0)
 	{
+		// 		cout<<op->no<<endl;
 		if (curr->op==op)
 			return true;
 		curr=curr->next;
 	}
-// 	cout<<"not valid!\n";
+	// 	cout<<"not valid!\n";
 	return false;
 }
 
@@ -135,4 +142,16 @@ char* RegList::where(struct TOperand *op)
 unsigned RegList::count()
 {
 	return elems;
+}
+
+void RegList::out()
+{
+	cout<<"RegList: \n";
+	TRegListEntry* curr=start;
+	while (curr!=0)
+	{
+		cout<<"op: "<<curr->op->label<<", addr: "<<curr->label<<endl;
+		curr=curr->next;
+	}
+	cout<<endl;
 }

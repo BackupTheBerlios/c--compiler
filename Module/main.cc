@@ -94,7 +94,8 @@ int main(int argc, char* arv[])
 	strcpy(f, "cat spill>>");
 	strcpy(f+11, ofile);
 	system(f);
-	
+	system("rm spill");
+		
 	if (basm)
 	{
 		char* f = (char*)malloc(50);

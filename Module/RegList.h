@@ -28,6 +28,7 @@ bool isValid (struct TOperand*);
 char* where (struct TOperand*);
 
 void invalidate();
+void out();
 unsigned count();
 
 
