@@ -142,46 +142,79 @@
 
 struct TNode
 {
-  struct TNode* n1;
-  struct TNode* n2;
-  struct TNode* n3;
-  struct TNode* n4;
-  struct TNode* n5;
-  int type;
+	struct TNode* n1;
+	struct TNode* n2;
+	struct TNode* n3;
+	struct TNode* n4;
+	struct TNode* n5;
+	int type;
+};
+
+struct TOp
+{
+	int TOpType;
+	char* operand1;
+	char* operand2;
+	char* operand3;
+};
+
+enum	TOpType {
+    mov_,
+    jmpgr_,
+    jmple_,
+    jmpeq_,
+    jmpne_,
+    mult_,
+    divi_,
+    mod_,
+    add_,
+    sub_,
+    shiftl_,
+    shiftr_,
+    sminus_,
+    splus_,
+    call_,
+    goto_,
+    label_,
+    ret_,
+    push_,
+    char_,
+    int_,
+    long_,
+    float_
 };
 
 enum TJmp {
-	gr,
-	le,
-	eq,
-	ne
+    jmpgr,
+    jmple,
+    jmpeq,
+    jmpne
 };
 
 enum TType {
-	schar,
-	sint,
-	slong,
-	sfloat,
-	svoid,
-	sstruct,
-	undeclared
+    schar,
+    sint,
+    slong,
+    sfloat,
+    svoid,
+    sstruct,
+    undeclared
 };
 
 enum TBinOp {
-	mult,
-	divi,
-	mod,
-	add,
-	sub,
-	shiftl,
-	shiftr
-	
+    mult,
+    divi,
+    mod,
+    add,
+    sub,
+    shiftl,
+    shiftr
 };
 
 enum TUnOp {
-	sminus,
-	splus
-	
+    sminus,
+    splus
+
 };
 
 

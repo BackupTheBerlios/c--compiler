@@ -5,6 +5,7 @@
 #include "ConstList.h"
 #include "FunctionList.h"
 #include "Stack.h"
+#include "List.h"
 #include <iostream>
 using namespace std;
 
@@ -52,8 +53,6 @@ private:
 	
 	void outlabel(char*);
 
-	void outcond(int);
-	
 	void outjump(char*,char*,TJmp);
 	
 	void outret(char*);
@@ -65,6 +64,8 @@ private:
 	TType checkConvAssign(char*&, TType, TType);
 	
 	TType checkConv(char*&, char*&, TType, TType);
+	
+	List ilList;
 	
 	Stack op;
 	Stack label;

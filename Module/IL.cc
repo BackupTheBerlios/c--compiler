@@ -1,7 +1,5 @@
 #include "IL.h"
 
-
-
 IL::IL()
 {
 	tempcount = 1;
@@ -192,8 +190,8 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				label.push(l);
 				char* temp=tempid();
 				outcopy(temp, "1");
-				outjump(temp,l,gr);
-				
+				outjump(temp,l,jmpgr);
+
 				//Sprungmarke für cond=false setzen
 				outlabel(cond.top());
 				cond.pop(1);
@@ -207,8 +205,8 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				char* dst=op.top();
 				outbin(temp,dst,sub,src);
 				// ergebnis darf nicht groesser oder gleich 0 sein
-				outjump(temp,cond.top(),gr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
-				outjump(temp,cond.top(),eq);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				outjump(temp,cond.top(),jmpgr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				outjump(temp,cond.top(),jmpeq);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
 				break;
 			}
 			case RELATION_3:
@@ -219,8 +217,8 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				char* dst=op.top();
 				outbin(temp,src,sub,dst);
 				// ergebnis darf nicht groesser oder gleich 0 sein
-				outjump(temp,cond.top(),gr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
-				outjump(temp,cond.top(),eq);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				outjump(temp,cond.top(),jmpgr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				outjump(temp,cond.top(),jmpeq);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
 				break;
 			}
 			case RELATION_4:
@@ -231,7 +229,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				char* dst=op.top();
 				outbin(temp,dst,sub,src);
 				// ergebnis darf nicht groesser 0 sein
-				outjump(temp,cond.top(),gr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				outjump(temp,cond.top(),jmpgr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
 				break;
 			}
 			case RELATION_5:
@@ -242,7 +240,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				char* dst=op.top();
 				outbin(temp,src,sub,dst);
 				// ergebnis darf nicht groesser 0 sein
-				outjump(temp,cond.top(),gr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				outjump(temp,cond.top(),jmpgr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
 				break;
 			}
 			case EQUALITY_2:
@@ -253,7 +251,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				char* dst=op.top();
 				outbin(temp,src,sub,dst);
 				// ergebnis darf muß gleich 0 sein, ansonsten sprung
-				outjump(temp,cond.top(),ne);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				outjump(temp,cond.top(),jmpne);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
 				break;
 			}
 			case EQUALITY_3:
@@ -264,7 +262,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				char* dst=op.top();
 				outbin(temp,src,sub,dst);
 				// ergebnis darf nicht gleich 0 sein, ansonsten sprung
-				outjump(temp,cond.top(),eq);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				outjump(temp,cond.top(),jmpeq);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
 				break;
 			}
 			case COND_START:
@@ -276,7 +274,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			{
 				// alle atomaren bedingungen wurden hintereinander durchlaufen, hinter jeder atomaren bedingung
 				// wird ein sprung hinter den true-block ausgefuehrt, falls diese bedingung falsch ist
-				
+
 				// wenn man hier angelangt ist(im zwischencode), beginnt der true-block
 				// cout<<"\ntrue-block\n";
 				break;
@@ -293,9 +291,9 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				// sprung zum start der while-schleife
 				char* temp=tempid();
 				outcopy(temp, "1");
-				outjump(temp,label.top(),gr);
+				outjump(temp,label.top(),jmpgr);
 				label.pop(1);
-				
+
 				// austritt aus der schleife
 				outlabel(cond.top());
 				cond.pop(1);
@@ -393,6 +391,8 @@ char* IL::genIL(unsigned* start, unsigned* end)
 		}
 		start++;
 	}
+	cout<<endl;
+	ilList.out();
 	return 0;
 }
 
@@ -467,6 +467,12 @@ char* IL::condlabelid()
 void IL::outcopy(char* l, char* r)
 {
 	cout<<l<<" := "<<r<<";\n";
+
+	struct TOp* op=(TOp*)malloc(sizeof(TOp));
+	op->TOpType=mov_;
+	op->operand1=l;
+	op->operand2=r;
+	ilList.append(op);
 }
 
 void IL::outbin(char* l, char* x, TBinOp o, char* y)
@@ -483,11 +489,37 @@ void IL::outbin(char* l, char* x, TBinOp o, char* y)
 		case sub: c = "-"; break;
 	}
 	cout<<l<<" := "<<x<<" "<<c<<" "<<y<<";\n";
+
+	unsigned a;
+	switch(o)
+	{
+		case shiftl: a = shiftl_; break;
+		case shiftr: a = shiftr_; break;
+		case mult: a = mult_; break;
+		case divi: a = divi_; break;
+		case mod: a = mod_; break;
+		case add: a = add_; break;
+		case sub: a = sub_; break;
+	}
+	struct TOp* op=(TOp*)malloc(sizeof(TOp));
+	op->TOpType=a;
+	op->operand1=l;
+	op->operand2=x;
+	op->operand3=y;
+	ilList.append(op);
 }
 
 void IL::outun(char* l, TUnOp u, char* y)
 {
 	if (u==sminus) cout<<l<<" := -"<<y<<";\n";
+
+	if (u==sminus)
+	{
+		struct TOp* op=(TOp*)malloc(sizeof(TOp));
+		op->TOpType=sminus_;
+		op->operand1=y;
+		ilList.append(op);
+	}
 }
 
 
@@ -503,16 +535,21 @@ void IL::outgoto(char* label, bool call)
 {
 	cout<<(call?"call":"goto");
 	cout<<" "<<label<<";\n";
+
+	struct TOp* op=(TOp*)malloc(sizeof(TOp));
+	op->TOpType=call?call_:goto_;
+	op->operand1=label;
+	ilList.append(op);
 }
 
 void IL::outlabel(char* label)
 {
 	cout<<label<<":\n";
-}
-
-void IL::outcond(int cc)
-{
-	cout<<"cond"<<"="<<cc<<"\n";
+	
+	struct TOp* op=(TOp*)malloc(sizeof(TOp));
+	op->TOpType=label_;
+	op->operand1=label;
+	ilList.append(op);
 }
 
 void IL::outjump(char* cc,char* jmp,TJmp type)
@@ -520,30 +557,55 @@ void IL::outjump(char* cc,char* jmp,TJmp type)
 	cout<<"jmp";
 	switch(type)
 	{
-		case gr:
+		case jmpgr:
 		cout<<"gr";
 		break;
-		case le:
+		case jmple:
 		cout<<"le";
 		break;
-		case eq:
+		case jmpeq:
 		cout<<"eq";
 		break;
-		case ne:
+		case jmpne:
 		cout<<"ne";
 		break;
 	}
 	cout<<" "<<cc<<", "<<jmp<<";\n";
+	
+	
+	unsigned a;
+	switch(type)
+	{
+		case jmpgr: a = jmpgr_; break;
+		case jmple: a = jmple_; break;
+		case jmpeq: a = jmpeq_; break;
+		case jmpne: a = jmpne_; break;
+	}
+	struct TOp* op=(TOp*)malloc(sizeof(TOp));
+	op->TOpType=a;
+	op->operand1=cc;
+	op->operand2=jmp;
+	ilList.append(op);
 }
 
 void IL::outret(char* l)
 {
 	cout<<"ret "<<l<<";\n";
+
+	struct TOp* op=(TOp*)malloc(sizeof(TOp));
+	op->TOpType=ret_;
+	op->operand1=l;
+	ilList.append(op);
 }
 
 void IL::outpush(char* l)
 {
 	cout<<"push "<<l<<";\n";
+
+	struct TOp* op=(TOp*)malloc(sizeof(TOp));
+	op->TOpType=push_;
+	op->operand1=l;
+	ilList.append(op);
 }
 
 
@@ -606,4 +668,15 @@ void IL::outconvert(char* m1, char* m2, TType to)
 	if (to==slong) c = "Long";
 	if (to==sfloat) c = "Float";
 	cout<<m2<<" := to"<<c<<"("<<m1<<");\n";
+
+	struct TOp* op=(TOp*)malloc(sizeof(TOp));
+	unsigned a;
+	if (to==schar) a = char_;
+	if (to==sint) a = int_;
+	if (to==slong) a = long_;
+	if (to==sfloat) a = float_;
+	op->TOpType=a;
+	op->operand1=m2;
+	op->operand2=m1;
+	ilList.append(op);
 }
