@@ -3,6 +3,8 @@
 
 #include "net/IPAddress.h"
 #include "net/IPNetwork.h"
+#include <iostream>
+using namespace std;
 
 /*
 * This class represents a LifeClient which connects to a boardserver, and then
@@ -19,9 +21,9 @@ public:
 	* @param servername is the name of the server for example "ep", not an ip address in ascii-representation
 	* @param port is the portnumber the boardserver listens
 	*/
-	LifeClient(IPNetwork* net, char* servername, short port){};
+	LifeClient(IPNetwork* net, char* servername, short port);
 
-	~LifeClient(){};
+	~LifeClient();
 
 
 private:

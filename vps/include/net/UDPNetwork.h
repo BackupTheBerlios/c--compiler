@@ -6,9 +6,6 @@
 #include <iostream>
 using namespace std;
 
-// 5 Sekunden Timeout
-#define timeout_sec 5
-
 /**
  * The UdpNetwork Class will be used to communicate through the network.
  *

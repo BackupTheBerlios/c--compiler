@@ -34,7 +34,7 @@ int main()
 /*	for (int x=0;x<BOARD_WIDTH;x++)
 		for (int y=0;y<BOARD_HEIGHT;y++)
 			board_a->setPos(x , y, (((rand()%RANDOM)==2) ? alive : dead) );*/
-	board_a->restoreBoard("test.board");
+/*	board_a->restoreBoard("test.board");
 
 	XWindow* w=new XWindow(BOARD_WIDTH*ZOOM, BOARD_HEIGHT*ZOOM, "Game of Life");
 
@@ -105,5 +105,5 @@ int main()
 		LocalBoard* board_cache=board_b;
 		board_b=board_a;
 		board_a=board_cache;
-	}
+	}*/
 }

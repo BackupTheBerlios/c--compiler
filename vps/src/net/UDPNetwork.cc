@@ -29,7 +29,7 @@ ssize_t UDPNetwork::request(const Server& server, void* req, size_t reqlen, void
 			cout<<"[udpnetwork] request(): sendto failed.\n";
 			exit(-1);
 		}
-		to.tv_sec = timeout_sec;
+		to.tv_sec = timeout;
 		to.tv_usec = 0;
 		fd_set fds;	
 		FD_ZERO(&fds);
