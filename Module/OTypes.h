@@ -141,6 +141,9 @@
 // maximale Anzahl Funtionen
 #define MAX_NO_OF_FUNCTIONS 4096
 
+// maximale Anzahl Case-Labels
+#define MAX_NO_OF_CASE_LABELS 4096
+
 
 
 struct TNode

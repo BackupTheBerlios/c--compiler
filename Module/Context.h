@@ -54,7 +54,11 @@ private:
 	unsigned cc; //Konstenzaehler
 	bool minus; // minuszeichen?
 	
-	
+	unsigned caselabels[MAX_NO_OF_CASE_LABELS];
+	unsigned labelcount;
+	Stack startcount;
+	unsigned lastconst;
+	unsigned startc;
 
 
 

@@ -491,7 +491,7 @@ char* IL::conid(unsigned i)
 {
 	TType t = cl.getType(i);
 	if (t==undeclared) return 0;
-
+	
 	char* n = (char*)malloc(VAR_LENGTH_ID);
 	if (t==sint) strcpy(n,"int");
 	if (t==schar) strcpy(n,"char");
@@ -499,6 +499,7 @@ char* IL::conid(unsigned i)
 	if (t==slong) strcpy(n,"long");
 
 	sprintf(n+strlen(n),"%u",i);
+	
 	return n;
 
 }

@@ -14,15 +14,16 @@ Context::Context()
   cc = 0;
   cpos = start;
   minus = false;
+  
+  labelcount=0; 
+  startcount.push((unsigned)0);
+  startc=0;
 }
 
 void Context::context(struct TNode* n)
 {
 unsigned v;
 unsigned cur;
-// unsigned vararray[64];
-// unsigned* varidx = vararray;
-// unsigned varinsertcount;
 
 
 if(n != 0)
@@ -122,8 +123,8 @@ if(n != 0)
         case CONSTANT_2                 : context(n->n1); break;
         case CONSTANT_3                 : minus = true; context(n->n1); minus = false; break;
         case UNSIGNED_CONSTANT          : context(n->n1); break;
-        case CHAR_CONSTANT              : if(minus) cl.insert(-(char)n->n1, ++cc); else cl.insert((char)n->n1, ++cc); break;
-        case INT_CONSTANT               : if(minus) cl.insert(-(int)n->n1, ++cc); else cl.insert((int)n->n1, ++cc); break;
+        case CHAR_CONSTANT              : if(minus) cl.insert(-(char)n->n1, ++cc);  else { cl.insert((char)n->n1, ++cc); lastconst = (char)n->n1; break; }
+        case INT_CONSTANT               : if(minus) cl.insert(-(int)n->n1, ++cc); else { cl.insert((int)n->n1, ++cc); lastconst = (int)n->n1; break; }
         case FLOAT_CONSTANT		: if(minus) cl.insert(-*(double*)n->n1, ++cc); else cl.insert(*(double*)n->n1, ++cc); break;
         case COMPLEX_CONSTANT_OPT       : context(n->n1); break;
         case COMPLEX_CONSTANT_ST_1      : context(n->n1); break;
@@ -228,12 +229,36 @@ if(n != 0)
         case IF_1                       : context(n->n1); context(n->n2); break;
         case IF_2                       : context(n->n1); context(n->n2); context(n->n3); break;
         case COND                       : context(n->n1); break;
-        case SWITCH                     : context(n->n1); context(n->n2); context(n->n3); break;
+        case SWITCH                     : 
+        				{
+        					startcount.push(startc); 
+        					startc=labelcount; 
+        					context(n->n1); context(n->n2); context(n->n3); 
+        					labelcount = startc; 
+        					startc=startcount.topi(0); 
+        					startcount.pop(1); 
+        					break;
+					}
         case CASE_ST_1                  : context(n->n1); break;
         case CASE_ST_2                  : context(n->n1); context(n->n2); break;
         case CASE                       : context(n->n1); context(n->n2); context(n->n3);break;
-        case CASE_LABEL_1               : context(n->n1); break;
-        case CASE_LABEL_2               : break;
+        case CASE_LABEL_2		: lastconst = 0xFFFFFFFF;
+        case CASE_LABEL_1               : 
+        				{
+	        				context(n->n1); 
+        					for(unsigned i=startc;i<labelcount;i++)
+        					{
+	        					if (lastconst==caselabels[i]) 
+	        					{
+		        					if (lastconst==0xFFFFFFFF) 
+		        						cout<<"[context] default case label already definied\n";
+		        					else 	cout<<"[context] case label with value "<<lastconst<<" already definied\n";
+		        					exit(-1);
+	        					}
+        					}
+        					caselabels[labelcount++]=lastconst; 
+        					break;
+					}        
         case WHILE                      : context(n->n1); context(n->n2); break;
         case COMPOUND                   : context(n->n1); context(n->n2); /*Blockende*/ b.pop(1); cblock = b.topi(0);   break;
         case EXPRESSION_ST_1            : context(n->n1); break;
