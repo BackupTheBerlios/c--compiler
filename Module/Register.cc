@@ -87,7 +87,7 @@ void Register::changeReg(TOperand* dest, TOperand* src)		// Register wird von op
 	cout<<"changeReg() error\n";
 }
 
-void Register::biggerReg(TOperand* op)
+TReg Register::biggerReg(TOperand* op)
 {
 	for(int i=0; i<regusable; i++)
 	{
@@ -97,9 +97,8 @@ void Register::biggerReg(TOperand* op)
 			{
 				reglist[i].mark = mark++;
 				reglist[i+1].var = op;
-				reglist[i+1].mark = mark;
-				cout<<"mov.w r"<<i+1<<", r"<<rnull<<endl;		// oberes Register wird null gesetzt
-				return;
+				reglist[i+1].mark = mark;	
+				return (TReg)(i+1);		// oberes Register wird null gesetzt
 			}
 			for(int j=0; j<regusable-1; j++)
 			{
@@ -111,8 +110,7 @@ void Register::biggerReg(TOperand* op)
 					reglist[j+1].mark = mark;
 					reglist[i].var = 0;
 					reglist[i].mark = 0;
-					cout<<"mov.w r"<<j+1<<", r"<<rnull<<endl;	// oberes Register wird null gesetzt
-					return;
+					return (TReg)(j+1);	// oberes Register wird null gesetzt
 				}
 			}
 		cout<<"biggerReg() error - no Reg free!\n";
