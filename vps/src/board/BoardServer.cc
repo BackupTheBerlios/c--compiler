@@ -19,6 +19,7 @@ BoardServer::BoardServer(IPNetwork* net,int clientcount, Board* board_a, Board* 
 	this->board_b = board_b;
 	this->timesteps = timesteps;
 	timestep = -1;
+	client = 0;
 	
 }
 
@@ -36,7 +37,7 @@ void BoardServer::start()
 		while(1)
 		{
 			IPAddress all(7654);	
-			char hello = 0;
+			int hello = 0;
 			
 			// auf client warten
 			net->receive(all, &hello, sizeof(hello));
@@ -45,8 +46,7 @@ void BoardServer::start()
 				// in all steht die source:addr!
 				logon(&all);
 				break;
-			}
-			else
+			} else
 			{
 				int anything=2;		// client muss noch warten
 				net->reply(all, &anything, sizeof(anything));
@@ -76,16 +76,18 @@ void BoardServer::start()
 	}
 	w->flush();
 
+
 /*	cout<<"timestep: "<<timestep<<endl;
-	// alle clients müssen den ersten Schritt anfordern
+	// alle clients mssen den ersten Schritt anfordern
 	notcomplete = true;
+	/*
 	while(notcomplete)
 	{
 		IPAddress all(7654);
-		int msg[2];
+		int msg[3];
 		net->receive(all, &msg, sizeof(msg));
-		barrier(&all, msg[1]);
-	}*/
+	}
+	*/
 	
 	// Und los gehts
 	for( timestep = 0 ; timestep<timesteps; timestep++)
@@ -117,7 +119,7 @@ void BoardServer::start()
 			} else if (msg[0]=='N') //barrier
 			{
 				//cerr<<"N\n";
-				barrier(&all, msg[1]);
+				barrier(&all, msg[1], msg[2]);
 			} else
 			{
 				cout<<"[boardserver] unrecognized message\n";
@@ -178,11 +180,12 @@ void BoardServer::logon(IPAddress* ip)
 	int xend = xstart+(board_a->getHeight()/clients)-1;
 	
 	// nachricht erzeugen
-	int msg[4];
+	int msg[5];
 	msg[0] = xstart;
 	msg[1] = xend;
 	msg[2] = 0;
 	msg[3] = board_a->getWidth()-1;
+	msg[4] = client;
 	
 	
 	// abschicken
@@ -197,7 +200,7 @@ void BoardServer::logon(IPAddress* ip)
 * @param ip is the address of the calling client
 * @param timestep is the finished timestep which the client is signalling
 */
-void BoardServer::barrier(IPAddress* ip,int timestep)
+void BoardServer::barrier(IPAddress* ip, int timestep, int clientid)
 {
 	if (this->timestep>timestep)	// client hat die bestaetigung schon einmal gesendet, sonst waere der timestep noch nicht weiter gezaehlt
 	{
@@ -208,24 +211,21 @@ void BoardServer::barrier(IPAddress* ip,int timestep)
 	if (this->timestep<timestep)
 	{
 		cout<<"[boardserver] received message from timestep "<<timestep<<" but we are in "<<this->timestep<<endl;
-		exit(-1);
+		//exit(-1);
 	}
-	for(int i=0; i<clients; i++)
-	{
-		if (addresses[i].getAddr() == ip->getAddr())
-		{
-			completed[i] = true;
-			cout<<"[boardserver] client "<<i<</*" at port "<<ip->getPort()<<*/" finished step "<<timestep<<endl;
-		}
-	}
+	
+	completed[clientid] = true;
+	cout<<"[boardserver] client "<<clientid<</*" at port "<<ip->getPort()<<*/" finished step "<<timestep<<endl;
+	
+	
 	bool c = true;
-	for(int i=0; i<clients; i++)
+	for (int i=0; i<clients; i++)
 	{
 		c &= completed[i];
 		if (!c)
 		{
 			int repl=2;
-			net->reply(addresses[i], &repl, sizeof(repl));
+			net->reply(*ip, &repl, sizeof(repl));
 			return;
 		}
 	}

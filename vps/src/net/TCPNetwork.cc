@@ -55,6 +55,7 @@ ssize_t TCPNetwork::request(const Server& server, void* req, size_t reqlen, void
 	if(shutdown(clientfd, SHUT_RDWR)==-1)
 	{
 		cout<<"[tcpnetwork] request(): closing connection failed.\n";
+		if (errno==ENOTCONN) cout<<"ENOTCONN\n";
 	}
 	close(clientfd);
 	

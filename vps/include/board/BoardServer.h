@@ -57,7 +57,7 @@ private:
 	 * @param ip is the address of the calling client
 	 * @param timestep is the finished timestep which the client is signalling
 	 */
-	void barrier(IPAddress* ip,int timestep);
+	void barrier(IPAddress* ip,int timestep, int clientid);
 
 	/**
 	 * This function tells a client, that it can continue to work or that the end of the simulation is reached.

@@ -40,7 +40,7 @@ LifeClient::~LifeClient()
 */
 int LifeClient::startUp()
 {
-	int message[ 4 ] = { 0,0,0,0 };
+	int message[ 5 ];
 	int req = 'Y';
 	
 
@@ -52,6 +52,8 @@ int LifeClient::startUp()
 	x2 = message[ 1 ];
 	y1 = message[ 2 ];
 	y2 = message[ 3 ];
+	myID = message[4];
+	cerr<<"myID is "<<myID<<endl;
 	board_a = new LocalBoard((x2-x1+3), (y2-y1+3));		// board wird zum cachen verwendet, es wird der zu berechnende Ausschnitt, sowie ein Rand von 1 gespeichert
 // 	cout<<"Abmasse cache_board: x: "<<(x2-x1+3)<<", y: "<<(y2-y1+3)<<endl;
 	return 0;
@@ -63,15 +65,17 @@ int LifeClient::startUp()
 void LifeClient::loop()
 {
 	int message;
-	int req[2];
+	int req[3];
 	int step = -1;
 	do		// request the next Step
 	{
 // 		cout<<"*";
 		req[0] = 'N';
 		req[1] = step;
+		req[2] = myID;
 		message = 0;
 		cout<<"[lifeclient] request next step!\n";
+
 		net->request( server, &req, sizeof(req), &message, sizeof(message));
  		cout<<"[lifeclient] server sends: "<<message<<" from "<<server.getAddr()<<endl;
 		if (message==1)		// if Server sends 1, we calculate the next Step
@@ -80,8 +84,8 @@ void LifeClient::loop()
 			makeStep();
 			step++;
 		}
-		sleep(1);	// wegen sockets warten
 	}while (message!=0);
+
 }
 
 /**
