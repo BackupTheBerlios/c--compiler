@@ -1,6 +1,6 @@
 #include "net/IPAddress.h"
 #include "net/IPNetwork.h"
-#include "net/UDPNetwork.h"
+#include "net/TCPNetwork.h"
 #include "board/Board.h"
 #include "board/LocalBoard.h"
 #include "board/BoardServer.h"
@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 	}
 	int clients=atoi(argv[1]);
 	int steps=atoi(argv[2]);
-	UDPNetwork* net = new UDPNetwork(7654);
+	TCPNetwork* net = new TCPNetwork(7654);
 	LocalBoard* board_a = new LocalBoard(BOARD_WIDTH,BOARD_HEIGHT);
 	LocalBoard* board_b = new LocalBoard(BOARD_WIDTH,BOARD_HEIGHT);
 	

@@ -53,7 +53,7 @@ int LifeClient::startUp()
 	y1 = message[ 2 ];
 	y2 = message[ 3 ];
 	board_a = new LocalBoard((x2-x1+3), (y2-y1+3));		// board wird zum cachen verwendet, es wird der zu berechnende Ausschnitt, sowie ein Rand von 1 gespeichert
-// 	cout<<"Abmasse cache_board: x: "<<(x2-x1+3)<<", y: "<<(y2-y1+3)<<endl;
+	cout<<"Abmasse cache_board: x: "<<(x2-x1+3)<<", y: "<<(y2-y1+3)<<endl;
 	return 0;
 }
 
@@ -67,7 +67,7 @@ void LifeClient::loop()
 	req[0] = 'N';
 	req[1] = -1;
 	cout<<"A";
- 	net->request( server, &req, sizeof(req), &message, sizeof(message));
+	net->request( server, &req, sizeof(req), &message, sizeof(message));
 	cout<<"B";
 	int step = 0;
 	while (message!=0)	// if Server sends 1, we calculate the next Step
@@ -93,7 +93,7 @@ void LifeClient::makeStep()
 	// daten holen
 	for (int x=(x1-1);x<=x2+1;x++)
 	{
-// 		if(x%10==0) cout<<x<<endl;
+ 		/*if(x%10==0)*/ cout<<x<<endl;
 		for (int y=(y1-1);y<=y2+1;y++)
 		{
 			// Punkte fuer die Anfrage bestimmen

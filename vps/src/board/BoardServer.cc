@@ -72,6 +72,11 @@ void BoardServer::start()
 	}
 	w->flush();
 
+	// alle clients müssen sich anmelden
+	IPAddress all(7654);
+	int msg[2];
+	net->receive(all, &msg, sizeof(msg));
+	
 	notifyAll();
 	
 	// Und los gehts
@@ -93,7 +98,7 @@ void BoardServer::start()
 			{
 				//cout<<msg[1]<<" "<<msg[2]<<" | ";
 				board_b->setPos(msg[1], msg[2], (life_status_t)msg[3]);
-			int anything=msg[ 4 ];
+				int anything=msg[ 4 ];
 				net->reply(all, &anything, sizeof(anything));
 
 			}
@@ -107,7 +112,7 @@ void BoardServer::start()
 				net->reply(all, &val, sizeof(val));
 			} else if (msg[0]=='N') //barrier
 			{
-				//cerr<<"N";
+				cerr<<"N\n";
 				barrier(&all, msg[1]);
 			} else
 			{

@@ -1,7 +1,7 @@
 #include "X/XWindow.h"
 #include "net/IPAddress.h"
 #include "net/IPNetwork.h"
-#include "net/UDPNetwork.h"
+#include "net/TCPNetwork.h"
 #include "client/LifeClient.h"
 #include <iostream>
 using namespace std;
@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
 	}
 	char* server=argv[1];
 	
-	UDPNetwork* net = new UDPNetwork();
+	TCPNetwork* net = new TCPNetwork();
 	LifeClient* client = new LifeClient((IPNetwork *)net,server,7654);
 
 }
