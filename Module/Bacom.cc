@@ -5,10 +5,6 @@ void Bacom::genAsm()
 {
 	cout << "\nBASM Ausgabe:\n";
 	cout << "sub.w " <<Register::toString( rnull )<<","<<Register::toString( rnull )<<endl;		// Nullregister 0 setzen
-	cout << "const_two:  ds.w 2 \n";
-	cout << "const_four:  ds.w 4 \n";
-	cout << "const_six:  ds.w 6 \n";
-	cout << "const_stack:  ds.w 65535 \n";  // Startwert Stackpointer
 	outloa(sint, rsp, rnull, "const_stack");
 	
 	// offset bis zum naechsten lokalen frame = 32
@@ -201,8 +197,8 @@ void Bacom::genAsm()
 				// Parameter liegen schon auf dem Stack
 				// Also: Rücksprungadresse sichern
 				
-				outlic(rnull, rnull, 20);  // Instruction counter laden
-				outstr(sint, rsp, rnull, 0); // auf den stack
+				outlic(rnull, rnull, 18);  // Instruction counter laden
+				outstr(sint, rnull, rsp, 0); // auf den stack
 				outsub(sint, rnull, rnull);
 				outsub(sint, rsp, rnull, "const_two"); // stack weiterzählen
 				outbra(rnull, op1->label); // Sprung zur Funktion
@@ -322,7 +318,7 @@ void Bacom::genAsm()
 	cout << endl;
 	for (unsigned i=0;i<cl.getCount();i++)
 	{
-		cout << "const_" << cl.getAddr(i) <<":\tdc.";
+		cout << "const_" << i <<":\tdc.";
 		if ( cl.getType(i) == schar )
 			cout << "b";
 		else if ( cl.getType(i) == sint )
@@ -338,7 +334,7 @@ void Bacom::genAsm()
 	// interne Konstanten
 	for (unsigned i=1;i<=icl.getCount();i++)
 	{
-		cout << "iconst_" << icl.getAddr(i) <<":\tdc.";
+		cout << "iconst_" << i <<":\tdc.";
 		if ( icl.getType(i) == schar )
 			cout << "b";
 		else if ( icl.getType(i) == sint )
@@ -350,7 +346,12 @@ void Bacom::genAsm()
 
 		cout<<" "<<icl.getVal(i)<<endl;
 	}
-	cout<<"\nstp\n";
+	
+	cout << "const_two:  dc.w 2 \n";
+	cout << "const_four:  dc.w 4 \n";
+	cout << "const_six:  dc.w 6 \n";
+	cout << "const_stack:  dc.w 65534 \n";  // Startwert Stackpointer
+	cout<<"stp\n";
 
 }
 
@@ -529,7 +530,7 @@ void Bacom::outbra(TReg r, int offs)
 
 void Bacom::outlic(TReg r, TReg s, int offs)
 {
-	cout<<"lic "<<Register::toString(r)<<" "<<Register::toString(s)<<" + "<<offs<<endl;
+	cout<<"lic.w "<<Register::toString(r)<<", "<<Register::toString(s)<<"+"<<offs<<endl;
 }
 
 char* Bacom::concat(char* pre, unsigned numb)
