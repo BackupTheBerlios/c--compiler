@@ -22,7 +22,7 @@ void Bacom::genAsm()
 				if (op1->type == funclabel)
 				{
 					// Die Parameter liegen bereits auf dem Stack, jetzt werden die Register gerettet
-					outloa(sint, rnull, rnull, "const_two");
+					outloa(sint, rnull, rnull, "const_two");	// wieso ins rnull??????????????
 					for (int i=0;i<16;i++)
 					{
 						outstr(sint, (TReg)i, rsp, 0 );
@@ -70,14 +70,48 @@ void Bacom::genAsm()
 				break;
 			}
 		case jmpgr_: 	// greater zero
+			{
+				cout << "[bacom] noch nicht implementiert\n";
+				break;
+			}
 		case jmple_: 	// less zero
+			{
+				cout << "[bacom] noch nicht implementiert\n";
+				break;
+			}
 		case jmpeq_: 	// equal zero
+			{
+				cout << "[bacom] noch nicht implementiert\n";
+				break;
+			}
 		case jmpne_: 	// not equal
+			{
+				cout << "[bacom] noch nicht implementiert\n";
+				break;
+			}
 		case mult_:
+			{
+				regs.changeReg( op1, op2 ); 						// Registerdeskriptor aendern (op2 wird zu op1)
+				outmul(op1->vtype, regs.whichReg( op1 ), regs.whichReg( op3 ));		// Dann wird der op3 damit multipliziert
+				regs.freeReg( op3 );
+				break;
+			}
 		case divi_:
-		case mod_:	break;
+			{
+				regs.changeReg( op1, op2 ); 						// Registerdeskriptor aendern (op2 wird zu op1)
+				outdiv(op1->vtype, regs.whichReg( op1 ), regs.whichReg( op3 ));		// Dann wird der op1 durch op3 geteilt
+				regs.freeReg( op3 );
+				break;
+			}
+		case mod_:
+			{
+				regs.changeReg( op1, op2 ); 						// Registerdeskriptor aendern (op2 wird zu op1)
+				outdiv(op1->vtype, regs.whichReg( op1 ), regs.whichReg( op3 ));		// Dann wird der op1 durch op3 geteilt
+				outmul(op1->vtype, regs.whichReg( op1 ), regs.whichReg( op3 ));		// Nun wird op3 mit dem Ergebnis multipliziert
+				regs.freeReg( op3 );
+				break;
+			}
 		case add_:
-
 			{
 				regs.changeReg( op1, op2 ); 						// Registerdeskriptor aendern (op2 wird zu op1)
 				outadd(op1->vtype, regs.whichReg( op1 ), regs.whichReg( op3 ));		// Dann wird der op3 drauf addiert
@@ -92,13 +126,45 @@ void Bacom::genAsm()
 				break;
 			}
 		case shiftl_:
+			{
+				cout << "[bacom] noch nicht implementiert\n";
+				break;
+			}
 		case shiftr_:
+			{
+				cout << "[bacom] noch nicht implementiert\n";
+				break;
+			}
 		case sminus_:
+			{
+				cout << "[bacom] noch nicht implementiert\n";
+				break;
+			}
 		case splus_:
+			{
+				cout << "[bacom] noch nicht implementiert\n";
+				break;
+			}
 		case call_:
+			{
+				cout << "[bacom] noch nicht implementiert\n";
+				break;
+			}
 		case goto_:
+			{
+				cout << "[bacom] noch nicht implementiert\n";
+				break;
+			}
 		case ret_:
-		case getret_:	break;
+			{
+				cout << "[bacom] noch nicht implementiert\n";
+				break;
+			}
+		case getret_:
+			{
+				cout << "[bacom] noch nicht implementiert\n";
+				break;
+			}
 		case char_:	// todo: abschneiden
 			{
 				if (op2->vtype==sfloat)		// float vorher nach long konvertieren
@@ -274,6 +340,34 @@ void Bacom::outadd( TType type, TReg dest, TReg src )
 void Bacom::outsub( TType type, TReg dest, TReg src )
 {
 	cout << "sub.";
+	if ( type == schar )
+		cout << "b";
+	else if ( type == sint )
+		cout << "w";
+	else if ( type == slong )
+		cout << "l";
+	else if ( type == sfloat )
+		cout << "f";
+	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+}
+
+void Bacom::outmul( TType type, TReg dest, TReg src )
+{
+	cout << "mul.";
+	if ( type == schar )
+		cout << "b";
+	else if ( type == sint )
+		cout << "w";
+	else if ( type == slong )
+		cout << "l";
+	else if ( type == sfloat )
+		cout << "f";
+	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+}
+
+void Bacom::outdiv( TType type, TReg dest, TReg src )
+{
+	cout << "div.";
 	if ( type == schar )
 		cout << "b";
 	else if ( type == sint )
