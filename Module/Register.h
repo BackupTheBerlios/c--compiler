@@ -38,6 +38,9 @@ void biggerReg(TOperand*);
 // packt den Operanden in ein 2-byte grosses Register
 void smallerReg(TOperand*);
 
+// löscht alle Zuordnungen
+void invalidate();
+
 static TReg typeToReg(TOperandType);
 
 void out();

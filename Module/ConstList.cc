@@ -138,6 +138,20 @@ char* ConstList::getVal(unsigned u)
 	return 0;
 }
 
+int ConstList::getIntVal(unsigned u)
+{
+	if (last==0)  return 0;
+	TConstListEntry* cur = last;
+	while(1)
+	{
+		if (cur->ct == u) return cur->val.i;
+		cur = cur->next;
+		if (cur==0) return 0;
+	}
+	return 0;
+	
+}
+
 
 void ConstList::out()
 {

@@ -49,6 +49,8 @@ unsigned getCount();
 
 char* getVal(unsigned);
 
+int getIntVal(unsigned);
+
 private:
 	
 	struct TConstListEntry* last;

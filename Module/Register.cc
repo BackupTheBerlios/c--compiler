@@ -181,3 +181,12 @@ TReg Register::typeToReg(TOperandType t)
 	if (t==lvar) return rlb;
 	return unknown;
 }
+
+void Register::invalidate()
+{
+	for(int i=0; i<regmax; i++)
+	{
+		reglist[i].var = 0;
+		reglist[i].mark = 0;
+	}
+}

@@ -27,7 +27,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 	cl.insert(1,trueidx);
 	TOperand* truevar = conid(trueidx);
 	TOperand* falsevar = conid(falseidx);
-	cl.out();
+	//cl.out();
 	
 	TOperand* mainfunc = (TOperand*)malloc(sizeof(TOperand));
 	mainfunc->label = "main0";
@@ -347,7 +347,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				TOperand* t  = tempid(fl.getReturnType(funcidx));
 				
 				outgetret(t);
-				//op.push(t);
+				op.push(t);
 				break;
 			}
 			case FUNCTION_CALL_2:
@@ -369,7 +369,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				
 				TOperand* t  = tempid(fl.getReturnType(funcidx));
 				outgetret(t);
-				//op.push(t);
+				op.push(t);
 				break;
 			}
 			case FUNC_START:
@@ -384,7 +384,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case IMPLEMENTATION_5:
 			case IMPLEMENTATION_6:
 			{
-				outret(falsevar, funcident);
+				outret(0, funcident);
 				break;
 			}
 			case INT_CONSTANT:
@@ -404,7 +404,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case RETURN_1:
 			{
-				outret(falsevar, funcident);
+				outret(0, funcident);
 				break;
 			}
 			case RETURN_2:
