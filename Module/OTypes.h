@@ -267,10 +267,10 @@ enum TReg {
 	r9,
 	r10,
 	r11,
-	rsp,
+	rglobal, // startadresse fuer globale Variablen
 	rlb,     // lokale basis
 	rnull,  // Nullregister
-	rglobal, // startadresse fuer globale Variablen
+	rsp,  // Stackpointer
 	unknown  // Fehler
 };
 	

@@ -56,7 +56,7 @@ private:
 
 	void outjump(TOperand*,TOperand*,TJmp);
 	
-	void outret(TOperand*);
+	void outret(TOperand*, TOperand*);
 	
 	void outgetret(TOperand*);
 	

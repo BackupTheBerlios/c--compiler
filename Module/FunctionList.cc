@@ -12,7 +12,7 @@ FunctionList::FunctionList()
 }
 
 
-unsigned FunctionList::insert(char* n, TType* sig, TType ret, unsigned num, bool proto, unsigned maxsp, unsigned frame_constant)
+unsigned FunctionList::insert(char* n, TType* sig, TType ret, unsigned num, bool proto, unsigned maxsp, unsigned frame_constant, unsigned sig_constant)
 {
 	if (no!=0) 
 	{
@@ -38,6 +38,7 @@ unsigned FunctionList::insert(char* n, TType* sig, TType ret, unsigned num, bool
 	last->proto = proto;
 	last->maxsp = maxsp;
 	last->frame_constant = frame_constant;
+	last->sig_constant = sig_constant;
 	last++;
 	return (no++)+MAX_NO_OF_VARIABLES+1;
 }
@@ -142,6 +143,12 @@ unsigned FunctionList::getFrameConstant(unsigned u)
 {
 	TFunctionListEntry* pos = start+u-MAX_NO_OF_VARIABLES-1;
 	return pos->frame_constant;
+}
+
+unsigned FunctionList::getSigConstant(unsigned u)
+{
+	TFunctionListEntry* pos = start+u-MAX_NO_OF_VARIABLES-1;
+	return pos->sig_constant;
 }
 
 

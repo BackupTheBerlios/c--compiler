@@ -66,7 +66,7 @@ private:
 	Stack startcount;
 	unsigned lastconst;
 	unsigned startc;
-	unsigned frame_constants;
+	unsigned func_constants;
 
 
 

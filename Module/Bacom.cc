@@ -6,6 +6,9 @@ void Bacom::genAsm()
 	cout << "\nBASM Ausgabe:\n";
 	cout << "sub.w " <<Register::toString( rnull )<<","<<Register::toString( rnull )<<endl;		// Nullregister 0 setzen
 	cout << "const_two:  ds.w 2 \n";
+	
+	// offset bis zum naechsten lokalen frame = 32
+	unsigned para = 32;
 	for ( unsigned i = 1; i <= ilList.count(); i++ )
 	{
 		TOp* e = ilList.getelem( i );
@@ -18,6 +21,7 @@ void Bacom::genAsm()
 
 		case label_:
 			{
+				para = 32;
 				cout<<op1->label<<":\n";
 				if (op1->type == funclabel)
 				{
@@ -64,11 +68,44 @@ void Bacom::genAsm()
 				break;
 			}
 
+
 		case push_:
+		{
+			// Paramter ins lokale Frame der aufgerufenen Funktion schreiben
+			outstr(op1->vtype, regs.whichReg(op1), rsp, para);
+			para+=((op1->vtype>=slong)?4:(op1->vtype+1));
+			break;
+		}
+		
+		case ret_:
+		{
+			// Lokales Frame abräumen
+			outloa(sint, r0, rnull, fl.getFrameConstant(op2->no) );
+			outadd(sint, rsp, rnull);
+			
+			//Rueckgabewert?
+			
+			// Register wiederherstellen
+			outloa(sint, rnull, rnull, "const_two");
+			for (int i=14;i>=0;i--)
 			{
-				outstr(op1->vtype, regs.whichReg(op1), rsp, op1->add);
-				break;
+				outloa(sint, (TReg)i, rsp, 0 );
+				outadd(sint, rsp, rnull);
+				
 			}
+
+			outsub(sint, rnull, rnull);
+			
+			// Parameter abräumen
+			outloa(sint, r0, rnull, fl.getSigConstant(op2->no) );
+			outadd(sint, rsp, r0);
+	
+			
+			break;
+		}
+			
+			
+
 		case jmpgr_: 	// greater zero
 			{
 				cout << "[bacom] noch nicht implementiert\n";
@@ -151,11 +188,6 @@ void Bacom::genAsm()
 				break;
 			}
 		case goto_:
-			{
-				cout << "[bacom] noch nicht implementiert\n";
-				break;
-			}
-		case ret_:
 			{
 				cout << "[bacom] noch nicht implementiert\n";
 				break;
@@ -246,7 +278,7 @@ void Bacom::genAsm()
 
 	// Konstanten
 	cout << endl;
-	for (unsigned i=3;i<=cl.getCount();i++)
+	for (unsigned i=0;i<cl.getCount();i++)
 	{
 		cout << "const_" << cl.getAddr(i) <<":\tdc.";
 		if ( cl.getType(i) == schar )
@@ -277,8 +309,8 @@ void Bacom::genAsm()
 		cout<<" "<<icl.getVal(i)<<endl;
 	}
 	cout<<"\nstp\n";
-}
 
+}
 
 
 void Bacom::outloa( TType type, TReg dest, TReg help, int offset )

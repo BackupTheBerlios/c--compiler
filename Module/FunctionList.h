@@ -18,11 +18,12 @@ struct TFunctionListEntry
 	bool proto;
 	unsigned maxsp; // Groesse des Variablensblocks im lokalen Frame
 	unsigned frame_constant;
+	unsigned sig_constant;
 };
 
 FunctionList();
 
-unsigned insert(char*, TType*, TType, unsigned, bool, unsigned, unsigned );
+unsigned insert(char*, TType*, TType, unsigned, bool, unsigned, unsigned, unsigned );
 
 unsigned isDefined(char*, unsigned, bool);
 
@@ -42,6 +43,7 @@ TType getReturnType(unsigned);
 char* checkForUnImplemented();
 
 unsigned getFrameConstant(unsigned);
+unsigned getSigConstant(unsigned);
 
 private:
 	

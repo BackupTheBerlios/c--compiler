@@ -11,13 +11,13 @@ Context::Context()
   ex = 0;         
   proto = false;  
   call = false;
-  cc = 2;
+  cc = 1;
   cpos = start;
   minus = false;
   sp = 0;
   gp = 0;
   maxsp = 0;
-  frame_constants = 1;
+  func_constants = 1;
     
   labelcount=0; 
   startcount.push((unsigned)0);
@@ -207,8 +207,10 @@ if(n != 0)
                                             cout<<"[context] function "<<c<<" with same signature already defined";
                                             exit(-1);
                                           }
-                                          fl.insert(c, sig-num, ret, num, proto, maxsp, frame_constants);
-                                          icl.insert((int)maxsp, frame_constants++);
+                                          fl.insert(c, sig-num, ret, num, proto, maxsp, func_constants, func_constants+1);
+                                          icl.insert((int)maxsp, func_constants++);
+                                          icl.insert((int)num, func_constants++);
+                                          
                                           proto = false;
                                           f.pop(1);                                          
                                           ft.pop(1);

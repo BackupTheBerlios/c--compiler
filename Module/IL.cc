@@ -13,7 +13,7 @@ IL::IL()
 char* IL::genIL(unsigned* start, unsigned* end)
 {
 	cout<<endl;
-	unsigned constcount = 1;
+	unsigned constcount = 2;
 	TOperand* lastident = 0;
 	TOperand* funcident = 0;
 	unsigned funcidx = 0;
@@ -21,13 +21,13 @@ char* IL::genIL(unsigned* start, unsigned* end)
 	bool func = false;
 	bool relation = false;
 	bool switchcond = false;
-	unsigned const trueidx = 1;
-	unsigned const falseidx = 2;
+	unsigned const trueidx = 0;
+	unsigned const falseidx = 1;
 	cl.insert(0,falseidx);
 	cl.insert(1,trueidx);
 	TOperand* truevar = conid(trueidx);
 	TOperand* falsevar = conid(falseidx);
-	
+	cl.out();
 	
 
 	while(start<end)
@@ -340,18 +340,20 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				TOperand* t  = tempid(fl.getReturnType(funcidx));
 				
 				outgetret(t);
-				op.push(t);
+				//op.push(t);
 				break;
 			}
 			case FUNCTION_CALL_2:
 			{
-				unsigned i = fl.getNum(funcidx);
-				for (unsigned j=0;j<i;j++)
+				int i = fl.getNum(funcidx)-1;
+				for (;i>=0;i--)
 				{
+					cout<<i<<endl;
 					TOperand* s = op.topOp();
-					TOperand* tmp = (TOperand*)malloc(sizeof(TOperand*));
-					tmp->vtype = fl.getSigType(funcidx, j);
-					checkConvAssign(s,tmp);
+					TOperand* tmp = (TOperand*)malloc(sizeof(TOperand));
+					tmp->vtype = fl.getSigType(funcidx, i);
+					checkConvAssign(s, tmp);
+					
 					outpush(s);
 					op.pop(1);
 				}
@@ -360,7 +362,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				
 				TOperand* t  = tempid(fl.getReturnType(funcidx));
 				outgetret(t);
-				op.push(t);
+				//op.push(t);
 				break;
 			}
 			case FUNC_START:
@@ -375,7 +377,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case IMPLEMENTATION_5:
 			case IMPLEMENTATION_6:
 			{
-				outret(falsevar);
+				outret(falsevar, funcident);
 				break;
 			}
 			case INT_CONSTANT:
@@ -395,7 +397,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case RETURN_1:
 			{
-				outret(falsevar);
+				outret(falsevar, funcident);
 				break;
 			}
 			case RETURN_2:
@@ -405,7 +407,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				TOperand* tmp = (TOperand*)malloc(sizeof(TOperand*));
 				tmp->vtype = fl.getReturnType(funcidx);
 				checkConvAssign(s, tmp);
-				outret(s);
+				outret(s, funcident);
 				op.pop(1);
 				break;
 			}
@@ -510,8 +512,7 @@ TOperand* IL::conid(unsigned i)
 	tmp->vtype = cl.getType(i+2);			// todo: bug suchen, index berichtigen
 	tmp->label = (char*)malloc(6+10);
 	strcpy(tmp->label,"const_");
-	sprintf (tmp->label+6,"%u",cl.getAddr(i+2));	// todo: bug suchen, index berichtigen
-	
+	sprintf (tmp->label+6,"%u",cl.getAddr(i));
 	return tmp;
 }
 
@@ -667,11 +668,12 @@ void IL::outjump(TOperand* cc,TOperand* jmp,TJmp type)
 	ilList.append(op);
 }
 
-void IL::outret(TOperand* l)
+void IL::outret(TOperand* l, TOperand* f)
 {
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=ret_;
 	op->operand1=(TOperand*)l;
+	op->operand2=(TOperand*)f;
 	ilList.append(op);
 }
 
@@ -785,8 +787,15 @@ TType IL::checkConvAssign(TOperand*& m1, TOperand*& m2)
 		else if (t1>t2)
 		{
 			cout<<"[code-il] warning: loss of precision\n";
+			
 		}
-		else cout<<"_[code-il] warning: types not equal t1: "<<t1<<" t2: "<<t2<<endl;
+		else 
+		{
+			// Type1 ganzzahlig, kleiner als Type2
+			cout<<"[code-il] warning: types not equal t1: "<<t1<<" t2: "<<t2<<endl;
+			
+			
+		}
 	}
 	return t1;
 }
