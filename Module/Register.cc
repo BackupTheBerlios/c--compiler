@@ -104,7 +104,7 @@ TReg Register::biggerReg(TOperand* op)
 			}
 			for(int j=0; j<regusable-1; j++)
 			{
-				if (reglist[j].var == 0 && reglist[j+1].var == 0)
+				if (reglist[j].var == 0 && reglist[j+1].var == 0 && j%2==0)
 				{
 					reglist[j].var = op;
 					reglist[j].mark = mark++;
