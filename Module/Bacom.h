@@ -26,7 +26,9 @@ private:
 	void outinp(TType, TReg);
 	void outout(TType, TReg);
 	void outcvt(TType, TReg, TReg);
-	void outlic(TReg, TReg);
+	void outlic(TReg, TReg, int);
+	void outbra(TReg, char*);
+	void outbra(TReg, int);
 	void outbra(char*);
 	void outble(char*);
 	void outbeq(char*);
@@ -40,7 +42,9 @@ private:
 	void outshl(TType, TReg, TReg);
 	void outshr(TType, TReg, TReg);
 	void outadd(TType, TReg, TReg);
+	void outadd(TType, TReg, TReg, char*);
 	void outsub(TType, TReg, TReg);
+	void outsub(TType, TReg, TReg, char*);
 	void outmul(TType, TReg, TReg);
 	void outdiv(TType, TReg, TReg);
 	void outnop();
@@ -48,6 +52,8 @@ private:
 	void outdc(char);
 	void outdc(TType, int);
 	void outdc(float);
+	
+	char* concat(char*, unsigned);
 	
 	Register regs;
 	

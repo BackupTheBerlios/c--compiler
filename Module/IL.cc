@@ -29,6 +29,11 @@ char* IL::genIL(unsigned* start, unsigned* end)
 	TOperand* falsevar = conid(falseidx);
 	cl.out();
 	
+	TOperand* mainfunc = (TOperand*)malloc(sizeof(TOperand));
+	mainfunc->label = "main0";
+	mainfunc->type = funclabel;
+	
+	outgoto(mainfunc, false);
 
 	while(start<end)
 	{

@@ -6,6 +6,8 @@ void Bacom::genAsm()
 	cout << "\nBASM Ausgabe:\n";
 	cout << "sub.w " <<Register::toString( rnull )<<","<<Register::toString( rnull )<<endl;		// Nullregister 0 setzen
 	cout << "const_two:  ds.w 2 \n";
+	cout << "const_stack:  ds.w 65535 \n";  // Startwert Stackpointer
+	outloa(sint, rsp, rnull, "const_stack");
 	
 	// offset bis zum naechsten lokalen frame = 32
 	unsigned para = 32;
@@ -26,21 +28,20 @@ void Bacom::genAsm()
 				if (op1->type == funclabel)
 				{
 					// Die Parameter liegen bereits auf dem Stack, jetzt werden die Register gerettet
-					outloa(sint, rnull, rnull, "const_two");	// wieso ins rnull??????????????
+					//outloa(sint, rnull, rnull, "const_two");
 					for (int i=0;i<16;i++)
 					{
 						outstr(sint, (TReg)i, rsp, 0 );
-						outsub(sint, rsp, rnull);
+						outsub(sint, rsp, rnull, "const_two");
 
 					}
-					outsub(sint, rnull, rnull);
+					
 
 					// Lokale Basis neu setzen
 					outmov(rlb, rsp);
 
 					// Platz schaffen fuer lokales Frame, sp um Framegroesse weiterschieben
-					outloa(sint, r0, rnull, fl.getFrameConstant(op1->no) );
-					outsub(sint, rsp, rnull);
+					outsub(sint, rsp, rnull, concat("iconst_", fl.getFrameConstant(op1->no)) );
 					cout<<"\n";
 
 					// Fertig!
@@ -80,25 +81,26 @@ void Bacom::genAsm()
 		case ret_:
 		{
 			// Lokales Frame abräumen
-			outloa(sint, r0, rnull, fl.getFrameConstant(op2->no) );
-			outadd(sint, rsp, rnull);
+			outadd(sint, rsp, rnull, concat("iconst_", fl.getFrameConstant(op2->no)) );
 			
 			//Rueckgabewert?
 			
 			// Register wiederherstellen
-			outloa(sint, rnull, rnull, "const_two");
 			for (int i=14;i>=0;i--)
 			{
 				outloa(sint, (TReg)i, rsp, 0 );
-				outadd(sint, rsp, rnull);
+				outadd(sint, rsp, rnull, "const_two");
 				
 			}
 
-			outsub(sint, rnull, rnull);
-			
 			// Parameter abräumen
-			outloa(sint, r0, rnull, fl.getSigConstant(op2->no) );
-			outadd(sint, rsp, r0);
+			outadd(sint, rsp, rnull, concat("iconst_", fl.getSigConstant(op2->no)) );
+			
+			// Rücksprungadresse abräumen 
+			outloa(sint, rnull, rsp, 0);
+			
+			// Rücksprung
+			outbra(rnull, 0);
 	
 			
 			break;
@@ -188,12 +190,29 @@ void Bacom::genAsm()
 			}
 		case call_:
 			{
-				cout << "[bacom] noch nicht implementiert\n";
+				// Parameter liegen schon auf dem Stack
+				// Also: Rücksprungadresse sichern
+				
+				outlic(rnull, rnull, 20);  // Instruction counter laden
+				outstr(sint, rsp, rnull, 0); // auf den stack
+				outsub(sint, rnull, rnull);
+				outsub(sint, rsp, rnull, "const_two"); // stack weiterzählen
+				outbra(rnull, op1->label); // Sprung zur Funktion
+				
+				// Hier kehren wir zurück:
+				// in rnull steht jetzt noch die rücksprungadresse!
+				outsub(sint, rnull, rnull);
+				
+				// stackpointer muss auch noch zurückgeschoben werden:
+				outadd(sint, rsp, rnull, "const_two");
+				
+				// fertig
+				
 				break;
 			}
 		case goto_:
 			{
-				cout << "[bacom] noch nicht implementiert\n";
+				outbra(rnull, op1->label);
 				break;
 			}
 		case getret_:
@@ -316,7 +335,6 @@ void Bacom::genAsm()
 
 }
 
-
 void Bacom::outloa( TType type, TReg dest, TReg help, int offset )
 {
 	cout << "loa.";
@@ -373,6 +391,21 @@ void Bacom::outadd( TType type, TReg dest, TReg src )
 	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
 }
 
+void Bacom::outadd( TType type, TReg dest, TReg src, char* c )
+{
+	cout << "add.";
+	if ( type == schar )
+		cout << "b";
+	else if ( type == sint )
+		cout << "w";
+	else if ( type == slong )
+		cout << "l";
+	else if ( type == sfloat )
+		cout << "f";
+	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << " + "<<c<< endl;
+}
+
+
 void Bacom::outsub( TType type, TReg dest, TReg src )
 {
 	cout << "sub.";
@@ -385,6 +418,20 @@ void Bacom::outsub( TType type, TReg dest, TReg src )
 	else if ( type == sfloat )
 		cout << "f";
 	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+}
+
+void Bacom::outsub( TType type, TReg dest, TReg src, char* c )
+{
+	cout << "sub.";
+	if ( type == schar )
+		cout << "b";
+	else if ( type == sint )
+		cout << "w";
+	else if ( type == slong )
+		cout << "l";
+	else if ( type == sfloat )
+		cout << "f";
+	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << " + "<<c<< endl;
 }
 
 void Bacom::outmul( TType type, TReg dest, TReg src )
@@ -448,5 +495,29 @@ void Bacom::outcvt(TType type, TReg r1, TReg r2)
 	else if (type==slong)
 		cout << "l ";
 	cout << Register::toString( r1 ) << ", " << Register::toString( r2 ) << endl;
+}
+
+void Bacom::outbra(TReg r, char* c)
+{
+	cout<<"bra "<<Register::toString( r )<<"+"<<c<<endl;
+}
+
+
+void Bacom::outbra(TReg r, int offs)
+{
+	cout<<"bra "<<Register::toString( r )<<"+"<<offs<<endl;
+}
+
+void Bacom::outlic(TReg r, TReg s, int offs)
+{
+	cout<<"lic "<<Register::toString(r)<<" "<<Register::toString(s)<<" + "<<offs<<endl;
+}
+
+char* Bacom::concat(char* pre, unsigned numb)
+{
+	char* c = (char*)malloc(30);
+	strcpy(c, pre);
+	sprintf (c+7,"%u", numb);
+	return c;
 }
 
