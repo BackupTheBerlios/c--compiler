@@ -17,7 +17,7 @@ using namespace std;
 extern NameList nl;
 extern ConstList cl;
 extern FunctionList fl;
-extern List ilList;
+extern List ilList; // die Zwischencodeliste
 
 class IL
 {
@@ -32,6 +32,7 @@ char* genIL(unsigned*, unsigned*);
 
 private:
 
+	// Erzeugung der im Zwischencode verwendeten Operanden
 	TOperand* varid(unsigned);
 	
 	TOperand* conid(unsigned);
@@ -44,6 +45,8 @@ private:
 
 	TOperand* funcid(unsigned);	
 	
+	
+	// Ausgabe der Zwischencodebefehle in die Liste
 	void outcopy(TOperand*, TOperand*);
 	
 	void outbin(TOperand*, TOperand*, TBinOp, TOperand*);
@@ -70,11 +73,13 @@ private:
 	
 	void outstop();
 	
+	// Prüft die Typkompatiblität bei Zuweisungen
 	TType checkConvAssign(TOperand*&, TOperand*&);
 	
+	// Prüft die Typkompatiblität bei binären Operationen
 	TType checkConv(TOperand*&, TOperand*&);
 	
-	
+	// Stacks und Hilfsvariablen
 	Stack op;
 	Stack label;
 	Stack cond;

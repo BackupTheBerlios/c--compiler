@@ -19,10 +19,10 @@ extern unsigned* pos;
 
 extern FILE *yyin, *yyout;
 
-ConstList cl;
+ConstList cl;  // Konstantenliste
 ConstList icl; //interne Konstantenliste, zb. Framegroessen, ect.
-NameList nl;
-FunctionList fl;
+NameList nl; // Namensliste
+FunctionList fl; // Funktionsliste
 Context c;
 IL il;
 List ilList;
@@ -38,7 +38,7 @@ int main(int argc, char* arv[])
 	bool bac = false;
 	bool info = false;
 	
-	
+	// Auswertung der Kommandozeilenargumente
 	if (argc>1) ifile = arv[1];
 	else 
 	{
@@ -61,6 +61,8 @@ int main(int argc, char* arv[])
 			info = true;
 		}
 	}
+	
+	// Ausgabe des Infotextes
 	if (info)
 	{
 		cout<<"Usage:  inputfile outputfile [-a | -b]\n";
@@ -70,26 +72,32 @@ int main(int argc, char* arv[])
 	}
 	
 	
+	// Dateien öffnen
 	bsm.open(ofile);
 	spilldata.open("spill");
 	yyin = fopen(ifile,"r+");
 	
+	// Parser starten
 	yyparse();
 	cout<<"\n[parser] OK\n";
 	//fclose(yyin);
 	
+	// Kontextprüfung starten
 	c.context(root);  
 	cout<<"\n[context] OK\n";
 	
-
+	// Zwischencodeerzeugung starten
 	il.genIL(start, pos);
 	cout<<"\n[code-il] OK\n";
 	
+	// Bacom Zielcodeerzeugung starten
 	bc.genAsm();
 	cout<<"\n[bacom] OK\n";
 	bsm.close();
 	spilldata.close();
 	
+	// Ausführung von basm / bacom
+	// Kommandozeilen zusammenbasteln
 	char* f = (char*)malloc(50);
 	strcpy(f, "cat spill>>");
 	strcpy(f+11, ofile);

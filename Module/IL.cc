@@ -22,14 +22,17 @@ char* IL::genIL(unsigned* start, unsigned* end)
 	bool func = false;
 	bool relation = false;
 	bool switchcond = false;
+	
+	// True / False Konstanten
 	unsigned const trueidx = 0;
 	unsigned const falseidx = 1;
 	cl.insert(0,falseidx);
 	cl.insert(1,trueidx);
 	TOperand* truevar = conid(trueidx);
 	TOperand* falsevar = conid(falseidx);
-	//cl.out();
 	
+	
+	// Erzeugung des Operanden für die main-Funktion (für den Sprung dorthin)
 	TOperand* mainfunc = (TOperand*)malloc(sizeof(TOperand));
 	mainfunc->label = "main0";
 	mainfunc->type = funclabel;
@@ -37,7 +40,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 	
 	TOperand* lastfunclabel;
 	
-	
+	// Traversierung durchlaufen
 
 	while(start<end)
 	{
@@ -45,6 +48,8 @@ char* IL::genIL(unsigned* start, unsigned* end)
 		{
 			case IDENTIFIER:
 			{
+				// ein Ident, kann eine Variable oder eine Funktion sein
+				
 				unsigned idx = *++start;
 				if (idx>MAX_NO_OF_VARIABLES)
 				{
@@ -62,8 +67,6 @@ char* IL::genIL(unsigned* start, unsigned* end)
 					lastident = varid(idx);
 					varidx = idx;
 				}
-				//if (funcident==0) cout<<"IDENT: "<<lastident<<endl;
-				//if (funcident!=0) cout<<"FUNCID:"<<funcident<<endl;
 				break;
 			}
 			case VARIABLE:
@@ -134,6 +137,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case EXPRESSION_2:
 			{
+				cout<<"exp2";
 				TOperand* src = op.topOp();
 				op.pop(1);
 				TOperand* dst = op.topOp();
@@ -208,6 +212,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case RELATION_2:
 			{
+				cout<<"rel2";
 				relation = true;
 				TOperand* src = op.topOp();
 				op.pop(1);
@@ -229,6 +234,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case RELATION_3:
 			{
+				cout<<"rel3";
 				relation = true;
 				TOperand* src = op.topOp();
 				op.pop(1);
