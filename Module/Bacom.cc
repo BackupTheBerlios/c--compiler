@@ -101,15 +101,43 @@ void Bacom::genAsm()
 		case call_:
 		case goto_:
 		case ret_:
-		case getret_:
+		case getret_:	break;
 		case char_:
-		case int_:	break;
+			{
+				if (op2->vtype==sfloat)		// evt vorher nach long konvertieren
+				{
+					TReg r;
+					op1->vtype=slong;	// vorher typ auf long, somit wird ein breites register geholt
+					regs.getReg(op1, r);
+					op1->vtype=sint;
+					outcvt(slong, regs.whichReg( op1 ), regs.whichReg( op2 ) );
+					regs.freeReg( op2 );
+				}
+				regs.smallerReg(op2);
+				break;
+			}
+		case int_:
+			{
+				if (op2->vtype==sfloat)		// evt vorher nach long konvertieren
+				{
+					TReg r;
+					op1->vtype=slong;	// vorher typ auf long, somit wird ein breites register geholt
+					regs.getReg(op1, r);
+					op1->vtype=sint;
+					outcvt(slong, regs.whichReg( op1 ), regs.whichReg( op2 ) );
+					regs.freeReg( op2 );
+				}
+				regs.smallerReg(op2);
+				break;
+			}
 		case long_:	//Todo: in IL.cc noch toLong und toInt einfuegen!
 			{
-				// wenn convert von int, dann nur in ein doppelregister stecken
+				// wenn convert von int, dann in ein doppelregister stecken
 				if (op2->vtype<=sint)
 				{
 					regs.biggerReg(op2);
+					op1=op2;
+					regs.changeReg( op1, op2 );
 				}
 				else	// convert von float
 				{
