@@ -46,7 +46,11 @@ void BoardServer::start()
 				logon(&all);
 				break;
 			}
-			hello = 0;
+			else
+			{
+				int anything=2;		// client muss noch warten
+				net->reply(all, &anything, sizeof(anything));
+			}
 		}
 	
 		

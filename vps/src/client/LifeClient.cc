@@ -71,15 +71,16 @@ void LifeClient::loop()
 		req[0] = 'N';
 		req[1] = step;
 		message = 0;
-		
+		cout<<"[lifeclient] request next step!\n";
 		net->request( server, &req, sizeof(req), &message, sizeof(message));
-// 		cout<<"server sends: "<<message<<" from "<<server.getAddr()<<endl;
+ 		cout<<"[lifeclient] server sends: "<<message<<" from "<<server.getAddr()<<endl;
 		if (message==1)		// if Server sends 1, we calculate the next Step
 		{
 // 			cout<<"makestep"<<endl;
 			makeStep();
 			step++;
 		}
+		sleep(1);	// wegen sockets warten
 	}while (message!=0);
 }
 
