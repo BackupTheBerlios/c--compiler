@@ -129,8 +129,8 @@ void LifeClient::makeStep()
 			char message;
 			int req[ 4 ];
 			req[ 0 ] = 2;			// Setzen eines Punktes
-			req[ 1 ] = x+(x2-x1);
-			req[ 2 ] = y+(y2-y1);
+			req[ 1 ] = x+x1;
+			req[ 2 ] = y+y1;
 			// transmit positions to server
 			if (neighbours_alive==3 && board_a->readPos(x,y)==dead)
 			{
