@@ -13,7 +13,11 @@ List::List()
 
 void List::del (unsigned n)
 {
-	if (elems==0 && n>elems) return;
+	if (elems==0 || n>elems || n<1)
+	{
+		cout<<"error while List::del\n";
+		return;
+	}
 	TListEntry* curr=start;
 	TListEntry* prev;
 	for (unsigned i=0; i<n-1; i++)
@@ -21,7 +25,19 @@ void List::del (unsigned n)
 		prev=curr;
 		curr=curr->next;
 	}
-	prev->next=curr->next;
+	if (n==1)
+	{
+		start=curr->next;
+	}
+	else if (n==elems)
+	{
+		prev->next=0;
+		end=prev;
+	}
+	else
+	{
+		prev->next=curr->next;
+	}
 	free(curr);
 	if (elems==1)
 	{
@@ -48,6 +64,33 @@ void List::append (struct TOp *op)
 	}
 	end=e;
 	elems++;
+}
+
+void List::insert (struct TOp *op, unsigned n)
+{
+	if (n>elems+1 || n<1)
+	{
+		cout<<"error while List::insert\n";
+		return;
+	}
+	TListEntry* e = (TListEntry*)malloc(sizeof(TListEntry));
+	e->op = op;
+	e->next = 0;
+	if (elems==0)
+	{
+		start=e;
+	}
+	TListEntry* curr=start;
+	TListEntry* prev;
+	for (unsigned i=0; i<n-1; i++)
+	{
+		prev=curr;
+		curr=curr->next;
+	}
+	prev->next=e;
+	e->next=curr;
+	elems++;
+	if (elems==n) end=e;
 }
 
 struct TOp* List::getelem(unsigned n)

@@ -16,6 +16,7 @@ List();
 
 void del (unsigned n);
 void append (struct TOp*);
+void insert (struct TOp*, unsigned n);	// element wird an n gesetzt
 struct TOp* getelem(unsigned n);	// n startet bei 1
 unsigned count();
 void out();
