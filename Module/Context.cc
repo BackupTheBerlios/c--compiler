@@ -398,6 +398,10 @@ if(n != 0)
 	case FUNCTION_CALL_CHAR_OUT	: context(n->n1); context(n->n2); s.pop(1); break;
 	case FUNCTION_CALL_LONG_OUT	: context(n->n1); context(n->n2); s.pop(1); break;
 	case FUNCTION_CALL_FLOAT_OUT	: context(n->n1); context(n->n2); s.pop(1); break;
+	case FUNCTION_CALL_INT_IN	: s.pop(1); break;
+	case FUNCTION_CALL_CHAR_IN	: s.pop(1); break;
+	case FUNCTION_CALL_LONG_IN	: s.pop(1); break;
+	case FUNCTION_CALL_FLOAT_IN	: s.pop(1); break;
         case EPSILON                    :  break;
     }
   }

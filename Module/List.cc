@@ -229,6 +229,22 @@ void List::out()
 			case floatout:
 			cout<<"floatout";
 			break;
+
+			case intin:
+			cout<<"intin";
+			break;
+			
+			case charin:
+			cout<<"charin";
+			break;
+			
+			case longin:
+			cout<<"longin";
+			break;
+			
+			case floatin:
+			cout<<"floatin";
+			break;
 		}
 		
 		for (int i=0;i<3;i++)

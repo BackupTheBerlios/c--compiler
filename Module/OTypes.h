@@ -133,6 +133,10 @@
 #define FUNCTION_CALL_CHAR_OUT 127
 #define FUNCTION_CALL_LONG_OUT 128
 #define FUNCTION_CALL_FLOAT_OUT 129
+#define FUNCTION_CALL_INT_IN 130
+#define FUNCTION_CALL_CHAR_IN 131
+#define FUNCTION_CALL_LONG_IN 132
+#define FUNCTION_CALL_FLOAT_IN 133
 
 
 // maximale Bezeichnerlänge mit Block-ID
@@ -235,7 +239,11 @@ enum	TOpType {
     intout,
     charout,
     longout,
-    floatout
+    floatout,
+    intin,
+    charin,
+    longin,
+    floatin
 };
 
 enum TJmp {

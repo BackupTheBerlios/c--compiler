@@ -341,6 +341,34 @@ void Bacom::genAsm()
 				regs.changeReg( op1, op2);
 				break;
 			}
+		case intin:
+			{
+				TReg r;
+				regs.getReg(op1, r);
+				out_in(sint, regs.whichReg( op1 ));
+				break;
+			}
+		case charin:
+			{
+				TReg r;
+				regs.getReg(op1, r);
+				out_in(schar, regs.whichReg( op1 ));
+				break;
+			}
+		case longin:
+			{
+				TReg r;
+				regs.getReg(op1, r);
+				out_in(slong, regs.whichReg( op1 ));
+				break;
+			}
+		case floatin:
+			{
+				TReg r;
+				regs.getReg(op1, r);
+				out_in(sfloat, regs.whichReg( op1 ));
+				break;
+			}
 		default:
 			{
 				cout << "[bacom] noch nicht implementiert\n";
@@ -585,6 +613,20 @@ void Bacom::outlic(TReg r, TReg s, int offs)
 void Bacom::out_out(TType type, TReg r)
 {
 	bsm << "out.";
+	if ( type == sint )
+		bsm << "w ";
+	else if ( type == schar )
+		bsm << "b ";
+	else if ( type == slong )
+		bsm << "l ";
+	else if ( type == sfloat )
+		bsm << "f ";
+	bsm<<Register::toString(r)<<endl;
+}
+
+void Bacom::out_in(TType type, TReg r)
+{
+	bsm << "in.";
 	if ( type == sint )
 		bsm << "w ";
 	else if ( type == schar )

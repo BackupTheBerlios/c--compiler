@@ -439,6 +439,34 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				op.push(p);
 				break;
 			}
+			case FUNCTION_CALL_INT_IN:
+			{
+				TOperand* p = tempid(sint);
+				outio(intin, p);
+				op.push(p);
+				break;
+			}
+			case FUNCTION_CALL_CHAR_IN:
+			{
+				TOperand* p = tempid(schar);
+				outio(charin, p);
+				op.push(p);
+				break;
+			}
+			case FUNCTION_CALL_LONG_IN:
+			{
+				TOperand* p = tempid(slong);
+				outio(longin, p);
+				op.push(p);
+				break;
+			}
+			case FUNCTION_CALL_FLOAT_IN:
+			{
+				TOperand* p = tempid(sfloat);
+				outio(floatin, p);
+				op.push(p);
+				break;
+			}
 			case FUNC_START:
 			{
 				func = true;
@@ -904,5 +932,13 @@ void IL::outio(TOpType type, TOperand* p, TOperand* m)
 	op->TOpType=type;
 	op->operand1=p;
 	op->operand2=m;
+	ilList.append(op);
+}
+
+void IL::outio(TOpType type, TOperand* p)
+{
+	struct TOp* op=(TOp*)malloc(sizeof(TOp));
+	op->TOpType=type;
+	op->operand1=p;
 	ilList.append(op);
 }

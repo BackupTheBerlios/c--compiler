@@ -53,6 +53,7 @@ private:
 	void outdc(TType, int);
 	void outdc(float);
 	void out_out(TType, TReg);
+	void out_in(TType, TReg);
 	
 	char* concat(char*, unsigned);
 	

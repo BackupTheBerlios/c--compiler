@@ -274,7 +274,16 @@ qualifying:             epsilon                                         { $$ = c
         |               qualifying '.' var_ident                        { $$ = createNewNode($1,$3,0,0,0,QUALIFYING_2);}
         |               qualifying '[' expression expression_st ']'     { $$ = createNewNode($1,$3,$4,0,0,QUALIFYING_3);}
         ;
-function_call:          func_ident '(' ')'                              { $$ = createNewNode($1,0,0,0,0,FUNCTION_CALL_1);}
+function_call:          func_ident '(' ')'                              { if (strstr((char*)$1->n1,"int_in"))
+                                                                            $$ = createNewNode(0,0,0,0,0, FUNCTION_CALL_INT_IN);
+                                                                          else if (strstr((char*)$1->n1,"char_in"))
+                                                                            $$ = createNewNode(0,0,0,0,0, FUNCTION_CALL_CHAR_IN);
+                                                                          else if (strstr((char*)$1->n1,"long_in"))
+                                                                            $$ = createNewNode(0,0,0,0,0, FUNCTION_CALL_LONG_IN);
+                                                                          else if (strstr((char*)$1->n1,"float_in"))
+                                                                            $$ = createNewNode(0,0,0,0,0, FUNCTION_CALL_FLOAT_IN);
+                                                                          else
+                                                                            $$ = createNewNode($1,0,0,0,0,FUNCTION_CALL_1);}
         |               func_ident '(' expression expression_st ')'     { if (strstr((char*)$1->n1,"int_out"))
                                                                             $$ = createNewNode($3,$4,0,0,0, FUNCTION_CALL_INT_OUT);
                                                                           else if (strstr((char*)$1->n1,"char_out"))
@@ -433,10 +442,14 @@ void out(struct TNode* n)
         case QUALIFYING_3               : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("qualifying "); break;
         case FUNCTION_CALL_1            : out(n->n1); gen(n->type); printf("function_call "); break;
         case FUNCTION_CALL_2            : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("function_call "); break;
-        case FUNCTION_CALL_INT_OUT      : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("function_call_int_out "); break;
-        case FUNCTION_CALL_CHAR_OUT     : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("function_call_char_out "); break;
-        case FUNCTION_CALL_LONG_OUT     : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("function_call_long_out "); break;
-        case FUNCTION_CALL_FLOAT_OUT    : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("function_call_float_out "); break;
+        case FUNCTION_CALL_INT_OUT      : out(n->n1); out(n->n2); gen(n->type); printf("function_call_int_out "); break;
+        case FUNCTION_CALL_CHAR_OUT     : out(n->n1); out(n->n2); gen(n->type); printf("function_call_char_out "); break;
+        case FUNCTION_CALL_LONG_OUT     : out(n->n1); out(n->n2); gen(n->type); printf("function_call_long_out "); break;
+        case FUNCTION_CALL_FLOAT_OUT    : out(n->n1); out(n->n2); gen(n->type); printf("function_call_float_out "); break;
+        case FUNCTION_CALL_INT_IN       : gen(n->type); printf("function_call_int_in "); break;
+        case FUNCTION_CALL_CHAR_IN      : gen(n->type); printf("function_call_char_in "); break;
+        case FUNCTION_CALL_LONG_IN      : gen(n->type); printf("function_call_long_in "); break;
+        case FUNCTION_CALL_FLOAT_IN     : gen(n->type); printf("function_call_float_in "); break;
         case EPSILON                    : gen(n->type); printf("epsilon "); break;
     }
   }

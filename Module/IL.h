@@ -64,7 +64,9 @@ private:
 	
 	void outconvert(TOperand*, TOperand*, TType);
 	
-	void outio(TOpType, TOperand*, TOperand*);
+	void outio(TOpType, TOperand*, TOperand*);	// fuer Ausgabe
+	
+	void outio(TOpType, TOperand*);			// fuer Eingabe
 	
 	TType checkConvAssign(TOperand*&, TOperand*&);
 	
