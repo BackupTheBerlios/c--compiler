@@ -32,8 +32,45 @@ ofstream bsm;
 
 int main(int argc, char* arv[])
 {
-	bsm.open("test.bsm");
-	yyin = fopen("test.cc","r+");
+	char* ifile, *ofile;
+	bool basm = false;
+	bool bac = false;
+	bool info = false;
+	
+	
+	if (argc>1) ifile = arv[1];
+	else 
+	{
+		cout<<"[main] no input file\n";
+		info = true;
+	}
+	if (argc>2) ofile = arv[2];
+	else 
+	{
+		cout<<"[main] no output file\n";
+		info = true;
+	}
+	if (argc>3)
+	{
+		if (strcmp(arv[3], "-a")==0) basm = true;
+		else if (strcmp(arv[3], "-b")==0) { basm = true; bac = true; } 
+		else 
+		{
+			cout<<"[main] unknown option\n";
+			info = true;
+		}
+	}
+	if (info)
+	{
+		cout<<"Usage:  inputfile outputfile [-a | -b]\n";
+		cout<<"-a for assemble\n";
+		cout<<"-b for assemble and execute\n";
+		exit(-1);
+	}
+	
+	
+	bsm.open(ofile);
+	yyin = fopen(ifile,"r+");
 	
 	yyparse();
 	cout<<"\n[parser] OK\n";
@@ -42,12 +79,29 @@ int main(int argc, char* arv[])
 	c.context(root);  
 	cout<<"\n[context] OK\n";
 	
+
 	il.genIL(start, pos);
 	cout<<"\n[code-il] OK\n";
 	
 	bc.genAsm();
 	cout<<"\n[bacom] OK\n";
 	bsm.close();
+	if (basm)
+	{
+		char* f = (char*)malloc(50);
+		strcpy(f, "basm ");
+		strcpy(f+5, ofile);
+		system(f);
+		if (bac)
+		{
+		
+			char* n = strrchr(ofile, '.');
+			strcpy( n+1, "pro");
+			strcpy( f, "bacom ");
+			strcpy( f+6, ofile );
+			system(f);
+		}
+	}
 }
 
 
