@@ -23,6 +23,9 @@ unsigned FunctionList::insert(char* n, TType* sig, TType ret, unsigned num, bool
 			if ((strcmp(cur->name,n)==0)&&(cur->num==num)&&(cur->proto)) 
 			{
 				cur->proto = 0;
+				cur->maxsp = maxsp;
+				cur->num = num;
+				cur->frame_constant = frame_constant;
 				return c;
 			}
 			cur++;

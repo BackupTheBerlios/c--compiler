@@ -168,7 +168,7 @@ if(n != 0)
         case COMPLEX_CONSTANT_2         : cout<<"[context] Complex initialisers not implemented!\n"; exit(-1); break;
         case FUNC_DECL                  : { 
                                           func = true;
-                                          sp = 0; // stackpointer resetten 
+                                          if (!proto) sp = 0; // stackpointer resetten 
                                           context(n->n1);
                                           
                                           char* c = f.top();
@@ -230,7 +230,7 @@ if(n != 0)
                                           f.pop(1);                                          
                                           ft.pop(1);
                                           func = false;
-                                          maxsp = 0;
+                                          if (!proto) maxsp = 0;
                                                                                 
                                           
                                         }
