@@ -212,6 +212,8 @@ return:                 _return ';'                                     { $$ = c
 if:                     _if '(' cond ')' stm %prec _if                  { $$ = createNewNode($3,$5,0,0,0,IF_1);}
         |               _if '(' cond ')' stm _else stm                  { $$ = createNewNode($3,$5,$7,0,0,IF_2);}
         ;
+// else:			_else						{ $$ = createNewNode($1,0,0,0,0,ELSE);}
+// 	;
 cond:                   expression                                      { $$ = createNewNode($1,0,0,0,0,COND);}
         ;
 switch:                 _switch '(' cond ')' '{' case case_st '}'       { $$ = createNewNode($3,$6,$7,0,0,SWITCH);}
@@ -380,7 +382,7 @@ void out(struct TNode* n)
         case RETURN_1                   : gen(n->type); printf("return "); break;
         case RETURN_2                   : out(n->n1); gen(n->type); printf("return "); break;
         case IF_1                       : out(n->n1); out(n->n2); gen(n->type); printf("if "); break;
-        case IF_2                       : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("if "); break;
+        case IF_2                       : out(n->n1); out(n->n2); gen(ELSE); out(n->n3); gen(n->type); printf("if "); break;
         case COND                       : out(n->n1); gen(n->type); printf("cond "); break;
         case SWITCH                     : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("switch "); break;
         case CASE_ST_1                  : out(n->n1); gen(n->type); printf("{case}* "); break;

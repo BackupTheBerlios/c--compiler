@@ -121,6 +121,7 @@
 #define IDENTIFIER 118
 #define FLOAT_CONSTANT 119
 #define FUNC_START 120 // Beschmuh-Symbol um rechtzeitig festzustellen wann eine func-decl beginnt
+#define ELSE 121 // nochn Beschmuh-Symbol fuer das label beim else
 
 
 // maximale Bezeichnerlänge mit Block-ID

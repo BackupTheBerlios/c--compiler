@@ -26,7 +26,6 @@ public:
 IL();
 
 char* genIL(unsigned*, unsigned*);
-void pushLabel(bool);
 
 
 private:
@@ -51,16 +50,16 @@ private:
 	
 	void outlabel(char*);
 	
+	void outjump(char*);
+	
 	void outret(char*);
 	
-	void outpush(char *);
+	void outpush(char*);
 	
 	Stack op;
 	Stack label;
 	unsigned tempcount;
 	unsigned labelcount;
-// 	unsigned labelin;
-// 	unsigned labelout;
 
 };
 

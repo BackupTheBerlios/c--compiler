@@ -143,39 +143,25 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case IF_2: //if mit else
 			{
+				outlabel(label.top());
+				label.pop(2);
 				break;
 			}
-			case STM:
+			case ELSE:
 			{
-				outlabel(label.first());
-				label.pop(label.count());
-			}
-				
-				
-/*				// vorwaerts suchen, ob if folgt und wenn ja, ob vorher ein weiteres stm
-				unsigned* temp=start;
-				temp++;
-				while ((*temp!=STM && *temp!=IF_1 && *temp!=IF_2) && temp<end)
-				{
-					temp++;
-// 					cout<<*temp;
-				}
-				if (*temp==IF_1 || *temp==IF_2)
-				{
-					label.push(labelid()); // label auf stack und jmp erzeugen
-					cout<<"jmp("<<label.top()<<");\n";
-				}
+				char* l=labelid();
+				char* e=label.top();
+				label.push(l);
+				outjump(l);
+				outlabel(e);
 				break;
 			}
-			case COMPOUND:
+			case COND:
 			{
-				if (label.count()>0)
-				{
-// 					cout<<"jmp("<<label.topi(labelout)<<");\n";
-// 					labelout++;
-				}
+				label.push(labelid());
+				outjump(label.top());
 				break;
-			}*/
+			}
 			case INIT_PART:
 			{
 				char* dst = lastident;
@@ -333,7 +319,12 @@ void IL::outgoto(char* label, bool call)
 
 void IL::outlabel(char* label)
 {
-	cout<<label<<":\n";
+	cout<<"\n"<<label<<":\n";
+}
+
+void IL::outjump(char* jmp)
+{
+	cout<<"jmp "<<jmp<<";\n"; //springe dort hin, wenn cond false
 }
 
 void IL::outret(char* l)
@@ -344,11 +335,4 @@ void IL::outret(char* l)
 void IL::outpush(char* l)
 {
 	cout<<"push "<<l<<";\n";
-}
-
-void IL::pushLabel(bool l) //soll label gepusht werden oder platzhalter?
-{
-	if (l)
-		label.push(labelid());
-	else	label.push("0");
 }
