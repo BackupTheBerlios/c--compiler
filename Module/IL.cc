@@ -18,6 +18,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 	char* lastident = 0;
 	char* funcident = 0;
 	unsigned funcidx = 0;
+	unsigned varidx = 0;
 	bool func = false;
 
 	while(start<end)
@@ -38,6 +39,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				} else 
 				{
 					lastident = varid(idx);
+					varidx = idx;
 				}
 				//if (funcident==0) cout<<"IDENT: "<<lastident<<endl;
 				//if (funcident!=0) cout<<"FUNCID:"<<funcident<<endl;
@@ -45,94 +47,128 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case VARIABLE:
 			{
-				op.push(lastident);
+				op.push(lastident, nl.getType(varidx));
 				break;
 			}
 			case VAR_DECL_ST_2:	break;
 			case MULT_DIV_2:
 			{
 				char* m1 = op.top();
+				TType t1 = op.toptype();
 				op.pop(1);
 				char* m2 = op.top();
+				TType t2 = op.toptype();
 				op.pop(1);
+				TType tt = checkConv(m1,m2,t1,t2);
 				char* p = tempid();
 				outbin(p, m2, mult, m1);
-				op.push(p);
+				op.push(p,tt);
 				break;
 			}
 			case MULT_DIV_3:
 			{
 				char* m1 = op.top();
+				TType t1 = op.toptype();
 				op.pop(1);
 				char* m2 = op.top();
+				TType t2 = op.toptype();
 				op.pop(1);
+				TType tt = checkConv(m1,m2,t1,t2);
 				char* p = tempid();
 				outbin(p, m2, divi, m1);
-				op.push(p);
+				op.push(p,tt);
 				break;
 			}
 			case MULT_DIV_4:
 			{
 				char* m1 = op.top();
+				TType t1 = op.toptype();
 				op.pop(1);
 				char* m2 = op.top();
+				TType t2 = op.toptype();
 				op.pop(1);
+				TType tt = checkConv(m1,m2,t1,t2);
 				char* p = tempid();
 				outbin(p, m2, mod, m1);
-				op.push(p);
+				op.push(p,tt);
 				break;
 			}
 			case ADD_SUB_2:
 			{
 				char* m1 = op.top();
+				TType t1 = op.toptype();
 				op.pop(1);
 				char* m2 = op.top();
+				TType t2 = op.toptype();
 				op.pop(1);
+				TType tt = checkConv(m1,m2,t1,t2);
 				char* p = tempid();
 				outbin(p, m2, add, m1);
-				op.push(p);
+				op.push(p,tt);
 				break;
 			}
 			case ADD_SUB_3:
 			{
 				char* m1 = op.top();
+				TType t1 = op.toptype();
 				op.pop(1);
 				char* m2 = op.top();
+				TType t2 = op.toptype();
 				op.pop(1);
+				TType tt = checkConv(m1,m2,t1,t2);
 				char* p = tempid();
 				outbin(p, m2, sub, m1);
-				op.push(p);
+				op.push(p,tt);
 				break;
 			}
 			case EXPRESSION_2:
 			{
 				char* src = op.top();
+				TType srct = op.toptype();
 				op.pop(1);
 				char* dst = op.top();
+				TType dstt = op.toptype();
 				op.pop(1);
+				//cout<<src<<" dst:"<<dst<<endl;
+				checkConvAssign(src,srct,dstt);
+				
 				outcopy(dst,src);
 				break;
 			}
 			case SHIFT_2:
 			{
 				char* m1 = op.top();
+				TType t1 = op.toptype();
 				op.pop(1);
 				char* m2 = op.top();
+				TType t2 = op.toptype();
+				if ((t1==sfloat)||(t2==sfloat)) 
+				{
+					cout<<"[code-il] float-shift not permitted";
+					exit(-1);
+				}
 				op.pop(1);
 				char* p = tempid();
 				outbin(p, m2, shiftl, m1);
-				op.push(p);
+				op.push(p,t1);
 				break;
 			}
 			case SHIFT_3:
 			{
 				char* m1 = op.top();
+				TType t1 = op.toptype();
 				op.pop(1);
 				char* m2 = op.top();
+				TType t2 = op.toptype();
 				op.pop(1);
+				if ((t1==sfloat)||(t2==sfloat)) 
+				{
+					cout<<"[code-il] float-shift not permitted";
+					exit(-1);
+				}
 				char* p = tempid();
 				outbin(p, m2, shiftr, m1);
-				op.push(p);
+				op.push(p,t1);
 				break;
 			}
 			case IF_1: //if ohne else
@@ -158,9 +194,11 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case COND:
 			{
+
 				label.push(labelid());
 				outjump(label.top());
 				break;
+
 			}
 			case WHILE_COND:
 			{
@@ -190,6 +228,8 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case FUNCTION_CALL_1:
 			{
 				outgoto(funcident, true);
+				// todo: in dieser tempid muss der rückgabewert stehen
+				op.push(tempid(),fl.getReturnType(funcidx));
 				break;
 			}
 			case FUNCTION_CALL_2:
@@ -197,10 +237,16 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				unsigned i = fl.getNum(funcidx);
 				for (unsigned j=0;j<i;j++)
 				{
-					outpush(op.top());
+					char* s = op.top();
+					TType t1 = op.toptype();
+					TType t2 = fl.getSigType(funcidx, j);
+					checkConvAssign(s,t1,t2);
+					outpush(s);
 					op.pop(1);
 				}
 				outgoto(funcident, true);
+				// todo: in dieser tempid muss der rückgabewert stehen
+				op.push(tempid(),fl.getReturnType(funcidx));
 				break;
 			}
 			case FUNC_START:
@@ -230,7 +276,11 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case RETURN_2:
 			{
-				outret(op.top());
+				char* s = op.top();
+				TType t1 = op.toptype();
+				TType t2 = fl.getReturnType(funcidx);
+				checkConvAssign(s,t1,t2);
+				outret(s);
 				op.pop(1);
 				break;
 			}
@@ -352,4 +402,53 @@ void IL::outret(char* l)
 void IL::outpush(char* l)
 {
 	cout<<"push "<<l<<";\n";
+}
+
+
+TType IL::checkConv(char*& m1, char*& m2, TType t1, TType t2)
+{
+	if (t1!=t2) 
+	{
+		if ((t1==sfloat)&&(t2==sint))
+		{
+			char* m3 = tempid();
+			outconvert(m2,m3,sfloat);
+			m2 = m3;
+			return sfloat;
+		} else if ((t1==sint)&&(t2==sfloat))
+		{
+			char* m3 = tempid();
+			outconvert(m1,m3,sfloat);
+			m1 = m3;
+			return sfloat;
+		} else {
+			cout<<"[code-il] warning: types not equal t1: "<<t1<<" t2: "<<t2<<endl;
+		}
+	}
+	return t1;
+}
+
+TType IL::checkConvAssign(char*& m1, TType t1, TType t2)
+{
+	if (t1!=t2) 
+	{
+		if ((t1==sint)&&(t2==sfloat))
+		{
+			char* t = tempid();
+			outconvert(m1,t,sfloat);
+			m1 = t;
+			return sfloat;
+		} else if ((t1==sfloat)&&(t2==sint))
+		{
+			char* t = tempid();
+			outconvert(m1,t,sint);
+			m1 = t;
+			return sint;
+		} else cout<<"[code-il] warning: types not equal t1: "<<t1<<" t2: "<<t2<<endl;
+	}
+	return t1;
+}
+void IL::outconvert(char* m1, char* m2, TType to)
+{
+	cout<<m2<<" := to"<<((to==sint)?"Int(":"Float(")<<m1<<");\n";
 }

@@ -32,6 +32,28 @@ void Stack::push (char* name)
 	
 }
 
+void Stack::push (TType type)
+{
+	TStackEntry* e = (TStackEntry*)malloc(sizeof(TStackEntry));
+	e->type = type;
+	e->next = tos;
+	if (tos==0) start = e;
+	tos = e;		
+	
+}
+
+
+void Stack::push (char* name, TType type)
+{
+	TStackEntry* e = (TStackEntry*)malloc(sizeof(TStackEntry));
+	e->ret.name = name;
+	e->type = type;
+	e->next = tos;
+	if (tos==0) start = e;
+	tos = e;		
+	
+}
+
 void Stack::push (unsigned block)
 {
 	TStackEntry* e = (TStackEntry*)malloc(sizeof(TStackEntry));
@@ -59,6 +81,27 @@ char* Stack::first ()
 	
 	return re;
 }
+
+TType Stack::firsttype ()
+{
+	
+	if (tos==0) return svoid;
+	
+	TType re = start->type;
+	TStackEntry* ctos = tos;
+	while(1)
+	{
+		if (ctos==0) return svoid;
+		
+		if (ctos->next == start) { start = ctos; ctos->next = 0; break; }
+		if (ctos->next == 0) { tos = 0; start = 0; break; }
+		ctos = ctos->next;
+	}
+	
+	return re;
+}
+
+
 
 
 unsigned Stack::firsti ()
@@ -96,6 +139,13 @@ char* Stack::top ()
 {
 	if (tos!=0) return tos->ret.name;
 	return 0;
+}
+
+
+TType Stack::toptype()
+{
+	if (tos!=0) return tos->type;
+	return undeclared;
 }
 
 

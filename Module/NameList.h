@@ -12,16 +12,16 @@ struct TNameListEntry
 {
 	char* name;
 	unsigned block;
-	char* ttype;
+	TType type;
 	
 	
 };
 
 NameList();
 
-unsigned insert(char*, unsigned, char*);
+unsigned insert(char*, unsigned, TType);
 
-char* typeOf(char*, unsigned);
+TType typeOf(char*, unsigned);
 
 unsigned isDefined(char*, unsigned);
 
@@ -30,6 +30,8 @@ void out();
 char* getIdent(unsigned);
 
 unsigned getBlock(unsigned);
+
+TType getType(unsigned);
 
 
 private:

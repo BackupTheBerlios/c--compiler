@@ -154,7 +154,9 @@ enum TType {
 	sint,
 	slong,
 	sfloat,
-	svoid
+	svoid,
+	sstruct,
+	undeclared
 };
 
 enum TBinOp {

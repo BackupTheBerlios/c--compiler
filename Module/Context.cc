@@ -60,10 +60,10 @@ if(n != 0)
                                           {
 	                                    
                                             char* c = s.first();                                            
-                                            char* t = stype.first();
+                                            TType t = stype.firsttype();
                                             if (c==0) break;
 	                                                                        
-                                            if (t==0) cout<<"Typestack leer!";
+                                            //if (t==svoid) cout<<"Typestack leer!";
                                             int tmpblock;
                                             
                                             if (s.count()<decl) 
@@ -105,7 +105,7 @@ if(n != 0)
         case VAR_DECL_4                 : context(n->n1); context(n->n2); break;
         case DEF_PART                   : context(n->n1); s.push((char*)n->n2); stype.push(lasttype); break;
         case STRUCT_PART                : cout<<"[context] structs not implemented\n"; exit(-1); context(n->n1); break;
-        case BASE_TYPE                  : lasttype = (char*)n->n1; break;
+        case BASE_TYPE                  : lasttype = (TType)(unsigned)n->n1; break;
         case VAR_PART_1                 : context(n->n1); context(n->n2);  stype.push(lasttype); ; break;
         case VAR_PART_2                 : context(n->n1); context(n->n2); context(n->n3);  stype.push(lasttype); break;
         case VAR_PART_ALL_1             : context(n->n1); stype.push(lasttype);  break;
@@ -134,32 +134,32 @@ if(n != 0)
                                           context(n->n1);
                                           
                                           char* c = f.top();
-                                          char* sig = (char*)malloc(100);
-                                          char* ret = ft.top();
+                                          TType* sig = (TType*)malloc(100);
+                                          TType ret = ft.toptype();
                                           
                                           // prototypes
                                           if (c==0) 
                                           {
                                             c = s.top(); 
                                             s.pop(1);
-                                            ret = stype.top();
+                                            ret = stype.toptype();
                                             stype.pop(1); 
                                             ins(fl.nextId());                                           
                                           }
                                           
-                                          if ((ret!=tvoid)&&(!retu)&&(!proto))
+                                          if ((ret!=svoid)&&(!retu)&&(!proto))
                                           {
                                             cout<<"[context] Missing return statement in non-void function "<<c<<"\n";
                                             exit(-1);
                                           }
                                           retu = false;
-                                          strcpy(sig,"\0");
+                                          //strcpy(sig,"\0");
                                           unsigned num = 0;
                                           while(1)
                                           {   
-                                            char* tmp = par.top();
-                                            if (tmp==0) break;
-                                            strcat(sig,tmp);
+                                            TType tmp = par.toptype();                                            
+                                            if (tmp==undeclared) break;
+                                            *(sig++)=tmp;
                                             par.pop(1);
                                             num++;
                                           }
@@ -172,7 +172,7 @@ if(n != 0)
                                             cout<<"[context] function "<<c<<" with same signature already defined";
                                             exit(-1);
                                           }
-                                          fl.insert(c,sig, ret,num,proto);
+                                          fl.insert(c,sig-num, ret,num,proto);
                                           proto = false;
                                           f.pop(1);                                          
                                           ft.pop(1);
@@ -187,7 +187,7 @@ if(n != 0)
         case PROTOTYPE_4                : context(n->n1); context(n->n2); context(n->n3); proto = true; break;
         case PROTOTYPE_5                : context(n->n1); proto = true; break;
         case PROTOTYPE_6                : context(n->n1); context(n->n2);  proto = true; break;
-        case RET_TYPE                   : context(n->n1); stype.push((char*)tvoid); break;
+        case RET_TYPE                   : stype.push(svoid); break;
         case FUNC_IDENT                 : s.push((char*)n->n1); break;
         case PAR_TYPE_ST_1              : context(n->n1); break;
         case PAR_TYPE_ST_2              : context(n->n1); context(n->n2); break;

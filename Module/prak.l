@@ -10,15 +10,10 @@
 #include "prak.hh"
 #include "string.h"
 #include <iostream>
+#include "OTypes.h"
 using namespace std;
 
 
-
-const char tstruct[] = "struct";
-const char tchar[] = "char";
-const char tint[] = "int";
-const char tlong[] = "long";
-const char tfloat[] = "float";
 
 
 extern YYSTYPE yylval;
@@ -40,11 +35,11 @@ TRENNER [ \n\t]
 
 {DIGIT}+{TRENNER}*"."{TRENNER}*{DIGIT}*{TRENNER}*("e"{TRENNER}*[+-]?{TRENNER}*{DIGIT}+)?	{ double* d = (double*)malloc(sizeof(double)); *d = atof(yytext);  yylval.nodep = (TNode*)d;  return float_lit; }
 
-"struct"				{ yylval.nodep = (TNode*)&tstruct; return _struct; }
-"char"					{ yylval.nodep = (TNode*)&tchar; return _char; }
-"int"					{ yylval.nodep = (TNode*)&tint; return _int; }
-"long"					{ yylval.nodep = (TNode*)&tlong; return _long; }
-"float"					{ yylval.nodep = (TNode*)&tfloat; return _float; }
+"struct"				{ yylval.nodep = (TNode*)sstruct; return _struct; }
+"char"					{ yylval.nodep = (TNode*)schar; return _char; }
+"int"					{ yylval.nodep = (TNode*)sint; return _int; }
+"long"					{ yylval.nodep = (TNode*)slong; return _long; }
+"float"					{ yylval.nodep = (TNode*)sfloat; return _float; }
 "break"					{ return _break; }
 "return"				{ return _return; }
 "if"					{ return _if; }

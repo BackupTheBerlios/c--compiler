@@ -11,8 +11,8 @@ public:
 struct TFunctionListEntry
 {
 	char* name;
-	char* signature;
-	char* rettype;
+	TType* signature;
+	TType rettype;
 	unsigned num;
 	struct TFunctionListEntry* next;
 	bool proto;
@@ -20,7 +20,7 @@ struct TFunctionListEntry
 
 FunctionList();
 
-unsigned insert(char*, char*, char*, unsigned, bool);
+unsigned insert(char*, TType*, TType, unsigned, bool);
 
 unsigned isDefined(char*, unsigned, bool);
 
@@ -33,6 +33,9 @@ unsigned getNum(unsigned);
 unsigned nextId();
 
 unsigned isProto(char*, unsigned);
+
+TType getSigType(unsigned, unsigned);
+TType getReturnType(unsigned);
 
 char* checkForUnImplemented();
 

@@ -12,11 +12,11 @@ NameList::NameList()
 	last = start;
 }
 
-unsigned NameList::insert(char* n, unsigned b, char* ttype)
+unsigned NameList::insert(char* n, unsigned b, TType type)
 {
 	last->name = n;
 	last->block = b;
-	last->ttype = ttype;
+	last->type = type;
 	
 	last++;
 	return (no++)+1;
@@ -43,21 +43,21 @@ void NameList::out()
 	
 	while(1)
 	{
-		cout<<"Name: "<<cur->name<<" Block: "<<cur->block<<" Type: "<<cur->ttype<<"\n";
+		cout<<"Name: "<<cur->name<<" Block: "<<cur->block<<" Type: "<<cur->type<<"\n";
 		cur++;
 		if (cur==start+no) return;
 	}
 }
 
-char* NameList::typeOf(char* n, unsigned b)
+TType NameList::typeOf(char* n, unsigned b)
 {
 	TNameListEntry* cur = start;
 	while(1)
 	{
-		cout<<"Name: "<<cur->name<<" Block: "<<cur->block<<" Type: "<<cur->ttype<<"\n";
-		if ((strcmp(n, cur->name)==0)&&(b==cur->block)) return cur->ttype;
+		cout<<"Name: "<<cur->name<<" Block: "<<cur->block<<" Type: "<<cur->type<<"\n";
+		if ((strcmp(n, cur->name)==0)&&(b==cur->block)) return cur->type;
 		cur++;
-		if (cur==start+no) return 0;
+		if (cur==start+no) return svoid;
 	}
 	
 }
@@ -74,6 +74,11 @@ unsigned NameList::getBlock(unsigned u)
 	return (start+u-1)->block;
 }
 
+TType NameList::getType(unsigned u)
+{
+	if (u==0) return svoid;
+	return (start+u-1)->type;
+}
 
 
 

@@ -12,7 +12,7 @@ FunctionList::FunctionList()
 }
 
 
-unsigned FunctionList::insert(char* n, char* sig, char* ret, unsigned num, bool proto)
+unsigned FunctionList::insert(char* n, TType* sig, TType ret, unsigned num, bool proto)
 {
 	if (no!=0) 
 	{
@@ -66,7 +66,9 @@ void FunctionList::out()
 	
 	while(1)
 	{
-		cout<<"Name: "<<cur->name<<" Sig: "<<cur->signature<<" Ret: "<<cur->rettype<<" Proto: "<<cur->proto<<"\n";
+		cout<<"Name: "<<cur->name<<" Sig: ";
+		for(unsigned i=0;i<cur->num;i++) cout<<*(cur->signature+i)<<" ";
+		cout<<" Ret: "<<cur->rettype<<" Proto: "<<cur->proto<<"\n";
 		cur++;
 		if (cur==start+no) return;
 	}
@@ -120,3 +122,20 @@ unsigned FunctionList::isProto(char* n, unsigned num)
 		if (cur==start+no) return 0;
 	}
 }
+
+TType FunctionList::getSigType(unsigned u, unsigned s)
+{
+	TFunctionListEntry* pos = start+u-MAX_NO_OF_VARIABLES-1;
+	TType* sig = pos->signature;
+	return *(sig+s);
+}
+
+TType FunctionList::getReturnType(unsigned u)
+{
+	TFunctionListEntry* pos = start+u-MAX_NO_OF_VARIABLES-1;
+	return pos->rettype;
+}
+
+
+
+

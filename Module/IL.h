@@ -56,6 +56,12 @@ private:
 	
 	void outpush(char*);
 	
+	void outconvert(char*, char*, TType);
+	
+	TType checkConvAssign(char*&, TType, TType);
+	
+	TType checkConv(char*&, char*&, TType, TType);
+	
 	Stack op;
 	Stack label;
 	unsigned tempcount;

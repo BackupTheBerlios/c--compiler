@@ -354,7 +354,7 @@ void out(struct TNode* n)
         case PROTOTYPE_4                : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("prototype "); break;
         case PROTOTYPE_5                : out(n->n1); gen(n->type); printf("prototype "); break;
         case PROTOTYPE_6                : out(n->n1); out(n->n2); gen(n->type); printf("prototype "); break;
-        case RET_TYPE                   : out(n->n1); gen(n->type); printf("ret_type "); break;
+        case RET_TYPE                   : gen(n->type); printf("ret_type "); break;
         case FUNC_IDENT                 : gen(IDENTIFIER); printf("func_ident "); break;
         case PAR_TYPE_ST_1              : out(n->n1); gen(n->type); printf("{par_type}* "); break;
         case PAR_TYPE_ST_2              : out(n->n1); out(n->n2); gen(n->type); printf("{par_type}* "); break;

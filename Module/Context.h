@@ -40,7 +40,7 @@ private:
 	Stack stype;  //typen-stack
 	
 	Stack pro;  // Protypen-ident
-	char* lasttype;  //letzter Basistyp
+	TType lasttype;  //letzter Basistyp
 	
 	unsigned* cpos;
 	int cblock;     // aktueller block
