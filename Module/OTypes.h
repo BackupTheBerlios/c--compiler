@@ -225,23 +225,25 @@ enum TUnOp {
 
 };
 
+
 enum TReg {
-	reg0,
-	reg1,
-	reg2,
-	reg3,
-	reg4,
-	reg5,
-	reg6,
-	reg7,
-	reg8,
-	reg9,
-	reg10,
-	reg11,
-	reg12,
-	reg13,
-	reg14,
-	reg15
+	r0,
+	r1,
+	r2,
+	r3,
+	r4,
+	r5,
+	r6,
+	r7,
+	r8,
+	r9,
+	r10,
+	r11,
+	r12,
+	r13,
+	r14,
+	r15,
+	unknown
 };
 	
 
