@@ -111,6 +111,7 @@ TReg Register::biggerReg(TOperand* op)
 					reglist[i].var = 0;
 					reglist[i].mark = 0;
 					return (TReg)(j+1);	// oberes Register wird null gesetzt
+								// außerdem muß noch das alte kleine Register ins niederwertige neue verschoben werden
 				}
 			}
 		cout<<"biggerReg() error - no Reg free!\n";
