@@ -13,9 +13,12 @@ int main()
 	LocalBoard* board_a = new LocalBoard(BOARD_WIDTH,BOARD_HEIGHT);
 	LocalBoard* board_b = new LocalBoard(BOARD_WIDTH,BOARD_HEIGHT);
 	
+/*	for ( int x = 0;x < BOARD_WIDTH;x++ )
+		for ( int y = 0;y < BOARD_HEIGHT;y++ )
+			board_a->setPos(x,y,alive);*/
 	board_a->restoreBoard("test.board");
 			
-	BoardServer* boardserver = new BoardServer((IPNetwork *)net,1,(Board *)board_a,(Board *)board_b,10);
+	BoardServer* boardserver = new BoardServer((IPNetwork *)net,1,(Board *)board_a,(Board *)board_b,100);
 	
 	boardserver->start();
 }

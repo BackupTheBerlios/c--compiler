@@ -23,7 +23,7 @@ LifeClient::LifeClient( IPNetwork* net, char* servername, short port )
 	}
 	cout << "successful!\n";
 	cout << "[client] x1: " << x1 << " x2: " << x2 << " y1: " << y1 << " y2: " << y2 << endl;
-	cout << "[client] calculating... ";
+	cout << "[client] calculating... \n";
 	loop();
 	cout << "finished!\n";
 }
@@ -50,6 +50,8 @@ int LifeClient::startUp()
 	x2 = message[ 1 ];
 	y1 = message[ 2 ];
 	y2 = message[ 3 ];
+	board_a = new LocalBoard((x2-x1+3), (y2-y1+3));		// board wird zum cachen verwendet, es wird der zu berechnende Ausschnitt, sowie ein Rand von 1 gespeichert
+// 	cout<<"Abmasse cache_board: x: "<<(x2-x1+3)<<", y: "<<(y2-y1+3)<<endl;
 	return 0;
 }
 
@@ -79,71 +81,76 @@ void LifeClient::loop()
 */
 void LifeClient::makeStep()
 {
-	LocalBoard* board_a = new LocalBoard((x2-x1+2), (y2-y1+2));		// board wird zum cachen verwendet
 	unsigned neighbours_alive;
 	int x_,y_;
 	// daten holen
-	for (int x=(x1-1);x<(x2+1);x++)
+	for (int x=(x1-1);x<=x2+1;x++)
 	{
-		for (int y=(y1-1);y<(y2+1);y++)
+		for (int y=(y1-1);y<=y2+1;y++)
 		{
-			if (y==-1) 			y_=BOARD_HEIGHT-1;
-			else if (y==BOARD_HEIGHT) 	y_=0;
+			// Punkte fuer die Anfrage bestimmen
+			if (y==-1)			y_=BOARD_HEIGHT-1;
+			else if (y==BOARD_HEIGHT)	y_=0;
 			else				y_=y;
-			if (x==-1) 			x_=BOARD_WIDTH-1;
-			else if (x==BOARD_WIDTH) 	x_=0;
+			if (x==-1)			x_=BOARD_WIDTH-1;
+			else if (x==BOARD_WIDTH)	x_=0;
 			else				x_=x;
 			
-			int message;					// todo: evt reihenfolge vertauscht?! wenn ja, einfach laufende nummer ins paket packen
+			int message;			// todo: evt reihenfolge vertauscht?! wenn ja, einfach laufende nummer ins paket packen
 			int req[3];
 			req[ 0 ] = 1;			// Anfrage eines Punktes
 			req[ 1 ] = x_;
 			req[ 2 ] = y_;
 // 			cout<<"G";
+// 			cout<<"get-req an Server - x_: "<<req[ 1 ]<<", y_: "<<req[ 2 ]<<", x: "<<x<<", y: "<<y<<", seten an: x: "<<(x-(x1-1))<<", y: "<<(y-(y1-1))<<endl;
 			net->request( server, &req, 12, &message, sizeof(message) );
-			cout<<message<<" ";
-			board_a->setPos(x-(x1-1), y-(y1-1), (life_status_t)message);
+			if (message==invalid)
+				cout<<"x_: "<<x_<<", y_: "<<y<<", error!\n";
+ 			board_a->setPos( (x-(x1-1)), (y-(y1-1)), (life_status_t)message);
 		}
 	}
 	
 	// berechnung durchfuehren und daten uebermitteln
-	for (int x=1;x<(x2-x1);x++)
+	for (int x=1;x<=(x2-x1)+1;x++)
 	{
-		for (int y=1;y<(y2-y1);y++)
+		for (int y=1;y<=(y2-y1)+1;y++)
 		{
 			// set count of neighbours
 			neighbours_alive=0;
 
-			if (board_a->readPos(x-1,y+1)==alive) neighbours_alive++;	// top left
-			if (board_a->readPos(x-1,y)==alive) neighbours_alive++;		// top
-			if (board_a->readPos(x-1,y+1)==alive) neighbours_alive++;	// top right
-			if (board_a->readPos(x,y+1)==alive) neighbours_alive++;		// left
-			if (board_a->readPos(x,y-1)==alive) neighbours_alive++;		// right
-			if (board_a->readPos(x+1,y+1)==alive) neighbours_alive++;	// top left
-			if (board_a->readPos(x+1,y)==alive) neighbours_alive++;		// top
-			if (board_a->readPos(x+1,y-1)==alive) neighbours_alive++;	// top right
+			if (board_a->readPos(x-1, y-1)==alive) neighbours_alive++;	// top left
+			if (board_a->readPos(x,   y-1)==alive) neighbours_alive++;	// top
+			if (board_a->readPos(x+1, y-1)==alive) neighbours_alive++;	// top right
+			if (board_a->readPos(x-1, y)==alive) neighbours_alive++;	// left
+			if (board_a->readPos(x+1, y)==alive) neighbours_alive++;	// right
+			if (board_a->readPos(x-1, y+1)==alive) neighbours_alive++;	// bottom left
+			if (board_a->readPos(x,   y+1)==alive) neighbours_alive++;	// bottom
+			if (board_a->readPos(x+1, y+1)==alive) neighbours_alive++;	// bottom right
 
-// 			if ( x>=BOARD_WIDTH || x<0 || y>=BOARD_HEIGHT || y<0 )
-// 				cout<<"Index out of bounds!\n";
+			if ( x>BOARD_WIDTH || x<0 || y>BOARD_HEIGHT || y<0 )
+				cout<<"Index out of bounds!\n";
 
 			char message;
 			int req[ 4 ];
 			req[ 0 ] = 2;			// Setzen eines Punktes
-			req[ 1 ] = x+x1;
-			req[ 2 ] = y+y1;
+			req[ 1 ] = (x-1)+x1;
+			req[ 2 ] = (y-1)+y1;
+			
+// 			cout<<"set-req an Server - x: "<<req[ 1 ]<<", y: "<<req[ 2 ]<<", abhaengig von cache_board: x: "<<x<<", y: "<<y<<endl;
 			// transmit positions to server
-			if (neighbours_alive==3 && board_a->readPos(x,y)==dead)
+			life_status_t status=board_a->readPos(x,y);
+			if (neighbours_alive==3 && status==dead)
 			{
 				req[ 3 ] = alive;
 			}
 			else
 			{
-				if ((board_a->readPos(x,y)==alive) && (neighbours_alive<2 || neighbours_alive>3))
+				if ((status==alive) && (neighbours_alive<2 || neighbours_alive>3))
 				{
 					req[ 3 ] = dead;
 				}
 				else
-					req[ 3 ] = board_a->readPos(x,y);
+					req[ 3 ] = status;
 			}
 
 // 			cout<<"S";

@@ -1,6 +1,7 @@
 #include "board/BoardServer.h"
+#include "board/LocalBoard.h"
 
-#define ZOOM 5
+#define ZOOM 3
 #define RANDOM 7
 
 
@@ -64,10 +65,15 @@ void BoardServer::start()
 	{
 		for ( int y = 0;y < BOARD_HEIGHT;y++ )
 		{
-			w->fillRectangle( ( board_a->readPos( x, y ) == alive ) ? alivecol : deadcol, x * ZOOM, y * ZOOM, ZOOM, ZOOM );
+			if (((LocalBoard*)board_a)->readPos( x, y ) == invalid)
+			{
+ 				cout << "Load error, x: " << x << ", y: "<<y<<endl;
+				exit(-1);
+			}
+			w->fillRectangle( ( ((LocalBoard*)board_a)->readPos( x, y ) == alive ) ? alivecol : deadcol, x * ZOOM, y * ZOOM, ZOOM, ZOOM );
 		}
 	}
-	int i = 0;
+	w->flush();
 
 	notifyAll();
 
@@ -92,8 +98,12 @@ void BoardServer::start()
 			else if ( msg[ 0 ] == 1 )  //getPos
 			{
 				//cout<<"G";
-				int val = board_a->readPos( msg[ 1 ], msg[ 2 ] );
-				cout << val << " ";
+				int val = ((LocalBoard*)board_a)->readPos( msg[ 1 ], msg[ 2 ] );
+				if (val==invalid)
+				{
+	 				cout << "Server error, x: " << msg[1] << ", y: "<<msg[2]<<endl;
+					exit(-1);
+				}
 				net->reply( all, &val, sizeof( life_status_t ) );
 			} else if ( msg[ 0 ] == 'N' )  //barrier
 			{
@@ -106,8 +116,8 @@ void BoardServer::start()
 			}
 
 		}
-		/********** zeichnen ********/
 
+		/********** zeichnen ********/
 		char* count = ( char* ) malloc( 16 );
 		for ( int x = 0;x < BOARD_WIDTH;x++ )
 		{
@@ -116,14 +126,13 @@ void BoardServer::start()
 				w->fillRectangle( ( board_b->readPos( x, y ) == alive ) ? alivecol : deadcol, x * ZOOM, y * ZOOM, ZOOM, ZOOM );
 			}
 		}
-		i++;
 		strcpy( count, "Durchlauf: " );
-		sprintf( count + 11, "%u", i );
-		if ( i < 10 )
+		sprintf( count + 11, "%u", timestep );
+		if ( timestep < 10 )
 			w->write( Green1, 10, 10, count, 12 );
-		else if ( i < 100 )
+		else if ( timestep < 100 )
 			w->write( Green1, 10, 10, count, 13 );
-		else if ( i < 1000 )
+		else if ( timestep < 1000 )
 			w->write( Green1, 10, 10, count, 14 );
 		else
 			w->write( Green1, 10, 10, count, 15 );

@@ -31,6 +31,7 @@ private:
 	int x1,x2,y1,y2; 	//outlines the part of the board which should be calculated by the client
 	IPAddress server;
 	IPNetwork* net;
+	LocalBoard* board_a;
 
 	/**
 	* This function contacts the server and gets the outlines of the boarpart which should be worked on.

@@ -4,6 +4,8 @@
 
 enum life_status_t LocalBoard::readPos(unsigned int x, unsigned int y)
 {
+	if (myMatrix[x][y]==invalid)
+		cout << "readPos error, x: " << x << ", y: "<<y<<endl;
 	return myMatrix[x][y];
 }
 
@@ -52,7 +54,11 @@ void LocalBoard::restoreBoard(char* filename)
 			else if (stat=='.')
 				setPos(x,y,dead);
 			else
+			{
 				setPos(x,y,invalid);
+				cout<<"invalid!\n";
+				exit(-1);
+			}
 		}
 	boardFile.close();
 }
