@@ -41,6 +41,8 @@ int main(int argc, char* arv[])
 	c.context(root);  
 	cout<<"\n[context] OK\n";
 	
+	system("echo \n cat test.cc");
+	
 	il.genIL(start, pos);
 	cout<<"\n[code-il] OK\n";
 	

@@ -29,7 +29,7 @@ TReg whichReg(TOperand*);
 // gibt das Register wieder frei
 void freeReg(TOperand*);
 
-// aendert Register von einem auf den anderen Operanden
+// aendert Register von einem auf den anderen Operanden, (dst,src)
 void changeReg(TOperand*, TOperand*);
 
 // packt den Operanden in ein 4-byte grosses Register

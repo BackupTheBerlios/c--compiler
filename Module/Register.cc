@@ -98,6 +98,7 @@ void Register::biggerReg(TOperand* op)
 				reglist[i].mark = mark++;
 				reglist[i+1].var = op;
 				reglist[i+1].mark = mark;
+				cout<<"mov.w r"<<i+1<<", r"<<rnull<<endl;		// oberes Register wird null gesetzt
 				return;
 			}
 			for(int j=0; j<regusable-1; j++)
@@ -110,14 +111,15 @@ void Register::biggerReg(TOperand* op)
 					reglist[j+1].mark = mark;
 					reglist[i].var = 0;
 					reglist[i].mark = 0;
+					cout<<"mov.w r"<<j+1<<", r"<<rnull<<endl;	// oberes Register wird null gesetzt
 					return;
 				}
 			}
-		cout<<"biggerReg() error - op not found!\n";
+		cout<<"biggerReg() error - no Reg free!\n";
 		}
 	}
 	// todo: spillcode einfuegen
-	cout<<"biggerReg() error - no Reg free!\n";
+	cout<<"biggerReg() error - op not found!\n";
 }
 
 void Register::smallerReg(TOperand* op)
@@ -136,6 +138,7 @@ void Register::smallerReg(TOperand* op)
 		cout<<"smallerReg() error\n";
 		}
 	}
+	cout<<"smallerReg() error - op not found!\n";
 }
 
 TReg Register::whichReg(TOperand* temp)
@@ -164,7 +167,7 @@ void Register::out()
 
 char* Register::toString(TReg r)
 {
-	if (r>regmax-1) cout<<"registerfehler";
+	if (r>regmax-1) cout<<" Registerfehler";
 	char* n = (char*)malloc(3);
 	strcpy(n,"r");
 	sprintf (n+1,"%u",r);

@@ -69,9 +69,6 @@ void Bacom::genAsm()
 				outstr(op1->vtype, regs.whichReg(op1), rsp, op1->add);
 				break;
 			}
-
-
-
 		case jmpgr_: 	// greater zero
 		case jmple_: 	// less zero
 		case jmpeq_: 	// equal zero
@@ -102,41 +99,52 @@ void Bacom::genAsm()
 		case goto_:
 		case ret_:
 		case getret_:	break;
-		case char_:
+		case char_:	// todo: abschneiden
 			{
-				if (op2->vtype==sfloat)		// evt vorher nach long konvertieren
+				if (op2->vtype==sfloat)		// float vorher nach long konvertieren
 				{
 					TReg r;
 					op1->vtype=slong;	// vorher typ auf long, somit wird ein breites register geholt
 					regs.getReg(op1, r);
-					op1->vtype=sint;
 					outcvt(slong, regs.whichReg( op1 ), regs.whichReg( op2 ) );
 					regs.freeReg( op2 );
+					regs.smallerReg(op1);
+					break;
 				}
-				regs.smallerReg(op2);
+				if (op2->vtype==slong)
+				{
+					regs.smallerReg(op2);
+				}
+				op2->vtype=schar;		// typ setzen, damit typen von op1 und op2 gleich
+				regs.changeReg( op1, op2 );
 				break;
 			}
 		case int_:
 			{
-				if (op2->vtype==sfloat)		// evt vorher nach long konvertieren
+				if (op2->vtype==sfloat)		// float vorher nach long konvertieren
 				{
 					TReg r;
 					op1->vtype=slong;	// vorher typ auf long, somit wird ein breites register geholt
 					regs.getReg(op1, r);
-					op1->vtype=sint;
 					outcvt(slong, regs.whichReg( op1 ), regs.whichReg( op2 ) );
 					regs.freeReg( op2 );
+					regs.smallerReg(op1);
+					break;
 				}
-				regs.smallerReg(op2);
+				if (op2->vtype==slong)
+				{
+					regs.smallerReg(op2);
+				}
+				op2->vtype=sint;		// typ setzen, damit typen von op1 und op2 gleich
+				regs.changeReg( op1, op2 );
 				break;
 			}
-		case long_:	//Todo: in IL.cc noch toLong und toInt einfuegen!
+		case long_:
 			{
-				// wenn convert von int, dann in ein doppelregister stecken
-				if (op2->vtype<=sint)
+				if (op2->vtype<=sint)		// wenn convert von int/char, dann in ein doppelregister stecken
 				{
 					regs.biggerReg(op2);
-					op1=op2;
+					op2->vtype=slong;	// op2 wird long, damit changeReg weiß, dass op2 nun auch breites Register hat
 					regs.changeReg( op1, op2 );
 				}
 				else	// convert von float
@@ -150,8 +158,7 @@ void Bacom::genAsm()
 			}
 		case float_:
 			{
-				// wenn convert von int, dann zuerst in ein doppelregister stecken
-				if (op2->vtype<=sint)
+				if (op2->vtype<=sint)		// wenn convert von int, dann zuerst in ein doppelregister stecken
 				{
 					regs.biggerReg(op2);
 				}
@@ -290,6 +297,6 @@ void Bacom::outcvt(TType type, TReg r1, TReg r2)
 		cout << "f " ;
 	else if (type==slong)
 		cout << "l ";
-	cout << Register::toString( r1 ) << "," << Register::toString( r2 ) << endl;
+	cout << Register::toString( r1 ) << ", " << Register::toString( r2 ) << endl;
 }
 

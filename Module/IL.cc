@@ -754,18 +754,32 @@ TType IL::checkConvAssign(TOperand*& m1, TOperand*& m2)
 			m1 = t;
 			return sfloat;
 		}
-		else if ((t1==sfloat)&&(t2<=slong))
+		else if ( ( (t1==sfloat) || (t1==sint) || (t1==schar) )&&(t2==slong))
+		{
+			TOperand* t = tempid(slong);
+			outconvert(m1,t,slong);
+			m1 = t;
+			return slong;
+		}
+		else if ( ( (t1==sfloat) || (t1==slong) || (t1==schar) )&&(t2==sint))
 		{
 			TOperand* t = tempid(sint);
-			outconvert(m1,t,t2);
+			outconvert(m1,t,sint);
 			m1 = t;
 			return sint;
+		}
+		else if ( ( (t1==sfloat) || (t1==slong) || (t1==sint) )&&(t2==schar))
+		{
+			TOperand* t = tempid(schar);
+			outconvert(m1,t,schar);
+			m1 = t;
+			return schar;
 		}
 		else if (t1>t2)
 		{
 			cout<<"[code-il] warning: loss of precision\n";
 		}
-		else cout<<"[code-il] warning: types not equal t1: "<<t1<<" t2: "<<t2<<endl;
+		else cout<<"_[code-il] warning: types not equal t1: "<<t1<<" t2: "<<t2<<endl;
 	}
 	return t1;
 }

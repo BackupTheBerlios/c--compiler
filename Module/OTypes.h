@@ -181,7 +181,7 @@ enum TOperandType
 
 struct TOperand
 {
-	TOperandType type;  
+	TOperandType type;
 	TType vtype;
 	union 
 	{
