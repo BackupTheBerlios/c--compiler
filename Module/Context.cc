@@ -30,7 +30,19 @@ if(n != 0)
     switch(n->type)
     {
 
-        case PROGRAM                    : b.push(1); context(n->n1); cout<<"\nNamensliste:\n"; nl.out(); cout<<"\nFunktionsliste:\n"; fl.out(); cout<<"\nKonstantenliste:\n";cl.out(); break;
+        case PROGRAM                    : {
+	        			  	b.push(1); 
+	        			  	context(n->n1); 
+	        			  	cout<<"\nNamensliste:\n"; nl.out(); 
+	        			  	cout<<"\nFunktionsliste:\n"; fl.out(); 
+	        			  	cout<<"\nKonstantenliste:\n";cl.out();
+	        			  	if (!fl.isDefined("main",0,true)) 
+	        			  	{
+		        			  	cout<<"[context] function main not implemented\n";
+		        			  	exit(-1);
+	        			  	}
+	        			  	break;
+        			  	}
         case DECL_ST_1                  : context(n->n1); break;
         case DECL_ST_2                  : context(n->n1); context(n->n2); break;
         case DECL                       : context(n->n1); break;

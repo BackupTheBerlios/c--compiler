@@ -43,7 +43,7 @@ bool FunctionList::isDefined(char* n, unsigned num, bool proto)
 		//cout<<"name: "<<n<<" Sig: "<<sig<<"  curname: "<<cur->name<<" cursig: "<<cur->signature<<"\n";
 		// NOCH KEINE AUSWERTUNG DER SIGNATUR
 		//if ((strcmp(cur->name,n)==0)&&(strcmp(cur->signature,sig)==0)) return true; 
-		if ((strcmp(cur->name,n)==0)&&(cur->num==num)&&(cur->proto&!proto)) return true; 
+		if ((strcmp(cur->name,n)==0)&&(cur->num==num)&&(!(cur->proto&proto))) return true; 
 		cur = cur->next;
 		if (cur==0) return false;
 	}
@@ -55,7 +55,7 @@ void FunctionList::out()
 	TFunctionListEntry* cur = last;
 	while(1)
 	{
-		cout<<"Name: "<<cur->name<<" Sig: "<<cur->signature<<" Ret: "<<cur->rettype<<"\n";
+		cout<<"Name: "<<cur->name<<" Sig: "<<cur->signature<<" Ret: "<<cur->rettype<<" Proto: "<<cur->proto<<"\n";
 		cur = cur->next;
 		if (cur==0) return;
 	}
