@@ -626,7 +626,7 @@ void Bacom::out_out(TType type, TReg r)
 
 void Bacom::out_in(TType type, TReg r)
 {
-	bsm << "in.";
+	bsm << "inp.";
 	if ( type == sint )
 		bsm << "w ";
 	else if ( type == schar )
