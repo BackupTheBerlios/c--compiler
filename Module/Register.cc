@@ -89,7 +89,7 @@ void Register::changeReg(TOperand* dest, TOperand* src)		// Register wird von op
 	cout<<"changeReg() error: Register not found!\n";
 }
 
-TReg Register::biggerReg(TOperand* op)
+void Register::biggerReg(TOperand* op)
 {
 	for(int i=0; i<regusable; i++)
 	{
@@ -100,7 +100,8 @@ TReg Register::biggerReg(TOperand* op)
 				reglist[i].mark = mark++;
 				reglist[i+1].var = op;
 				reglist[i+1].mark = mark;
-				return (TReg)(i+1);		// oberes Register wird null gesetzt
+				bsm<<"mov.w\tr"<<i+1<<", r"<<rnull<<endl;	// oberes Register wird null gesetzt
+				return;
 			}
 			for(int j=0; j<regusable-1; j++)
 			{
@@ -112,8 +113,9 @@ TReg Register::biggerReg(TOperand* op)
 					reglist[j+1].mark = mark;
 					reglist[i].var = 0;
 					reglist[i].mark = 0;
-					return (TReg)(j+1);	// oberes Register wird null gesetzt
-					// außerdem muß noch das alte kleine Register ins niederwertige neue verschoben werden
+					bsm<<"mov.w\tr"<<j+1<<", r"<<rnull<<endl;	// oberes Register wird null gesetzt
+					bsm<<"mov.w\tr"<<j<<", r"<<i<<endl;	// außerdem muß noch das alte kleine Register ins niederwertige neue verschoben werden
+					return;
 				}
 			}
 			cout<<"biggerReg() error - no Reg free!\n";
@@ -121,7 +123,7 @@ TReg Register::biggerReg(TOperand* op)
 	}
 	// todo: spillcode einfuegen
 	cout<<"biggerReg() error - op not found!\n";
-	return unknown;
+	return;
 }
 
 void Register::smallerReg(TOperand* op)

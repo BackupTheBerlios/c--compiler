@@ -13,13 +13,12 @@ extern List ilList;
 extern FunctionList fl;
 extern ConstList cl;
 extern ConstList icl;
+extern ofstream bsm;
 
 
 class Bacom
 {
 public:
-	Bacom();
-	~Bacom();
 
 	void genAsm();
 
@@ -61,7 +60,7 @@ private:
 	char* concat(char*, unsigned);
 	
 	Register regs;
-	ofstream bsm;
+// 	ofstream bsm;
 	
 	
 };

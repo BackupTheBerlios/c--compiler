@@ -2,10 +2,13 @@
 #define register_h
 #include "OTypes.h"
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 #define regmax 16     // Gesamtanzahl der Register
 #define regusable 13  // Anzahl frei nutzbarer Register
+
+extern ofstream bsm;
 
 struct TRegEntry
 {
@@ -32,8 +35,8 @@ void freeReg(TOperand*);
 // aendert Register von einem auf den anderen Operanden, (dst,src)
 void changeReg(TOperand*, TOperand*);
 
-// packt den Operanden in ein 4-byte grosses Register, es wird das obere Register zurueck gegeben (muss auf 0 gesetzt werden!)
-TReg biggerReg(TOperand*);
+// packt den Operanden in ein 4-byte grosses Register
+void biggerReg(TOperand*);
 
 // packt den Operanden in ein 2-byte grosses Register
 void smallerReg(TOperand*);

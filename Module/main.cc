@@ -27,12 +27,13 @@ Context c;
 IL il;
 List ilList;
 Bacom bc;
+ofstream bsm;
+
 
 int main(int argc, char* arv[])
 {
-	system("cat test.cc > parserfile.cc");
-	
-	yyin = fopen("parserfile.cc","r+");
+	bsm.open("test.bsm");
+	yyin = fopen("test.cc","r+");
 	
 	yyparse();
 	cout<<"\n[parser] OK\n";
@@ -41,14 +42,12 @@ int main(int argc, char* arv[])
 	c.context(root);  
 	cout<<"\n[context] OK\n";
 	
-	system("echo \n cat test.cc");
-	
 	il.genIL(start, pos);
 	cout<<"\n[code-il] OK\n";
 	
 	bc.genAsm();
 	cout<<"\n[bacom] OK\n";
-	
+	bsm.close();
 }
 
 

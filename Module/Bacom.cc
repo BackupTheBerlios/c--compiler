@@ -1,21 +1,9 @@
 #include "Bacom.h"
 
-Bacom::Bacom()
-{
-	bsm.open("test.bsm");
-}
-
-Bacom::~Bacom()
-{
-	bsm.close();
-}
-
-
-
 void Bacom::genAsm()
 {
 	cout << "\nBASM Ausgabe:\n";
-	bsm << "sub.w " <<Register::toString( rnull )<<","<<Register::toString( rnull )<<endl;		// Nullregister 0 setzen
+	bsm << "sub.w\t" <<Register::toString( rnull )<<", "<<Register::toString( rnull )<<endl;		// Nullregister 0 setzen
 	outloa(sint, rsp, rnull, "const_stack");
 	outloa(sint, rglobal, rnull, "const_global");
 	
@@ -307,10 +295,7 @@ void Bacom::genAsm()
 			{
 				if (op2->vtype<=sint)		// wenn convert von int/char, dann in ein doppelregister stecken
 				{
-					TReg r1=regs.whichReg( op2 );
-					outmov(regs.biggerReg( op2 ), rnull);	// hoeherwertiges Register nullen
-					if (r1 != regs.whichReg( op2))		// zusaetzlich wurde das Register verschoben aus Platzgruenden
-						outmov(regs.whichReg( op2), r1);
+					regs.biggerReg( op2 );
 					op2->vtype=slong;	// op2 wird long, damit changeReg weiß, dass op2 nun auch breites Register hat
 					regs.changeReg( op1, op2 );
 				}
@@ -327,10 +312,7 @@ void Bacom::genAsm()
 			{
 				if (op2->vtype<=sint)		// wenn convert von int, dann zuerst in ein doppelregister stecken
 				{
-					TReg r1=regs.whichReg( op2 );
-					outmov(regs.biggerReg( op2 ), rnull);	// hoeherwertiges Register nullen
-					if (r1 != regs.whichReg( op2))		// zusaetzlich wurde das Register verschoben aus Platzgruenden
-						outmov(regs.whichReg( op2), r1);
+					regs.biggerReg( op2 );
 				}
 				// danach convert zu float
 				TReg r;
@@ -442,16 +424,16 @@ void Bacom::genAsm()
 	}
 	
 	bsm << "stp\n";
-	bsm << "const_minusw: dc.w -1\n";
-	bsm << "const_minusl: dc.l -1\n";
-	bsm << "const_minusf: dc.f -1\n";
-	bsm << "const_two:  dc.w 2 \n";
-	bsm << "const_four:  dc.w 4 \n";
-	bsm << "const_six:  dc.w 6 \n";
-	bsm << "const_eight:  dc.w 8 \n";
-	bsm << "const_stack:  dc.w 32764 \n";  // Startwert Stackpointer
-	bsm << "const_global:  dc.w 10000 \n";  // Startwert globale variablen
-	bsm << "const_lic:  dc.w 22 \n";  // rücksprungoffset zur lic anweisung
+	bsm << "const_minusw:\tdc.w -1\n";
+	bsm << "const_minusl:\tdc.l -1\n";
+	bsm << "const_minusf:\tdc.f -1\n";
+	bsm << "const_two:\tdc.w 2 \n";
+	bsm << "const_four:\tdc.w 4 \n";
+	bsm << "const_six:\tdc.w 6 \n";
+	bsm << "const_eight:\tdc.w 8 \n";
+	bsm << "const_stack:\tdc.w 32764 \n";  // Startwert Stackpointer
+	bsm << "const_global:\tdc.w 10000 \n";  // Startwert globale variablen
+	bsm << "const_lic:\tdc.w 22 \n";  // rücksprungoffset zur lic anweisung
 
 }
 
@@ -466,7 +448,7 @@ void Bacom::outloa( TType type, TReg dest, TReg help, int offset )
 		bsm << "l";
 	else if ( type == sfloat )
 		bsm << "f";
-	bsm << " " << Register::toString( dest ) << ", " << Register::toString( help ) << ((offset>=0)?"+":"") << offset << endl;
+	bsm << "\t" << Register::toString( dest ) << ", " << Register::toString( help ) << ((offset>=0)?"+":"") << offset << endl;
 }
 
 void Bacom::outloa( TType type, TReg dest, TReg help, char* addr )
@@ -480,7 +462,7 @@ void Bacom::outloa( TType type, TReg dest, TReg help, char* addr )
 		bsm << "l";
 	else if ( type == sfloat )
 		bsm << "f";
-	bsm << " " << Register::toString( dest ) << ", " << Register::toString( help ) << "+" << addr << endl;
+	bsm << "\t" << Register::toString( dest ) << ", " << Register::toString( help ) << " + " << addr << endl;
 }
 
 void Bacom::outstr( TType type, TReg src, TReg help, int offset )
@@ -494,7 +476,7 @@ void Bacom::outstr( TType type, TReg src, TReg help, int offset )
 		bsm << "l";
 	else if ( type == sfloat )
 		bsm << "f";
-	bsm << " " << Register::toString( src ) << ", " << Register::toString( help ) << ((offset>=0)?"+":"") << offset << endl;
+	bsm << "\t" << Register::toString( src ) << ", " << Register::toString( help ) << ((offset>=0)?"+":"") << offset << endl;
 }
 
 void Bacom::outadd( TType type, TReg dest, TReg src )
@@ -508,7 +490,7 @@ void Bacom::outadd( TType type, TReg dest, TReg src )
 		bsm << "l";
 	else if ( type == sfloat )
 		bsm << "f";
-	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+	bsm << "\t" << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
 }
 
 void Bacom::outadd( TType type, TReg dest, TReg src, char* c )
@@ -522,7 +504,7 @@ void Bacom::outadd( TType type, TReg dest, TReg src, char* c )
 		bsm << "l";
 	else if ( type == sfloat )
 		bsm << "f";
-	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << " + "<<c<< endl;
+	bsm << "\t" << Register::toString( dest ) << ", " << Register::toString( src ) << " + "<<c<< endl;
 }
 
 
@@ -537,7 +519,7 @@ void Bacom::outsub( TType type, TReg dest, TReg src )
 		bsm << "l";
 	else if ( type == sfloat )
 		bsm << "f";
-	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+	bsm << "\t" << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
 }
 
 void Bacom::outsub( TType type, TReg dest, TReg src, char* c )
@@ -551,7 +533,7 @@ void Bacom::outsub( TType type, TReg dest, TReg src, char* c )
 		bsm << "l";
 	else if ( type == sfloat )
 		bsm << "f";
-	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << " + "<< c << endl;
+	bsm << "\t" << Register::toString( dest ) << ", " << Register::toString( src ) << " + "<< c << endl;
 }
 
 void Bacom::outmul( TType type, TReg dest, TReg src )
@@ -565,7 +547,7 @@ void Bacom::outmul( TType type, TReg dest, TReg src )
 		bsm << "l";
 	else if ( type == sfloat )
 		bsm << "f";
-	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+	bsm << "\t" << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
 }
 
 void Bacom::outmul( TType type, TReg dest, TReg src, char* c )
@@ -579,7 +561,7 @@ void Bacom::outmul( TType type, TReg dest, TReg src, char* c )
 		bsm << "l";
 	else if ( type == sfloat )
 		bsm << "f";
-	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << " + "<< c << endl;
+	bsm << "\t" << Register::toString( dest ) << ", " << Register::toString( src ) << " + "<< c << endl;
 }
 
 void Bacom::outdiv( TType type, TReg dest, TReg src )
@@ -593,7 +575,7 @@ void Bacom::outdiv( TType type, TReg dest, TReg src )
 		bsm << "l";
 	else if ( type == sfloat )
 		bsm << "f";
-	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+	bsm << "\t" << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
 }
 
 void Bacom::outshl( TType type, TReg dest, TReg src )
@@ -603,7 +585,7 @@ void Bacom::outshl( TType type, TReg dest, TReg src )
 		bsm << "w";
 	else if ( type == slong )
 		bsm << "l";
-	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+	bsm << "\t" << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
 }
 
 void Bacom::outshl( TType type, TReg dest, TReg src, char* c )
@@ -613,7 +595,7 @@ void Bacom::outshl( TType type, TReg dest, TReg src, char* c )
 		bsm << "w";
 	else if ( type == slong )
 		bsm << "l";
-	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << "+" <<c<<endl;
+	bsm << "\t" << Register::toString( dest ) << ", " << Register::toString( src ) << " + " <<c<<endl;
 }
 
 void Bacom::outshr( TType type, TReg dest, TReg src )
@@ -623,7 +605,7 @@ void Bacom::outshr( TType type, TReg dest, TReg src )
 		bsm << "w";
 	else if ( type == slong )
 		bsm << "l";
-	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+	bsm << "\t" << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
 }
 
 void Bacom::outshr( TType type, TReg dest, TReg src, char* c )
@@ -633,65 +615,65 @@ void Bacom::outshr( TType type, TReg dest, TReg src, char* c )
 		bsm << "w";
 	else if ( type == slong )
 		bsm << "l";
-	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << "+" <<c<<endl;
+	bsm << "\t" << Register::toString( dest ) << ", " << Register::toString( src ) << " + " <<c<<endl;
 }
 
 void Bacom::outmov(TReg r1, TReg r2)
 {
-	bsm << "mov.w " << Register::toString( r1 ) << "," << Register::toString( r2 ) << endl;
+	bsm << "mov.w\t" << Register::toString( r1 ) << ", " << Register::toString( r2 ) << endl;
 }
 
 void Bacom::outcvt(TType type, TReg r1, TReg r2)
 {
 	bsm << "cvt.";
 	if (type==sfloat)
-		bsm << "f " ;
+		bsm << "f\t" ;
 	else if (type==slong)
-		bsm << "l ";
+		bsm << "l\t";
 	bsm << Register::toString( r1 ) << ", " << Register::toString( r2 ) << endl;
 }
 
 void Bacom::outbra(TReg r, char* c)
 {
-	bsm<<"bra "<<Register::toString( r )<<"+"<<c<<endl;
+	bsm<<"bra\t"<<Register::toString( r )<<" + "<<c<<endl;
 }
 
 
 void Bacom::outbra(TReg r, int offs)
 {
-	bsm<<"bra "<<Register::toString( r )<<"+"<<offs<<endl;
+	bsm<<"bra\t"<<Register::toString( r )<<"+"<<offs<<endl;
 }
 
 
 void Bacom::outjmp(TReg r, char* c, TJmp type)
 {
 	if (type==jmple)
-		bsm<<"ble ";
+		bsm<<"ble\t";
 	else if (type==jmpne)
-		bsm<<"bne ";
+		bsm<<"bne\t";
 	else if (type==jmpgr)
-		bsm<<"bgr ";
+		bsm<<"bgr\t";
 	else if (type==jmpeq)
-		bsm<<"beq ";
-	bsm<<Register::toString( r )<<"+"<<c<<endl;
+		bsm<<"beq\t";
+	bsm<<Register::toString( r )<<" + "<<c<<endl;
 }
 
 void Bacom::outlic(TReg r, TReg s)
 {
-	bsm<<"lic.w "<<Register::toString(r)<<", "<<Register::toString(s) << endl;
+	bsm<<"lic.w\t"<<Register::toString(r)<<", "<<Register::toString(s) << endl;
 }
 
 void Bacom::out_out(TType type, TReg r)
 {
 	bsm << "out.";
 	if ( type == sint )
-		bsm << "w ";
+		bsm << "w\t";
 	else if ( type == schar )
-		bsm << "b ";
+		bsm << "b\t";
 	else if ( type == slong )
-		bsm << "l ";
+		bsm << "l\t";
 	else if ( type == sfloat )
-		bsm << "f ";
+		bsm << "f\t";
 	bsm<<Register::toString(r)<<endl;
 }
 
@@ -699,13 +681,13 @@ void Bacom::out_in(TType type, TReg r)
 {
 	bsm << "inp.";
 	if ( type == sint )
-		bsm << "w ";
+		bsm << "w\t";
 	else if ( type == schar )
-		bsm << "b ";
+		bsm << "b\t";
 	else if ( type == slong )
-		bsm << "l ";
+		bsm << "l\t";
 	else if ( type == sfloat )
-		bsm << "f ";
+		bsm << "f\t";
 	bsm<<Register::toString(r)<<endl;
 }
 
