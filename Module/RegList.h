@@ -12,27 +12,27 @@ class RegList
 {
 public:
 
-struct TRegListEntry
-{
-	struct TOperand* op;
-	char* label;
-	struct TRegListEntry* next;
-};
+	struct TRegListEntry
+	{
+		struct TOperand* op;
+		char* label;			// Stelle, an der der Operand gespeichert wird
+		struct TRegListEntry* next;
+	};
 
-RegList();
+	RegList();
 
-void append (struct TOperand*, char*);
-void append (struct TOperand*, TReg);
-bool del (struct TOperand*);
-bool isValid (struct TOperand*);
-char* where (struct TOperand*);
+	void append (struct TOperand*, char*);	// anhaengen mit Speicherstelle (wird von changeReg aufgerufen, Zuordnung wird nur geandert)
+	void append (struct TOperand*, TReg);	// anhaengen mit Register
+	bool del (struct TOperand*);		// loeschen, gibt false zurueck, falls nicht vorhanden
+	bool isValid (struct TOperand*);	// prueft, ob der Operand vorhanden ist
+	char* where (struct TOperand*);		// gibt das Label zurueck, an dem der Operand gespeichert ist
 
-void invalidate();
-void out();
-unsigned count();
+	void invalidate();			// alle loeschen
+	void out();
+	unsigned count();
 
 private:
-	
+
 	unsigned elems;
 	struct TRegListEntry* start;
 	struct TRegListEntry* end;

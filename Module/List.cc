@@ -118,155 +118,155 @@ void List::out()
 	{
 		switch (curr->op->TOpType)
 		{
-			case mov_:
+		case mov_:
 			cout<<"mov";
 			break;
 
-			case jmpgr_:
+		case jmpgr_:
 			cout<<"jmpgr";
 			break;
 
-			case jmple_:
+		case jmple_:
 			cout<<"jmple";
 			break;
 
-			case jmpeq_:
+		case jmpeq_:
 			cout<<"jmpeq";
 			break;
 
-			case jmpne_:
+		case jmpne_:
 			cout<<"jmpne";
 			break;
 
-			case mult_:
+		case mult_:
 			cout<<"mult";
 			break;
 
-			case divi_:
+		case divi_:
 			cout<<"div";
 			break;
 
-			case mod_:
+		case mod_:
 			cout<<"mod";
 			break;
 
-			case add_:
+		case add_:
 			cout<<"add";
 			break;
 
-			case sub_:
+		case sub_:
 			cout<<"sub";
 			break;
 
-			case shiftl_:
+		case shiftl_:
 			cout<<"shiftl";
 			break;
 
-			case shiftr_:
+		case shiftr_:
 			cout<<"shiftr";
 			break;
 
-			case sminus_:
+		case sminus_:
 			cout<<"minus";
 			break;
 
-			case splus_:
+		case splus_:
 			cout<<"plus";
 			break;
 
-			case call_:
+		case call_:
 			cout<<"call";
 			break;
 
-			case goto_:
+		case goto_:
 			cout<<"goto";
 			break;
 
-			case label_:
+		case label_:
 			cout<<"label";
 			break;
 
-			case ret_:
+		case ret_:
 			cout<<"ret";
 			break;
 
-			case getret_:
+		case getret_:
 			cout<<"getret";
 			break;
 
-			case push_:
+		case push_:
 			cout<<"push";
 			break;
 
-			case char_:
+		case char_:
 			cout<<"toChar";
 			break;
 
-			case int_:
+		case int_:
 			cout<<"toInt";
 			break;
 
-			case long_:
+		case long_:
 			cout<<"toLong";
 			break;
 
-			case float_:
+		case float_:
 			cout<<"tofloat";
 			break;
-			
-			case intout:
+
+		case intout:
 			cout<<"intout";
 			break;
-			
-			case charout:
+
+		case charout:
 			cout<<"charout";
 			break;
-			
-			case longout:
+
+		case longout:
 			cout<<"longout";
 			break;
-			
-			case floatout:
+
+		case floatout:
 			cout<<"floatout";
 			break;
 
-			case intin:
+		case intin:
 			cout<<"intin";
 			break;
-			
-			case charin:
+
+		case charin:
 			cout<<"charin";
 			break;
-			
-			case longin:
+
+		case longin:
 			cout<<"longin";
 			break;
-			
-			case floatin:
+
+		case floatin:
 			cout<<"floatin";
 			break;
-			
-			case stop:
+
+		case stop:
 			cout<<"stop";
 			break;
-			
+
 		}
-		
+
 		for (int i=0;i<3;i++)
 		{
 			TOperand* co;
 			if (i==0) co = curr->op->operand1;
 			if (i==1) co = curr->op->operand2;
 			if (i==2) co = curr->op->operand3;
-			if (co==0) { cout<<"\t"; continue; }
+		if (co==0) { cout<<"\t"; continue; }
 			cout<<"\t";
 			if (co->type==lvar) cout<<"lb+";
 			if (co->type==gvar) cout<<"g:";
-// 			if (co->type==constant) cout<<"c:";
+			// 			if (co->type==constant) cout<<"c:";
 			if ((co->type==labelstring) || (co->type==temp) || (co->type==constant)|| (co->type==funclabel)) cout<<co->label; else cout<<co->add;
-		
+
 		}
-	
+
 		cout<<";"<<endl;
 		curr=curr->next;
 	}

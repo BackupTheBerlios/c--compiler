@@ -465,7 +465,7 @@ void gen(unsigned u)
 
 int yyerror(char* s)
 {
-  printf("[parser] %s\n",s);
-  exit(-1);
-  return 0;
+	printf("[parser] %s\n",s);
+	exit(-1);
+	return 0;
 }

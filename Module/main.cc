@@ -37,16 +37,16 @@ int main(int argc, char* arv[])
 	bool basm = false;
 	bool bac = false;
 	bool info = false;
-	
+
 	// Auswertung der Kommandozeilenargumente
 	if (argc>1) ifile = arv[1];
-	else 
+	else
 	{
 		cout<<"[main] no input file\n";
 		info = true;
 	}
 	if (argc>2) ofile = arv[2];
-	else 
+	else
 	{
 		cout<<"[main] no output file\n";
 		info = true;
@@ -54,14 +54,14 @@ int main(int argc, char* arv[])
 	if (argc>3)
 	{
 		if (strcmp(arv[3], "-a")==0) basm = true;
-		else if (strcmp(arv[3], "-b")==0) { basm = true; bac = true; } 
-		else 
+	else if (strcmp(arv[3], "-b")==0) { basm = true; bac = true; }
+		else
 		{
 			cout<<"[main] unknown option\n";
 			info = true;
 		}
 	}
-	
+
 	// Ausgabe des Infotextes
 	if (info)
 	{
@@ -70,40 +70,41 @@ int main(int argc, char* arv[])
 		cout<<"-b for assemble and execute\n";
 		exit(-1);
 	}
-	
-	
+
+
 	// Dateien öffnen
 	bsm.open(ofile);
 	spilldata.open("spill");
 	yyin = fopen(ifile,"r+");
-	
+
 	// Parser starten
 	yyparse();
 	cout<<"\n[parser] OK\n";
 	//fclose(yyin);
-	
+
 	// Kontextprüfung starten
-	c.context(root);  
+	c.context(root);
 	cout<<"\n[context] OK\n";
-	
+
 	// Zwischencodeerzeugung starten
 	il.genIL(start, pos);
 	cout<<"\n[code-il] OK\n";
-	
+
 	// Bacom Zielcodeerzeugung starten
 	bc.genAsm();
 	cout<<"\n[bacom] OK\n";
 	bsm.close();
 	spilldata.close();
-	
+
 	// Ausführung von basm / bacom
 	// Kommandozeilen zusammenbasteln
 	char* f = (char*)malloc(50);
+	// Speicherstellen fuer spillcode ans Ende einfuegen
 	strcpy(f, "cat spill>>");
 	strcpy(f+11, ofile);
 	system(f);
 	system("rm spill");
-		
+
 	if (basm)
 	{
 		char* f = (char*)malloc(50);
@@ -112,7 +113,7 @@ int main(int argc, char* arv[])
 		system(f);
 		if (bac)
 		{
-		
+
 			char* n = strrchr(ofile, '.');
 			strcpy( n+1, "pro");
 			strcpy( f, "bacom ");
@@ -121,6 +122,4 @@ int main(int argc, char* arv[])
 		}
 	}
 }
-
-
 

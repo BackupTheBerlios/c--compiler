@@ -172,21 +172,22 @@ struct TNode
 	int type;
 };
 
-enum TType {
-    schar,
-    sint,
-    slong,
-    sfloat,
-    svoid,
-    sstruct,
-    undeclared
+enum TType
+{
+	schar,
+	sint,
+	slong,
+	sfloat,
+	svoid,
+	sstruct,
+	undeclared
 };
 
-enum TOperandType 
+enum TOperandType
 {
 	temp,
 	lvar,  // lokale Variable
-	gvar,  // globale 
+	gvar,  // globale
 	constant,
 	labelstring,
 	funclabel
@@ -196,7 +197,7 @@ struct TOperand
 {
 	TOperandType type;
 	TType vtype;
-	union 
+	union
 	{
 		char* label;
 		unsigned add;
@@ -215,68 +216,72 @@ struct TOp
 
 
 
-enum	TOpType {
-    mov_,
-    jmpgr_,	// greater zero
-    jmple_,	// less zero
-    jmpeq_,	// equal zero
-    jmpne_,	// not equal
-    mult_,
-    divi_,
-    mod_,
-    add_,
-    sub_,
-    shiftl_,
-    shiftr_,
-    sminus_,
-    splus_,
-    call_,
-    goto_,
-    label_,
-    ret_,
-    getret_,
-    push_,
-    char_,
-    int_,
-    long_,
-    float_,
-    intout,
-    charout,
-    longout,
-    floatout,
-    intin,
-    charin,
-    longin,
-    floatin,
-    stop
+enum	TOpType
+{
+	mov_,
+	jmpgr_,	// greater zero
+	jmple_,	// less zero
+	jmpeq_,	// equal zero
+	jmpne_,	// not equal
+	mult_,
+	divi_,
+	mod_,
+	add_,
+	sub_,
+	shiftl_,
+	shiftr_,
+	sminus_,
+	splus_,
+	call_,
+	goto_,
+	label_,
+	ret_,
+	getret_,
+	push_,
+	char_,
+	int_,
+	long_,
+	float_,
+	intout,
+	charout,
+	longout,
+	floatout,
+	intin,
+	charin,
+	longin,
+	floatin,
+	stop
 };
 
-enum TJmp {
-    jmpgr,
-    jmple,
-    jmpeq,
-    jmpne,
-};
-
-
-enum TBinOp {
-    mult,
-    divi,
-    mod,
-    add,
-    sub,
-    shiftl,
-    shiftr
-};
-
-enum TUnOp {
-    sminus,
-    splus
-
+enum TJmp
+{
+	jmpgr,
+	jmple,
+	jmpeq,
+	jmpne,
 };
 
 
-enum TReg {
+enum TBinOp
+{
+	mult,
+	divi,
+	mod,
+	add,
+	sub,
+	shiftl,
+	shiftr
+};
+
+enum TUnOp
+{
+	sminus,
+	splus
+};
+
+
+enum TReg
+{
 	r0,
 	r1,
 	r2,
@@ -289,13 +294,12 @@ enum TReg {
 	r9,
 	r10,
 	r11,
-	rglobal, // startadresse fuer globale Variablen
-	rlb,     // lokale basis
-	rnull,  // Nullregister
-	rsp,  // Stackpointer
-	unknown  // Fehler
+	rglobal,	// startadresse fuer globale Variablen
+	rlb,	// lokale basis
+	rnull,	// Nullregister
+	rsp,	// Stackpointer
+	unknown	// Fehler
 };
-	
 
 
 #endif

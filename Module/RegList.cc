@@ -62,6 +62,7 @@ void RegList::append (struct TOperand *op, TReg r)
 	strcpy(x,"spill_");
 	sprintf (x+6,"%u",maxcount++);
 
+	// Spillcode ausgeben
 	bsm<<"// Spillcode: Auslagern"<<endl;
 	bsm<<"str.";
 	if (op->vtype==schar) bsm<<"b";
@@ -70,6 +71,7 @@ void RegList::append (struct TOperand *op, TReg r)
 	else if (op->vtype==sfloat) bsm<<"f";
 	bsm<<"\tr"<<r<<", r"<<rnull<<" + "<<x<<endl;
 
+	// Datenbereich festlegen und ausgeben
 	spilldata<<x<<":\tds.";
 	if (op->vtype==schar) spilldata<<"b";
 	else if (op->vtype==sint) spilldata<<"w";

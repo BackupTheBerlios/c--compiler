@@ -6,53 +6,53 @@ class Stack
 {
 public:
 
-union TStackRet
-{
-	char* name;
-	int block;
-};	
+	union TStackRet
+	{
+		char* name;
+		int block;
+	};
 
-struct TStackEntry
-{
-	TStackRet ret;
-	TType type;
-	struct TStackEntry* next;
-};
-
-
-Stack();
-
-void pop (int n);
+	struct TStackEntry
+	{
+		TStackRet ret;
+		TType type;
+		struct TStackEntry* next;
+	};
 
 
-void push (char* name);
-void push (TOperand* t) { push((char*)t); }
-void push (unsigned block);
-void push (char*, TType);
-void push (TType);
+	Stack();
 
-char* top ();
-TOperand* topOp() { return (TOperand*)top(); }
+	void pop (int n);
 
-unsigned topi (unsigned);
-TType toptype();
 
-char* first ();
-unsigned firsti ();
-TType firsttype();
+	void push (char* name);
+	void push (TOperand* t) { push((char*)t); }
+	void push (unsigned block);
+	void push (char*, TType);
+	void push (TType);
 
-void out();
+	char* top ();
+	TOperand* topOp() { return (TOperand*)top(); }
 
-unsigned count();
-	
-	
+	unsigned topi (unsigned);
+	TType toptype();
+
+	char* first ();
+	unsigned firsti ();
+	TType firsttype();
+
+	void out();
+
+	unsigned count();
+
+
 
 private:
-	
+
 	struct TStackEntry* tos;
 	struct TStackEntry* start;
-	
-	
+
+
 };
 
 

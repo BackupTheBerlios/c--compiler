@@ -6,7 +6,7 @@ using namespace std;
 
 NameList::NameList()
 {
-	
+
 	no = 0;
 	start = (TNameListEntry*)malloc(sizeof(TNameListEntry)*MAX_NO_OF_VARIABLES);
 	last = start;
@@ -19,13 +19,13 @@ unsigned NameList::insert(char* n, unsigned b, TType type, unsigned add, bool is
 	last->type = type;
 	last->add = add;
 	last->isGlobal = isGlobal;
-	
+
 	last++;
 	return (no++)+1;
 }
 
 unsigned NameList::isDefined(char* n, unsigned b)
-{	
+{
 	if (no==0) return 0;
 	TNameListEntry* cur = start;
 	unsigned c = 1;
@@ -42,7 +42,7 @@ void NameList::out()
 {
 	if (no==0) { cout<<"<<leer>>"; return; }
 	TNameListEntry* cur = start;
-	
+
 	while(1)
 	{
 		cout<<"Name: "<<cur->name<<" Block: "<<cur->block<<" Type: "<<cur->type<<" Addr: "<<cur->add<<" Global: "<<cur->isGlobal<<"\n";
@@ -61,7 +61,7 @@ TType NameList::typeOf(char* n, unsigned b)
 		cur++;
 		if (cur==start+no) return svoid;
 	}
-	
+
 }
 
 char* NameList::getIdent(unsigned u)
