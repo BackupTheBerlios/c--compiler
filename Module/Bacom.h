@@ -2,10 +2,12 @@
 #define bacom_h
 #include "OTypes.h"
 #include "List.h"
+#include "Register.h" 
 #include <iostream>
 using namespace std;
 
 extern List ilList;
+
 
 class Bacom
 {
@@ -41,6 +43,8 @@ private:
 	void outdc(char);
 	void outdc(TType, int);
 	void outdc(float);
+	
+	Register regs;
 	
 	
 };
