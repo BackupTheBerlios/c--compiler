@@ -3,10 +3,13 @@
 TCPNetwork::TCPNetwork(short port)
 {
 	//open socket
-	sockfd = socket(PF_INET,SOCK_DGRAM,0);
+	sockfd = socket(PF_INET,SOCK_SEQPACKET,0);
 	IPAddress server(port);
 	//bind port
 	bind(sockfd, (struct sockaddr*)&server,sizeof(struct sockaddr));	
+	
+	//listen
+	listen(sockfd, 128);
 }
 
 TCPNetwork::TCPNetwork()
@@ -48,24 +51,38 @@ ssize_t TCPNetwork::request(const Server& server, void* req, size_t reqlen, void
 }
 
 ssize_t TCPNetwork::receive(Client& client, void* req, size_t reqlen){
-	//recvfrom, blocks until a message arrives
+	
+	// accept, blockiert solange bis eingehende Verbindung ankommt
 	socklen_t slen = sizeof(sockaddr);
-	ssize_t i = recvfrom(sockfd, req, reqlen, 0, (sockaddr*)&client, &slen);
-	if (i==-1)
+	
+	lastfd = accept(sockfd, (sockaddr*)&client, &slen);
+	
+	if (lastfd==-1)
 	{
-		cout<<"[udpnetwork] receive(): recvfrom failed.\n";
+		cout<<"[tcpnetwork] receive(): accept failed.\n";
 		exit(-1);
 	}
+	
+	//read
+	ssize_t i = read(lastfd, req, reqlen);
+	
+	if (i==-1)
+	{
+		cout<<"[tcpnetwork] receive(): read failed.\n";
+		exit(-1);
+	}	
 		
 	return i;
 }
 
 ssize_t TCPNetwork::reply(const Client& client, void* res, size_t reslen){
-	//sendto
-	ssize_t i = sendto(sockfd, res, reslen, 0, (sockaddr*)&client, sizeof(sockaddr));
+	
+	//write
+	ssize_t i = write(lastfd, res, reslen);
+	
 	if (i==-1)
 	{
-		cout<<"[udpnetwork] reply(): sendto failed.\n";
+		cout<<"[tcpnetwork] reply(): write failed.\n";
 		exit(-1);
 	}
 	return i;
