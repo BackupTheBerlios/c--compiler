@@ -52,6 +52,7 @@ private:
 	bool proto;  // prototype
 	bool call;    // func-call?
 	unsigned cc; //Konstenzaehler
+	bool minus; // minuszeichen?
 	
 	
 

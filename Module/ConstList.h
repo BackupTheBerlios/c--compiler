@@ -9,7 +9,7 @@ public:
 union tvalue
 {
 	int i;
-	float f;
+	double f;
 	unsigned u;
 	char c;
 };
@@ -28,7 +28,7 @@ void insert(char, unsigned);
 
 void insert(int, unsigned);
 
-void insert(float, unsigned);
+void insert(double, unsigned);
 
 tvalue getValue(unsigned);
 

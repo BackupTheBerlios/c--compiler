@@ -49,7 +49,7 @@ void ConstList::insert(int c, unsigned ct)
 	}
 	
 }
-void ConstList::insert(float c, unsigned ct)
+void ConstList::insert(double c, unsigned ct)
 {
 	if (last==0)
 	{

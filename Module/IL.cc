@@ -266,7 +266,17 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case INT_CONSTANT:
 			{
-				op.push(conid(constcount++)); 
+				op.push(conid(constcount++),sint); 
+				break;
+			}
+			case FLOAT_CONSTANT:
+			{
+				op.push(conid(constcount++),sfloat); 
+				break;
+			}
+			case CHAR_CONSTANT:
+			{
+				op.push(conid(constcount++),schar); 
 				break;
 			}
 			case RETURN_1:
@@ -282,6 +292,15 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				checkConvAssign(s,t1,t2);
 				outret(s);
 				op.pop(1);
+				break;
+			}
+			case PRIMITIVE_3:
+			{
+				char* t = tempid();
+				outun(t, sminus, op.top());
+				TType tt = op.toptype();
+				op.pop(1);
+				op.push(t, tt);
 				break;
 			}
 		}
@@ -310,6 +329,10 @@ char* IL::conid(unsigned i)
 
 	char* n = (char*)malloc(VAR_LENGTH_ID);
 	if (t==sint) strcpy(n,"int");
+	if (t==schar) strcpy(n,"char");
+	if (t==sfloat) strcpy(n,"float");
+	if (t==slong) strcpy(n,"long");
+	
 	sprintf(n+strlen(n),"%u",i);
 	return n;
 
@@ -367,7 +390,9 @@ void IL::outbin(char* l, char* x, TBinOp o, char* y)
 }
 
 void IL::outun(char* l, TUnOp u, char* y)
-{}
+{
+	if (u==sminus) cout<<l<<" := -"<<y<<";\n";
+}
 
 
 /* Sprunganweisung ans Label label

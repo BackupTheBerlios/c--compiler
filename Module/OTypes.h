@@ -171,7 +171,8 @@ enum TBinOp {
 };
 
 enum TUnOp {
-	neg
+	sminus,
+	splus
 	
 };
 
