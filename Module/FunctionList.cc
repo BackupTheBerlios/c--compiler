@@ -12,7 +12,7 @@ FunctionList::FunctionList()
 }
 
 
-unsigned FunctionList::insert(char* n, TType* sig, TType ret, unsigned num, bool proto, unsigned maxsp)
+unsigned FunctionList::insert(char* n, TType* sig, TType ret, unsigned num, bool proto, unsigned maxsp, unsigned frame_constant)
 {
 	if (no!=0) 
 	{
@@ -37,6 +37,7 @@ unsigned FunctionList::insert(char* n, TType* sig, TType ret, unsigned num, bool
 	last->next = 0;
 	last->proto = proto;
 	last->maxsp = maxsp;
+	last->frame_constant = frame_constant;
 	last++;
 	return (no++)+MAX_NO_OF_VARIABLES+1;
 }
@@ -69,7 +70,7 @@ void FunctionList::out()
 	{
 		cout<<"Name: "<<cur->name<<" Sig: ";
 		for(unsigned i=0;i<cur->num;i++) cout<<*(cur->signature+i)<<" ";
-		cout<<" Ret: "<<cur->rettype<<" Proto: "<<cur->proto<<" Max-SP: "<<cur->maxsp<<"\n";
+		cout<<" Ret: "<<cur->rettype<<" Proto: "<<cur->proto<<" Max-SP: "<<cur->maxsp<<" Frame_constant: "<<cur->frame_constant<<"\n";
 		cur++;
 		if (cur==start+no) return;
 	}
@@ -135,6 +136,12 @@ TType FunctionList::getReturnType(unsigned u)
 {
 	TFunctionListEntry* pos = start+u-MAX_NO_OF_VARIABLES-1;
 	return pos->rettype;
+}
+
+unsigned FunctionList::getFrameConstant(unsigned u)
+{
+	TFunctionListEntry* pos = start+u-MAX_NO_OF_VARIABLES-1;
+	return pos->frame_constant;
 }
 
 

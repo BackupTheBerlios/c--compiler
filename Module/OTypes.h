@@ -142,6 +142,8 @@
 // maximale Anzahl Funtionen
 #define MAX_NO_OF_FUNCTIONS 4096
 
+#define MAX_NO_OF_CONSTANTS 4096
+
 // maximale Anzahl Case-Labels
 #define MAX_NO_OF_CASE_LABELS 4096
 
@@ -173,7 +175,8 @@ enum TOperandType
 	lvar,  // lokale Variable
 	gvar,  // globale 
 	constant,
-	labelstring
+	labelstring,
+	funclabel
 };
 
 struct TOperand
@@ -185,6 +188,7 @@ struct TOperand
 		char* label;
 		unsigned add;
 	};
+	unsigned no;
 };
 
 struct TOp
@@ -263,7 +267,7 @@ enum TReg {
 	r9,
 	r10,
 	r11,
-	r12,
+	rsp,
 	rlb,     // lokale basis
 	rnull,  // Nullregister
 	rglobal, // startadresse fuer globale Variablen

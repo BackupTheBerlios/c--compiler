@@ -11,12 +11,13 @@ Context::Context()
   ex = 0;         
   proto = false;  
   call = false;
-  cc = 0;
+  cc = 2;
   cpos = start;
   minus = false;
   sp = 0;
   gp = 0;
   maxsp = 0;
+  frame_constants = 1;
     
   labelcount=0; 
   startcount.push((unsigned)0);
@@ -41,6 +42,7 @@ if(n != 0)
                                             cout<<"\nNamensliste:\n"; nl.out(); 
                                             cout<<"\nFunktionsliste:\n"; fl.out(); 
                                             cout<<"\nKonstantenliste:\n";cl.out();
+                                            cout<<"\nInterne Konstantenliste:\n";icl.out();
                                             cout<<"\n[context] Groesse Konstanten : "<<cl.getSize()<<endl;
                                             cout<<"[context] Groesse Globale Var: "<<gp<<endl;
                                             
@@ -205,7 +207,8 @@ if(n != 0)
                                             cout<<"[context] function "<<c<<" with same signature already defined";
                                             exit(-1);
                                           }
-                                          fl.insert(c, sig-num, ret, num, proto, maxsp);
+                                          fl.insert(c, sig-num, ret, num, proto, maxsp, frame_constants);
+                                          icl.insert((int)maxsp, frame_constants++);
                                           proto = false;
                                           f.pop(1);                                          
                                           ft.pop(1);

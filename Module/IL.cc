@@ -21,8 +21,8 @@ char* IL::genIL(unsigned* start, unsigned* end)
 	bool func = false;
 	bool relation = false;
 	bool switchcond = false;
-	unsigned const trueidx = 0xFFFFFFF;
-	unsigned const falseidx = 0xFFFFFFE;
+	unsigned const trueidx = 1;
+	unsigned const falseidx = 2;
 	cl.insert(0,falseidx);
 	cl.insert(1,trueidx);
 	TOperand* truevar = conid(trueidx);
@@ -539,8 +539,9 @@ TOperand* IL::funcid(unsigned i)
 	sprintf(n+strlen(c),"%u",num);
 	
 	TOperand* tmp = (TOperand*)malloc(sizeof(TOperand));
-	tmp->type = labelstring;
+	tmp->type = funclabel;
 	tmp->label = n;
+	tmp->no = i;
 	
 	return tmp;
 }

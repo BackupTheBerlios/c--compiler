@@ -14,6 +14,7 @@ using namespace std;
  */
 extern NameList nl;
 extern ConstList cl;
+extern ConstList icl;
 extern FunctionList fl;
 extern unsigned* start;
 
@@ -65,6 +66,7 @@ private:
 	Stack startcount;
 	unsigned lastconst;
 	unsigned startc;
+	unsigned frame_constants;
 
 
 

@@ -4,11 +4,15 @@
 #include "List.h"
 #include "ConstList.h"
 #include "Register.h" 
+#include "FunctionList.h"
 #include <iostream>
 using namespace std;
 
 extern List ilList;
+extern FunctionList fl;
 extern ConstList cl;
+extern ConstList icl;
+
 
 class Bacom
 {

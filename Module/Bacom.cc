@@ -5,6 +5,7 @@ void Bacom::genAsm()
 {
 	cout << "\nBASM Ausgabe:\n";
 	cout << "sub.w " <<Register::toString( rnull )<<","<<Register::toString( rnull )<<endl;		// Nullregister 0 setzen
+	cout << "const_two:  ds.w 2 \n";
 	for ( unsigned i = 1; i <= ilList.count(); i++ )
 	{
 		TOp* e = ilList.getelem( i );
@@ -17,7 +18,29 @@ void Bacom::genAsm()
 
 		case label_:
 			{
-				cout << op1->label << ":\n";
+				cout<<op1->label<<":\n";
+				if (op1->type == funclabel)
+				{
+					// Die Parameter liegen bereits auf dem Stack, jetzt werden die Register gerettet
+					outloa(sint, rnull, rnull, "const_two");
+					for (int i=0;i<16;i++)
+					{
+						outstr(sint, (TReg)i, rsp, 0 );
+						outsub(sint, rsp, rnull);
+						
+					}
+					outsub(sint, rnull, rnull);
+					
+					// Lokale Basis neu setzen
+					outmov(rlb, rsp);
+					
+					// Platz schaffen fuer lokales Frame, sp um Framegroesse weiterschieben
+					outloa(sint, r0, rnull, fl.getFrameConstant(op1->no) );
+					outsub(sint, rsp, rnull);
+					
+					
+					// Fertig!
+				}
 				break;
 			}
 		case mov_:
@@ -40,6 +63,15 @@ void Bacom::genAsm()
 
 				break;
 			}
+
+			case push_:
+			{
+				outstr(op1->vtype, regs.whichReg(op1), rsp, op1->add);
+				break;
+			}
+			
+			
+
 		case jmpgr_: 	// greater zero
 		case jmple_: 	// less zero
 		case jmpeq_: 	// equal zero
@@ -48,6 +80,7 @@ void Bacom::genAsm()
 		case divi_:
 		case mod_:	break;
 		case add_:
+
 			{
 				regs.changeReg( op1, op2 ); 						// Registerdeskriptor aendern (op2 wird zu op1)
 				regs.freeReg( op2 );
@@ -73,7 +106,6 @@ void Bacom::genAsm()
 		case goto_:
 		case ret_:
 		case getret_:
-		case push_:
 		case char_:
 		case int_:
 		case long_: break;
@@ -94,7 +126,9 @@ void Bacom::genAsm()
 
 		}
 	}
-	for (unsigned i=1;i<cl.getCount()-1;i++)
+	
+	// Konstanten
+	for (unsigned i=1;i<=cl.getCount();i++)
 	{
 		cout << "const_" << cl.getAddr(i) <<":\tdc.";
 		if ( cl.getType(i) == schar )
@@ -108,7 +142,24 @@ void Bacom::genAsm()
 
 		cout<<" "<<cl.getVal(i)<<endl;
 	}
+	
+	// interne Konstanten
+	for (unsigned i=1;i<=icl.getCount();i++)
+	{
+		cout << "iconst_" << icl.getAddr(i) <<":\tdc.";
+		if ( icl.getType(i) == schar )
+			cout << "b";
+		else if ( icl.getType(i) == sint )
+			cout << "w";
+		else if ( icl.getType(i) == slong )
+			cout << "l";
+		else if ( icl.getType(i) == sfloat )
+			cout << "f";
+
+		cout<<" "<<icl.getVal(i)<<endl;
+	}
 }
+
 
 
 void Bacom::outloa( TType type, TReg dest, TReg help, int offset )
@@ -122,7 +173,7 @@ void Bacom::outloa( TType type, TReg dest, TReg help, int offset )
 		cout << "l";
 	else if ( type == sfloat )
 		cout << "f";
-	cout << " " << Register::toString( dest ) << " " << Register::toString( help ) << "+" << offset << endl;
+	cout << " " << Register::toString( dest ) << ", " << Register::toString( help ) << "+" << offset << endl;
 }
 
 void Bacom::outloa( TType type, TReg dest, TReg help, char* addr )
@@ -136,7 +187,7 @@ void Bacom::outloa( TType type, TReg dest, TReg help, char* addr )
 		cout << "l";
 	else if ( type == sfloat )
 		cout << "f";
-	cout << " " << Register::toString( dest ) << " " << Register::toString( help ) << "+" << addr << endl;
+	cout << " " << Register::toString( dest ) << ", " << Register::toString( help ) << "+" << addr << endl;
 }
 
 void Bacom::outstr( TType type, TReg src, TReg help, int offset )
@@ -150,7 +201,7 @@ void Bacom::outstr( TType type, TReg src, TReg help, int offset )
 		cout << "l";
 	else if ( type == sfloat )
 		cout << "f";
-	cout << " " << Register::toString( src ) << " " << Register::toString( help ) << "+" << offset << endl;
+	cout << " " << Register::toString( src ) << ", " << Register::toString( help ) << "+" << offset << endl;
 }
 
 void Bacom::outadd( TType type, TReg dest, TReg src )
@@ -164,7 +215,7 @@ void Bacom::outadd( TType type, TReg dest, TReg src )
 		cout << "l";
 	else if ( type == sfloat )
 		cout << "f";
-	cout << " " << Register::toString( dest ) << " " << Register::toString( src ) << endl;
+	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
 }
 
 void Bacom::outsub( TType type, TReg dest, TReg src )
@@ -178,7 +229,7 @@ void Bacom::outsub( TType type, TReg dest, TReg src )
 		cout << "l";
 	else if ( type == sfloat )
 		cout << "f";
-	cout << " " << Register::toString( dest ) << " " << Register::toString( src ) << endl;
+	cout << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
 }
 
 void Bacom::outmov(TReg r1, TReg r2)

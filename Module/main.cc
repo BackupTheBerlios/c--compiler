@@ -20,6 +20,7 @@ extern unsigned* pos;
 extern FILE *yyin, *yyout;
 
 ConstList cl;
+ConstList icl; //interne Konstantenliste, zb. Framegroessen, ect.
 NameList nl;
 FunctionList fl;
 Context c;
