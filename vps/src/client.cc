@@ -6,11 +6,16 @@
 #include <iostream>
 using namespace std;
 
-int main()
+int main(int argc, char* argv[])
 {
+	if (argc!=2)
+	{
+		cout<<"Usage: client [server]\n";
+		exit(-1);
+	}
+	char* server=argv[1];
+	
 	UDPNetwork* net = new UDPNetwork();
-// 	LifeClient* client = new LifeClient((IPNetwork *)net,"localhost",7654);
-	LifeClient* client = new LifeClient((IPNetwork *)net,"192.168.123.2",7654);
-// 	LifeClient* client = new LifeClient((IPNetwork *)net,"192.168.208.154",7654);
+	LifeClient* client = new LifeClient((IPNetwork *)net,server,7654);
 }
 
