@@ -72,7 +72,7 @@ void BoardServer::start()
 	}
 	w->flush();
 
-	// alle clients müssen sich anmelden
+	// alle clients mssen sich anmelden
 	for (int i=0; i<clients; i++)
 	{
 		IPAddress all(7654);
@@ -115,7 +115,6 @@ void BoardServer::start()
 				net->reply(all, &val, sizeof(val));
 			} else if (msg[0]=='N') //barrier
 			{
-				cerr<<"N\n";
 				barrier(&all, msg[1]);
 			} else
 			{
@@ -124,7 +123,7 @@ void BoardServer::start()
 			}
 			
 		}
-		
+				
 		/********** zeichnen ********/
 		char* count = ( char* ) malloc( 16 );
 		for ( int x = 0;x < BOARD_WIDTH;x++ )
@@ -206,7 +205,7 @@ void BoardServer::barrier(IPAddress* ip,int timestep)
 	}
 	for(int i=0; i<clients; i++)
 	{
-		if (addresses[i] == *ip)
+		if (addresses[i].getAddr() == ip->getAddr())
 		{
 			completed[i] = true;
 			cout<<"[boardserver] client "<<i<<" finished step "<<timestep<<endl;
