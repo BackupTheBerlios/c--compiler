@@ -117,8 +117,8 @@ if(n != 0)
                                                 } else      // fuer lokale var. in funktionen....
                                                 {
                                                     sp = align(sp, length);                                            
-                                                    idx = nl.insert(c, tmpblock, t, sp, false);                      
                                                     sp+=length;
+                                                    idx = nl.insert(c, tmpblock, t, sp, false);                                                                          
                                                 }
                                                 
                                                 ins(idx);                                            
@@ -220,8 +220,8 @@ if(n != 0)
                                           {
 	                                          int length = (para[i]>=slong)?4:(para[i]+1);
 	                                          parsize = align(parsize, length);
-	                                          fl.setParaAdd(no, i, parsize);
 	                                          parsize += length;                                          
+	                                          fl.setParaAdd(no, i, parsize);                                          
                                           }
                                           icl.insert((int)align(maxsp,4), func_constants++);
                                           icl.insert((int)num, func_constants++);
