@@ -977,15 +977,7 @@ void IL::outconvert(TOperand* m1, TOperand* m2, TType to)
 	op->TOpType=a;
 	op->operand1=(TOperand*)m2;
 	op->operand2=(TOperand*)m1;
-	if (condition)
-	{
-		ilList.insert(op,condinsert+1);
-		condinsert++;
-	}
-	else
-	{
-		ilList.append(op);
-	}
+	ilList.append(op);
 
 }
 
