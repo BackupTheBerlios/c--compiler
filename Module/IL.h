@@ -38,6 +38,8 @@ private:
 	
 	char* labelid();
 
+	char* condlabelid();
+
 	char* funcid(unsigned);	
 	
 	void outcopy(char*, char*);
@@ -49,8 +51,10 @@ private:
 	void outgoto(char*, bool);
 	
 	void outlabel(char*);
+
+	void outcond(int);
 	
-	void outjump(char*);
+	void outjump(char*,char*,TJmp);
 	
 	void outret(char*);
 	
@@ -64,8 +68,10 @@ private:
 	
 	Stack op;
 	Stack label;
+	Stack cond;
 	unsigned tempcount;
 	unsigned labelcount;
+	unsigned condlabelcount;
 
 };
 

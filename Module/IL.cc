@@ -28,15 +28,17 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case IDENTIFIER:
 			{
 				unsigned idx = *++start;
-				if (idx>MAX_NO_OF_VARIABLES) {
+				if (idx>MAX_NO_OF_VARIABLES)
+				{
 					funcidx = idx;
-					funcident = funcid(idx); 
+					funcident = funcid(idx);
 					if (func)
 					{
 						func = false;
 						outlabel(funcident);
 					}
-				} else 
+				}
+				else
 				{
 					lastident = varid(idx);
 					varidx = idx;
@@ -131,7 +133,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				op.pop(1);
 				//cout<<src<<" dst:"<<dst<<endl;
 				checkConvAssign(src,srct,dstt);
-				
+
 				outcopy(dst,src);
 				break;
 			}
@@ -142,7 +144,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				op.pop(1);
 				char* m2 = op.top();
 				TType t2 = op.toptype();
-				if ((t1==sfloat)||(t2==sfloat)) 
+				if ((t1==sfloat)||(t2==sfloat))
 				{
 					cout<<"[code-il] float-shift not permitted";
 					exit(-1);
@@ -161,7 +163,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				char* m2 = op.top();
 				TType t2 = op.toptype();
 				op.pop(1);
-				if ((t1==sfloat)||(t2==sfloat)) 
+				if ((t1==sfloat)||(t2==sfloat))
 				{
 					cout<<"[code-il] float-shift not permitted";
 					exit(-1);
@@ -173,32 +175,89 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case IF_1: //if ohne else
 			{
-				outlabel(label.top());
-				label.pop(1);
+				outlabel(cond.top());
+				cond.pop(1);
 				break;
 			}
 			case IF_2: //if mit else
 			{
 				outlabel(label.top());
-				label.pop(2);
+				label.pop(1);
 				break;
 			}
 			case ELSE:
 			{
+				// hier endet der true-block, false-block ueberspringen
 				char* l=labelid();
-				char* e=label.top();
 				label.push(l);
-				outjump(l);
-				outlabel(e);
+				char* temp=tempid();
+				outcopy(temp, "1");
+				outjump(temp,l,gr);
+				
+				//Sprungmarke für cond=false setzen
+				outlabel(cond.top());
+				cond.pop(1);
+				break;
+			}
+			case RELATION_2:
+			{
+				char* temp=tempid();
+				char* src=op.top();
+				op.pop(1);
+				char* dst=op.top();
+				outbin(temp,dst,sub,src);
+				// ergebnis darf nicht groesser oder gleich 0 sein
+				outjump(temp,cond.top(),gr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				outjump(temp,cond.top(),eq);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				break;
+			}
+			case RELATION_3:
+			{
+				char* temp=tempid();
+				char* src=op.top();
+				op.pop(1);
+				char* dst=op.top();
+				outbin(temp,src,sub,dst);
+				// ergebnis darf nicht groesser oder gleich 0 sein
+				outjump(temp,cond.top(),gr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				outjump(temp,cond.top(),eq);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				break;
+			}
+			case RELATION_4:
+			{
+				char* temp=tempid();
+				char* src=op.top();
+				op.pop(1);
+				char* dst=op.top();
+				outbin(temp,dst,sub,src);
+				// ergebnis darf nicht groesser 0 sein
+				outjump(temp,cond.top(),gr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				break;
+			}
+			case RELATION_5:
+			{
+				char* temp=tempid();
+				char* src=op.top();
+				op.pop(1);
+				char* dst=op.top();
+				outbin(temp,src,sub,dst);
+				// ergebnis darf nicht groesser 0 sein
+				outjump(temp,cond.top(),gr);	// wenn bedingung falsch, springe zu nächstem condlabel (ueber if-block)
+				break;
+			}
+			case COND_START:
+			{
+				cond.push(condlabelid());	// dieses label kommt später hinter den true-block
 				break;
 			}
 			case COND:
 			{
-
-				label.push(labelid());
-				outjump(label.top());
+				// alle atomaren bedingungen wurden hintereinander durchlaufen, hinter jeder atomaren bedingung
+				// wird ein sprung hinter den true-block ausgefuehrt, falls diese bedingung falsch ist
+				
+				// wenn man hier angelangt ist(im zwischencode), beginnt der true-block
+				// cout<<"\ntrue-block\n";
 				break;
-
 			}
 			case WHILE_COND:
 			{
@@ -209,12 +268,15 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case WHILE:
 			{
-				char* label_end=label.top();
+				// sprung zum start der while-schleife
+				char* temp=tempid();
+				outcopy(temp, "1");
+				outjump(temp,label.top(),gr);
 				label.pop(1);
-				char* label_begin=label.top();
-				label.pop(1);
-				outjump(label_begin);
-				outlabel(label_end);
+				
+				// austritt aus der schleife
+				outlabel(cond.top());
+				cond.pop(1);
 				break;
 			}
 			case INIT_PART:
@@ -269,17 +331,17 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case INT_CONSTANT:
 			{
-				op.push(conid(constcount++),sint); 
+				op.push(conid(constcount++),sint);
 				break;
 			}
 			case FLOAT_CONSTANT:
 			{
-				op.push(conid(constcount++),sfloat); 
+				op.push(conid(constcount++),sfloat);
 				break;
 			}
 			case CHAR_CONSTANT:
 			{
-				op.push(conid(constcount++),schar); 
+				op.push(conid(constcount++),schar);
 				break;
 			}
 			case RETURN_1:
@@ -335,7 +397,7 @@ char* IL::conid(unsigned i)
 	if (t==schar) strcpy(n,"char");
 	if (t==sfloat) strcpy(n,"float");
 	if (t==slong) strcpy(n,"long");
-	
+
 	sprintf(n+strlen(n),"%u",i);
 	return n;
 
@@ -367,6 +429,15 @@ char* IL::labelid()
 	char* n = (char*)malloc(VAR_LENGTH_ID);
 	strcpy(n,"label");
 	sprintf (n+5,"%u",labelcount++);
+
+	return n;
+}
+
+char* IL::condlabelid()
+{
+	char* n = (char*)malloc(VAR_LENGTH_ID);
+	strcpy(n,"condlabel");
+	sprintf (n+9,"%u",condlabelcount++);
 
 	return n;
 }
@@ -405,7 +476,7 @@ void IL::outun(char* l, TUnOp u, char* y)
  * adresse gesichert werden.
  * Ohne gesetzes call ein normaler Sprung, wie zb. bei
  * if/else/while/break usw.
- */ 
+ */
 void IL::outgoto(char* label, bool call)
 {
 	cout<<(call?"call":"goto");
@@ -417,9 +488,30 @@ void IL::outlabel(char* label)
 	cout<<label<<":\n";
 }
 
-void IL::outjump(char* jmp)
+void IL::outcond(int cc)
 {
-	cout<<"jmp "<<jmp<<";\n"; //springe dort hin, wenn cond false
+	cout<<"cond"<<"="<<cc<<"\n";
+}
+
+void IL::outjump(char* cc,char* jmp,TJmp type)
+{
+	cout<<"jmp";
+	switch(type)
+	{
+		case gr:
+		cout<<"gr";
+		break;
+		case le:
+		cout<<"le";
+		break;
+		case eq:
+		cout<<"eq";
+		break;
+		case ne:
+		cout<<"ne";
+		break;
+	}
+	cout<<" "<<cc<<", "<<jmp<<";\n";
 }
 
 void IL::outret(char* l)
@@ -435,7 +527,7 @@ void IL::outpush(char* l)
 
 TType IL::checkConv(char*& m1, char*& m2, TType t1, TType t2)
 {
-	if (t1!=t2) 
+	if (t1!=t2)
 	{
 		if ((t1==sfloat)&&(t2==sint))
 		{
@@ -443,22 +535,24 @@ TType IL::checkConv(char*& m1, char*& m2, TType t1, TType t2)
 			outconvert(m2,m3,sfloat);
 			m2 = m3;
 			return sfloat;
-		} else if ((t1==sint)&&(t2==sfloat))
+		}
+		else if ((t1==sint)&&(t2==sfloat))
 		{
 			char* m3 = tempid();
 			outconvert(m1,m3,sfloat);
 			m1 = m3;
 			return sfloat;
-		} else 
+		}
+		else
 			cout<<"[code-il] warning: types not equal t1: "<<t1<<" t2: "<<t2<<endl;
-		
+
 	}
 	return t1;
 }
 
 TType IL::checkConvAssign(char*& m1, TType t1, TType t2)
 {
-	if (t1!=t2) 
+	if (t1!=t2)
 	{
 		if ((t1<=slong)&&(t2==sfloat))
 		{
@@ -466,16 +560,19 @@ TType IL::checkConvAssign(char*& m1, TType t1, TType t2)
 			outconvert(m1,t,sfloat);
 			m1 = t;
 			return sfloat;
-		} else if ((t1==sfloat)&&(t2<=slong))
+		}
+		else if ((t1==sfloat)&&(t2<=slong))
 		{
 			char* t = tempid();
 			outconvert(m1,t,t2);
 			m1 = t;
 			return sint;
-		} else if (t1>t2)
+		}
+		else if (t1>t2)
 		{
 			cout<<"[code-il] warning: loss of precision\n";
-		} else cout<<"[code-il] warning: types not equal t1: "<<t1<<" t2: "<<t2<<endl;
+		}
+		else cout<<"[code-il] warning: types not equal t1: "<<t1<<" t2: "<<t2<<endl;
 	}
 	return t1;
 }
