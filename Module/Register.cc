@@ -13,23 +13,24 @@ TReg Register::getReg(TOperand* temp, TReg& r)
 	unsigned minpos;
 	for(i=0; i<regusable; i++)
 	{
-		if (reglist[i].var==0) 
+		if (reglist[i].var==0)
 		{
 			if (temp->vtype>=slong)
 			{
 				if (i%2==1) continue;		// wenn 4 byte verarbeitungsbreite werden nur gerade register vergeben!
-				if ((i<regusable)&&(reglist[i+1].var==0)) 
+				if ((i<regusable)&&(reglist[i+1].var==0))
 				{
 					found = true;
 					break;
 				}
-			} else
+			}
+			else
 			{
 				found = true;
 				break;
 			}
 		}
-		if (reglist[i].mark<minmark) 
+		if (reglist[i].mark<minmark)
 		{
 			minpos = i;
 			minmark = reglist[i].mark;
@@ -37,14 +38,15 @@ TReg Register::getReg(TOperand* temp, TReg& r)
 	}
 	if (!found) i = minpos;
 	// was mach ich, wenn kein register mehr frei ist? ->wuerde zu fehler fuehren
-		reglist[i].var = temp;
-		reglist[i].mark = mark++;
-		if (temp->vtype>=slong)
-		{
-			reglist[i+1].var = temp;
-			reglist[i+1].mark = mark;
-		}
-		r = (TReg)i;
+	// todo: spillcode einfuegen
+	reglist[i].var = temp;
+	reglist[i].mark = mark++;
+	if (temp->vtype>=slong)
+	{
+		reglist[i+1].var = temp;
+		reglist[i+1].mark = mark;
+	}
+	r = (TReg)i;
 	return (found?unknown:(TReg)i);
 }
 
@@ -97,7 +99,7 @@ TReg Register::biggerReg(TOperand* op)
 			{
 				reglist[i].mark = mark++;
 				reglist[i+1].var = op;
-				reglist[i+1].mark = mark;	
+				reglist[i+1].mark = mark;
 				return (TReg)(i+1);		// oberes Register wird null gesetzt
 			}
 			for(int j=0; j<regusable-1; j++)
@@ -111,10 +113,10 @@ TReg Register::biggerReg(TOperand* op)
 					reglist[i].var = 0;
 					reglist[i].mark = 0;
 					return (TReg)(j+1);	// oberes Register wird null gesetzt
-								// außerdem muß noch das alte kleine Register ins niederwertige neue verschoben werden
+					// außerdem muß noch das alte kleine Register ins niederwertige neue verschoben werden
 				}
 			}
-		cout<<"biggerReg() error - no Reg free!\n";
+			cout<<"biggerReg() error - no Reg free!\n";
 		}
 	}
 	// todo: spillcode einfuegen
@@ -135,7 +137,7 @@ void Register::smallerReg(TOperand* op)
 				reglist[i].mark = mark++;
 				return;
 			}
-		cout<<"smallerReg() error\n";
+			cout<<"smallerReg() error\n";
 		}
 	}
 	cout<<"smallerReg() error - op not found!\n";
@@ -176,7 +178,7 @@ char* Register::toString(TReg r)
 
 TReg Register::typeToReg(TOperandType t)
 {
-// 	if (t==constant) return rconst;
+	// 	if (t==constant) return rconst;
 	if (t==gvar) return rglobal;
 	if (t==lvar) return rlb;
 	return unknown;

@@ -528,7 +528,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case PRIMITIVE_3:
 			{
-				TOperand* t = tempid(slong);
+				TOperand* t = tempid(op.topOp()->vtype);
 				outun(t, sminus, op.topOp());
 				
 				op.pop(1);
@@ -740,7 +740,8 @@ void IL::outun(TOperand* l, TUnOp u, TOperand* y)
 	{
 		struct TOp* op=(TOp*)malloc(sizeof(TOp));
 		op->TOpType=sminus_;
-		op->operand1=(TOperand*)y;
+		op->operand1=l;
+		op->operand2=y;
 		ilList.append(op);
 	}
 }

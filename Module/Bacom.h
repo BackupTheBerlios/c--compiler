@@ -48,6 +48,7 @@ private:
 	void outsub(TType, TReg, TReg);
 	void outsub(TType, TReg, TReg, char*);
 	void outmul(TType, TReg, TReg);
+	void outmul(TType, TReg, TReg, char*);
 	void outdiv(TType, TReg, TReg);
 	void outnop();
 	void outds(TType);

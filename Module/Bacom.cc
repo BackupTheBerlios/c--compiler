@@ -201,7 +201,16 @@ void Bacom::genAsm()
 			}
 		case sminus_:
 			{
-				cout << "[bacom] sminus noch nicht implementiert\n";
+				TReg r;
+				regs.getReg( op1, r );
+				outloa( op2->vtype, r, rnull , op2->label );
+				
+				if (op2->vtype<=sint)
+					outmul(sint, regs.whichReg( op1 ), rnull, "const_minusw");
+				else if (op2->vtype==slong)
+					outmul(slong, regs.whichReg( op1 ), rnull, "const_minusl");
+				else if (op2->vtype==sfloat)
+					outmul(sfloat, regs.whichReg( op1 ), rnull, "const_minusf");
 				break;
 			}
 		case splus_:
@@ -283,6 +292,7 @@ void Bacom::genAsm()
 					outcvt(slong, regs.whichReg( op1 ), regs.whichReg( op2 ) );
 					regs.freeReg( op2 );
 					regs.smallerReg(op1);
+					op1->vtype=sint;	// Typ wieder auf int setzen
 					break;
 				}
 				if (op2->vtype==slong)
@@ -432,6 +442,9 @@ void Bacom::genAsm()
 	}
 	
 	bsm << "stp\n";
+	bsm << "const_minusw: dc.w -1\n";
+	bsm << "const_minusl: dc.l -1\n";
+	bsm << "const_minusf: dc.f -1\n";
 	bsm << "const_two:  dc.w 2 \n";
 	bsm << "const_four:  dc.w 4 \n";
 	bsm << "const_six:  dc.w 6 \n";
@@ -538,7 +551,7 @@ void Bacom::outsub( TType type, TReg dest, TReg src, char* c )
 		bsm << "l";
 	else if ( type == sfloat )
 		bsm << "f";
-	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << " + "<<c<< endl;
+	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << " + "<< c << endl;
 }
 
 void Bacom::outmul( TType type, TReg dest, TReg src )
@@ -553,6 +566,20 @@ void Bacom::outmul( TType type, TReg dest, TReg src )
 	else if ( type == sfloat )
 		bsm << "f";
 	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << endl;
+}
+
+void Bacom::outmul( TType type, TReg dest, TReg src, char* c )
+{
+	bsm << "mul.";
+	if ( type == schar )
+		bsm << "b";
+	else if ( type == sint )
+		bsm << "w";
+	else if ( type == slong )
+		bsm << "l";
+	else if ( type == sfloat )
+		bsm << "f";
+	bsm << " " << Register::toString( dest ) << ", " << Register::toString( src ) << " + "<< c << endl;
 }
 
 void Bacom::outdiv( TType type, TReg dest, TReg src )
