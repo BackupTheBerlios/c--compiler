@@ -73,9 +73,12 @@ void BoardServer::start()
 	w->flush();
 
 	// alle clients müssen sich anmelden
-	IPAddress all(7654);
-	int msg[2];
-	net->receive(all, &msg, sizeof(msg));
+	for (int i=0; i<clients; i++)
+	{
+		IPAddress all(7654);
+		int msg[2];
+		net->receive(all, &msg, sizeof(msg));
+	}
 	
 	notifyAll();
 	

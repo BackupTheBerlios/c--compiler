@@ -53,7 +53,7 @@ int LifeClient::startUp()
 	y1 = message[ 2 ];
 	y2 = message[ 3 ];
 	board_a = new LocalBoard((x2-x1+3), (y2-y1+3));		// board wird zum cachen verwendet, es wird der zu berechnende Ausschnitt, sowie ein Rand von 1 gespeichert
-	cout<<"Abmasse cache_board: x: "<<(x2-x1+3)<<", y: "<<(y2-y1+3)<<endl;
+// 	cout<<"Abmasse cache_board: x: "<<(x2-x1+3)<<", y: "<<(y2-y1+3)<<endl;
 	return 0;
 }
 

@@ -34,18 +34,18 @@ ssize_t TCPNetwork::request(const Server& server, void* req, size_t reqlen, void
 		cout<<"[tcpnetwork] request(): connect failed.\n";
 	}
 		
-	cout<<"[tcpnetwork] request(): eintritt.\n";
+// 	cout<<"[tcpnetwork] request(): eintritt.\n";
 	// write
 	ssize_t i=write(clientfd, req, reqlen);
-	cout<<"[tcpnetwork] request(): nach write.\n";
+// 	cout<<"[tcpnetwork] request(): nach write.\n";
 	if (i==-1)
 	{
 		cout<<"[tcpnetwork] request(): write failed.\n";
 		exit(-1);
 	}
 	// read
-	size_t buffer=read(clientfd, res, reslen);
-	cout<<"[tcpnetwork] request(): nach read.\n";
+	ssize_t buffer=read(clientfd, res, reslen);
+// 	cout<<"[tcpnetwork] request(): nach read.\n";
 	if (buffer==-1)
 	{
 		cout<<"[tcpnetwork] request(): read failed.\n";
@@ -58,7 +58,7 @@ ssize_t TCPNetwork::request(const Server& server, void* req, size_t reqlen, void
 	}
 	close(clientfd);
 	
-	cout<<"[tcpnetwork] request(): success.\n";
+// 	cout<<"[tcpnetwork] request(): success.\n";
 	return buffer;
 }
 
@@ -68,10 +68,9 @@ ssize_t TCPNetwork::receive(Client& client, void* req, size_t reqlen)
 	// accept, blockiert solange bis eingehende Verbindung ankommt
 	socklen_t slen = sizeof(sockaddr);
 	
-	cout<<"[tcpnetwork] receive(): eintritt.\n";
+// 	cout<<"[tcpnetwork] receive(): eintritt.\n";
 	
 	lastfd = accept(sockfd, (sockaddr*)&client, &slen);
-	
 	if (lastfd==-1)
 	{
 		cout<<"[tcpnetwork] receive(): accept failed.\n";
@@ -87,14 +86,14 @@ ssize_t TCPNetwork::receive(Client& client, void* req, size_t reqlen)
 		exit(-1);
 	}	
 	
-	cout<<"\n[tcpnetwork] receive(): success!.\n";
+// 	cout<<"\n[tcpnetwork] receive(): success!.\n";
 	return i;
 }
 
 ssize_t TCPNetwork::reply(const Client& client, void* res, size_t reslen)
 {
 	
-	cout<<"\n[tcpnetwork] reply(): eintritt!.\n";
+// 	cout<<"\n[tcpnetwork] reply(): eintritt!.\n";
 	//write
 	ssize_t i = write(lastfd, res, reslen);
 	
@@ -103,6 +102,7 @@ ssize_t TCPNetwork::reply(const Client& client, void* res, size_t reslen)
 		cout<<"[tcpnetwork] reply(): write failed.\n";
 		exit(-1);
 	}
-	cout<<"\n[tcpnetwork] reply(): success!.\n";
+// 	cout<<"\n[tcpnetwork] reply(): success!.\n";
+	close(lastfd);
 	return i;
 }
