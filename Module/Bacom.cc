@@ -114,22 +114,22 @@ void Bacom::genAsm()
 
 		case jmpgr_: 	// greater zero
 			{
-				cout << "[bacom] jmpgr noch nicht implementiert\n";
+				outjmp(rnull, op1->label, jmpgr);
 				break;
 			}
 		case jmple_: 	// less zero
 			{
-				cout << "[bacom] jmple noch nicht implementiert\n";
+				outjmp(rnull, op1->label, jmple);
 				break;
 			}
 		case jmpeq_: 	// equal zero
 			{
-				cout << "[bacom] jmpeq noch nicht implementiert\n";
+				outjmp(rnull, op1->label, jmpeq);
 				break;
 			}
 		case jmpne_: 	// not equal
 			{
-				cout << "[bacom] jmpne noch nicht implementiert\n";
+				outjmp(rnull, op1->label, jmpne);
 				break;
 			}
 		case mult_:
@@ -354,10 +354,10 @@ void Bacom::genAsm()
 		cout<<" "<<icl.getVal(i)<<endl;
 	}
 	
-	cout << "const_two:  dc.w 2 \n";
-	cout << "const_four:  dc.w 4 \n";
-	cout << "const_six:  dc.w 6 \n";
-	cout << "const_stack:  dc.w 65534 \n";  // Startwert Stackpointer
+	cout << "const_two:\tdc.w 2 \n";
+	cout << "const_four:\tdc.w 4 \n";
+	cout << "const_six:\tdc.w 6 \n";
+	cout << "const_stack:\tdc.w 65534 \n";  // Startwert Stackpointer
 	cout<<"stp\n";
 
 }
@@ -533,6 +533,20 @@ void Bacom::outbra(TReg r, char* c)
 void Bacom::outbra(TReg r, int offs)
 {
 	cout<<"bra "<<Register::toString( r )<<"+"<<offs<<endl;
+}
+
+
+void Bacom::outjmp(TReg r, char* c, TJmp type)
+{
+	if (type==jmple)
+		cout<<"ble ";
+	else if (type==jmpne)
+		cout<<"bne ";
+	else if (type==jmpgr)
+		cout<<"bgr ";
+	else if (type==jmpeq)
+		cout<<"beq ";
+	cout<<Register::toString( r )<<"+"<<c<<endl;
 }
 
 void Bacom::outlic(TReg r, TReg s, int offs)

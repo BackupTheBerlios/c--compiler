@@ -204,11 +204,15 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case RELATION_2:
 			{
 				relation = true;
-				TOperand* temp=tempid(slong);
-				TOperand* src=op.topOp();
+				TOperand* src = op.topOp();
 				op.pop(1);
-				TOperand* dst=op.topOp();
+				TOperand* dst = op.topOp();
+				op.pop(1);
+				TType tt = checkConv(src,dst);
+				TOperand* temp = tempid(tt);
+	
 				outbin(temp,dst,sub,src);
+				op.push(temp);
 				// ergebnis darf nicht groesser oder gleich 0 sein
 				outjump(temp,cond.topOp(),jmpgr);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
 				outjump(temp,cond.topOp(),jmpeq);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
@@ -217,11 +221,15 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case RELATION_3:
 			{
 				relation = true;
-				TOperand* temp=tempid(slong);
-				TOperand* src=op.topOp();
+				TOperand* src = op.topOp();
 				op.pop(1);
-				TOperand* dst=op.topOp();
+				TOperand* dst = op.topOp();
+				op.pop(1);
+				TType tt = checkConv(src,dst);
+				TOperand* temp = tempid(tt);
+	
 				outbin(temp,src,sub,dst);
+				op.push(temp);
 				// ergebnis darf nicht groesser oder gleich 0 sein
 				outjump(temp,cond.topOp(),jmpgr);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
 				outjump(temp,cond.topOp(),jmpeq);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
@@ -230,11 +238,15 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case RELATION_4:
 			{
 				relation = true;
-				TOperand* temp=tempid(slong);
-				TOperand* src=op.topOp();
+				TOperand* src = op.topOp();
 				op.pop(1);
-				TOperand* dst=op.topOp();
+				TOperand* dst = op.topOp();
+				op.pop(1);
+				TType tt = checkConv(src,dst);
+				TOperand* temp = tempid(tt);
+	
 				outbin(temp,dst,sub,src);
+				op.push(temp);
 				// ergebnis darf nicht groesser 0 sein
 				outjump(temp,cond.topOp(),jmpgr);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
 				break;
@@ -242,11 +254,15 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case RELATION_5:
 			{
 				relation = true;
-				TOperand* temp=tempid(slong);
-				TOperand* src=op.topOp();
+				TOperand* src = op.topOp();
 				op.pop(1);
-				TOperand* dst=op.topOp();
+				TOperand* dst = op.topOp();
+				op.pop(1);
+				TType tt = checkConv(src,dst);
+				TOperand* temp = tempid(tt);
+	
 				outbin(temp,src,sub,dst);
+				op.push(temp);
 				// ergebnis darf nicht groesser 0 sein
 				outjump(temp,cond.topOp(),jmpgr);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
 				break;
@@ -254,11 +270,15 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case EQUALITY_2:
 			{
 				relation = true;
-				TOperand* temp=tempid(slong);
-				TOperand* src=op.topOp();
+				TOperand* src = op.topOp();
 				op.pop(1);
-				TOperand* dst=op.topOp();
+				TOperand* dst = op.topOp();
+				op.pop(1);
+				TType tt = checkConv(src,dst);
+				TOperand* temp = tempid(tt);
+				
 				outbin(temp,src,sub,dst);
+				op.push(temp);
 				// ergebnis muﬂ gleich 0 sein, ansonsten sprung
 				outjump(temp,cond.topOp(),jmpne);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
 				break;
@@ -266,11 +286,15 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case EQUALITY_3:
 			{
 				relation = true;
-				TOperand* temp=tempid(slong);
-				TOperand* src=op.topOp();
+				TOperand* src = op.topOp();
 				op.pop(1);
-				TOperand* dst=op.topOp();
+				TOperand* dst = op.topOp();
+				op.pop(1);
+				TType tt = checkConv(src,dst);
+				TOperand* temp = tempid(tt);
+				
 				outbin(temp,src,sub,dst);
+				op.push(temp);
 				// ergebnis darf nicht gleich 0 sein, ansonsten sprung
 				outjump(temp,cond.topOp(),jmpeq);	// wenn bedingung falsch, springe zu n‰chstem condlabel (ueber if-block)
 				break;
@@ -293,9 +317,12 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				if ((!switchcond)&&(!relation))
 				{
 					TOperand* src = op.topOp();
-					TOperand* temp = tempid(slong);
-					
+					op.pop(1);
+					TType tt = checkConv(src,truevar);
+					TOperand* temp = tempid(tt);
+	
 					outbin(temp,src,sub,truevar);
+					op.push(temp);
 					
 					outjump(temp,cond.topOp(),jmpne);	
 				}

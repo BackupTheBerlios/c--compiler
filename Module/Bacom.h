@@ -30,10 +30,7 @@ private:
 	void outbra(TReg, char*);
 	void outbra(TReg, int);
 	void outbra(char*);
-	void outble(char*);
-	void outbeq(char*);
-	void outbgr(char*);
-	void outbne(char*);
+	void outjmp(TReg, char*, TJmp);
 	void outmov(TReg, TReg);
 	void outloa(TType, TReg, TReg, int);
 	void outloa(TType, TReg, TReg, char*);
