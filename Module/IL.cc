@@ -729,6 +729,7 @@ void IL::outcopy(TOperand* l, TOperand* r)
 
 	op->operand1=(TOperand*)l;
 	op->operand2=(TOperand*)r;
+	op->operand3=0;
 
 	ilList.append(op);
 }
@@ -762,6 +763,7 @@ void IL::outun(TOperand* l, TUnOp u, TOperand* y)
 		op->TOpType=sminus_;
 		op->operand1=l;
 		op->operand2=y;
+		op->operand3=0;
 		ilList.append(op);
 	}
 }
@@ -780,6 +782,8 @@ void IL::outgoto(TOperand* label, bool call)
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=call?call_:goto_;
 	op->operand1 = (TOperand*)label;
+	op->operand2=0;
+	op->operand3=0;
 	ilList.append(op);
 }
 
@@ -788,6 +792,8 @@ void IL::outlabel(TOperand* label)
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=label_;
 	op->operand1 = (TOperand*)label;
+	op->operand2=0;
+	op->operand3=0;
 	ilList.append(op);
 }
 
@@ -805,6 +811,7 @@ void IL::outjump(TOperand* cc,TOperand* jmp,TJmp type)
 	op->TOpType=a;
 	op->operand1=(TOperand*)cc;
 	op->operand2=(TOperand*)jmp;
+	op->operand3=0;
 	ilList.append(op);
 }
 
@@ -814,6 +821,7 @@ void IL::outret(TOperand* l, TOperand* f)
 	op->TOpType=ret_;
 	op->operand1=(TOperand*)l;
 	op->operand2=(TOperand*)f;
+	op->operand3=0;
 	ilList.append(op);
 }
 
@@ -823,6 +831,7 @@ void IL::outpush(TOperand* l, TOperand* f)
 	op->TOpType=push_;
 	op->operand1=(TOperand*)l;
 	op->operand2=(TOperand*)f;
+	op->operand3=0;
 	ilList.append(op);
 }
 
@@ -831,6 +840,8 @@ void IL::outgetret(TOperand* l)
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=getret_;
 	op->operand1=(TOperand*)l;
+	op->operand2=0;
+	op->operand3=0;
 	ilList.append(op);
 }
 
@@ -977,6 +988,7 @@ void IL::outconvert(TOperand* m1, TOperand* m2, TType to)
 	op->TOpType=a;
 	op->operand1=(TOperand*)m2;
 	op->operand2=(TOperand*)m1;
+	op->operand3=0;
 	ilList.append(op);
 
 }
@@ -987,6 +999,7 @@ void IL::outio(TOpType type, TOperand* p, TOperand* m)
 	op->TOpType=type;
 	op->operand1=p;
 	op->operand2=m;
+	op->operand3=0;
 	ilList.append(op);
 }
 
@@ -995,6 +1008,8 @@ void IL::outio(TOpType type, TOperand* p)
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=type;
 	op->operand1=p;
+	op->operand2=0;
+	op->operand3=0;
 	ilList.append(op);
 }
 
@@ -1003,5 +1018,7 @@ void IL::outstop()
 	struct TOp* op=(TOp*)malloc(sizeof(TOp));
 	op->TOpType=stop;
 	op->operand1=0;
+	op->operand2=0;
+	op->operand3=0;
 	ilList.append(op);
 }
