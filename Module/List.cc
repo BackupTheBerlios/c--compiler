@@ -253,7 +253,7 @@ void List::out()
 			if (i==0) co = curr->op->operand1;
 			if (i==1) co = curr->op->operand2;
 			if (i==2) co = curr->op->operand3;
-			if (co==0) break;
+			if (co==0) { cout<<"\t"; continue; }
 			cout<<"\t";
 			if (co->type==lvar) cout<<"lb+";
 			if (co->type==gvar) cout<<"g:";

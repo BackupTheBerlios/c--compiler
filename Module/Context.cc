@@ -53,10 +53,14 @@ if(n != 0)
                                                 cout<<"[context] missing implementation for prototype "<<n<<"\n";
                                                 exit(-1);
                                             }
-                                            if (fl.isDefined("main",0,true)==0) 
+                                            unsigned i = fl.isDefined("main",0,true);
+                                            if (i==0) 
                                             {
                                                 cout<<"[context] function main not implemented\n";
                                                 exit(-1);
+                                            } else
+                                            {
+	                                            fl.setMainFunc(i);
                                             }
                                             break;
                                         }
@@ -74,11 +78,11 @@ if(n != 0)
                                             {
                                                 
                                                 
-                                                char* c = s.first();                                            
+                                                char* c = s.first();
+                                                
                                                 TType t = stype.firsttype();
                                                 if (c==0) break;
-                                                                                
-                                                //if (t==svoid) cout<<"Typestack leer!";
+                                                if (t==undeclared) cout<<"Typestack leer!";
                                                 int tmpblock;
                                                 bool isGlobal = false;
                                                 
@@ -123,8 +127,7 @@ if(n != 0)
                                           // Groesse eines jeden blocks merken
                                           if (sp>maxsp) maxsp=sp;
                                           bl.push(sp-oldsp);
-                                          decl = 0;
-                                         
+                                          decl = 0;                                         
                                         }
                                         break;
         case VAR_DECL_ST_2              : decl++; // Deklarationen mitzählen, um sie von denen des hauptblocks zu unterscheiden
@@ -179,7 +182,7 @@ if(n != 0)
                                             s.pop(1);
                                             ret = stype.toptype();
                                             stype.pop(1); 
-                                            ins(fl.nextId());                                           
+                                            //ins(fl.nextId());    <<---  Der "ich-habe-zwei-stunden-danach-gesucht"-Bug
                                           }
                                           
                                           if ((ret!=svoid)&&(!retu)&&(!proto))
@@ -265,7 +268,7 @@ if(n != 0)
                                           break;
         case IF_1                       : context(n->n1); context(n->n2); break;
         case IF_2                       : context(n->n1); context(n->n2); context(n->n3); break;
-        case COND                       : context(n->n1); break;
+        case COND                       : context(n->n1); ex = 0; break;
         case SWITCH                     : 
                                         {
                                             startcount.push(startc); 

@@ -13,6 +13,7 @@ IL::IL()
 char* IL::genIL(unsigned* start, unsigned* end)
 {
 	cout<<endl;
+	bool firstfunc = true;
 	unsigned constcount = 2;
 	TOperand* lastident = 0;
 	TOperand* funcident = 0;
@@ -32,8 +33,11 @@ char* IL::genIL(unsigned* start, unsigned* end)
 	TOperand* mainfunc = (TOperand*)malloc(sizeof(TOperand));
 	mainfunc->label = "main0";
 	mainfunc->type = funclabel;
+	mainfunc->no = fl.getMainFunc();
 	
-	outgoto(mainfunc, false);
+	
+	
+	
 
 	while(start<end)
 	{
@@ -371,10 +375,13 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			{
 				outgoto(funcident, true);
 				
-				TOperand* t  = tempid(fl.getReturnType(funcidx));
-				
-				outgetret(t);
-				op.push(t);
+				TType tp = fl.getReturnType(funcidx);
+				if (tp!=svoid) 
+				{
+					TOperand* t  = tempid(tp);
+					outgetret(t);
+					op.push(t);
+				}
 				break;
 			}
 			case FUNCTION_CALL_2:
@@ -382,7 +389,6 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				int i = fl.getNum(funcidx)-1;
 				for (;i>=0;i--)
 				{
-					cout<<i<<endl;
 					TOperand* s = op.topOp();
 					TOperand* tmp = (TOperand*)malloc(sizeof(TOperand));
 					tmp->vtype = fl.getSigType(funcidx, i);
@@ -394,9 +400,13 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				
 				outgoto(funcident, true);
 				
-				TOperand* t  = tempid(fl.getReturnType(funcidx));
-				outgetret(t);
-				op.push(t);
+				TType tp = fl.getReturnType(funcidx);
+				if (tp!=svoid) 
+				{
+					TOperand* t  = tempid(tp);
+					outgetret(t);
+					op.push(t);
+				}
 				break;
 			}
 			case FUNCTION_CALL_INT_OUT:
@@ -469,6 +479,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			}
 			case FUNC_START:
 			{
+				if (firstfunc) { outgoto(mainfunc, true); firstfunc=false; }
 				func = true;
 				break;
 			}

@@ -17,6 +17,7 @@ void Bacom::genAsm()
 	cout << "\nBASM Ausgabe:\n";
 	bsm << "sub.w " <<Register::toString( rnull )<<","<<Register::toString( rnull )<<endl;		// Nullregister 0 setzen
 	outloa(sint, rsp, rnull, "const_stack");
+	outloa(sint, rglobal, rnull, "const_global");
 	
 	// offset bis zum naechsten lokalen frame = 32
 	unsigned para = 32;
@@ -37,7 +38,6 @@ void Bacom::genAsm()
 				if (op1->type == funclabel)
 				{
 					// Die Parameter liegen bereits im lokalem Frame, jetzt werden die Register gerettet
-					//outloa(sint, rnull, rnull, "const_two");
 					for (int i=0;i<15;i++)
 					{
 						outstr(sint, (TReg)i, rsp, 0 );
@@ -47,7 +47,7 @@ void Bacom::genAsm()
 					// Registerzuordnungen löschen
 					regs.invalidate();
 
-					// Lokale Basis neu setzen
+					// Lokale Basis neu setzen (alignment fehlt noch!)
 					outmov(rlb, rsp);
 
 					// Platz schaffen fuer lokales Frame, sp um Framegroesse weiterschieben
@@ -104,6 +104,7 @@ void Bacom::genAsm()
 			}
 			
 			// Register wiederherstellen
+			outadd(sint, rsp, rnull, "const_two");
 			for (int i=14;i>=0;i--)
 			{
 				outloa(sint, (TReg)i, rsp, 0 );
@@ -208,9 +209,10 @@ void Bacom::genAsm()
 				// Parameter liegen schon auf dem Stack
 				// Also: Rücksprungadresse sichern
 				
-				outlic(rnull, rnull, 18);  // Instruction counter laden
-				outstr(sint, rnull, rsp, 0); // auf den stack
-				outsub(sint, rnull, rnull);
+				outlic(rglobal, rnull);  // Instruction counter laden
+				outadd(sint, rglobal, rnull, "const_lic"); // offset dazuaddieren
+				outstr(sint, rglobal, rsp, 0); // auf den stack
+				outloa(sint, rglobal, rnull, "const_global"); // restore rglobal
 				outsub(sint, rsp, rnull, "const_two"); // stack weiterzählen
 				outbra(rnull, op1->label); // Sprung zur Funktion
 				
@@ -219,15 +221,12 @@ void Bacom::genAsm()
 				outsub(sint, rnull, rnull);
 				
 				// stackpointer muss auch noch zurückgeschoben werden:
-				
 				TType ret = fl.getReturnType(op1->no);
-				
-				if ((ret==slong)||(ret==sfloat)) outadd(sint, rsp, rnull, "const_six");
-				else if (ret<slong) outadd(sint, rsp, rnull, "const_four");
-				else outadd(sint, rsp, rnull, "const_two"); //void
+				if ((ret==slong)||(ret==sfloat)) outadd(sint, rsp, rnull, "const_four");
+				else if (ret<slong) outadd(sint, rsp, rnull, "const_two");
+				//else outadd(sint, rsp, rnull, "const_two"); //void
 				
 				// Jetzt steht an sp der Rückgabewert --> weitere Behandlung bei getRet
-				
 				
 				// fertig
 				
@@ -243,6 +242,7 @@ void Bacom::genAsm()
 				TReg r;
 				// spillcode fehlt noch
 				regs.getReg(op1, r);
+				cout<<"getretstr: "<<op1->vtype<<endl;
 				outstr(op1->vtype, r, rsp, 0); 
 
 				break;
@@ -415,6 +415,8 @@ void Bacom::genAsm()
 	bsm << "const_four:  dc.w 4 \n";
 	bsm << "const_six:  dc.w 6 \n";
 	bsm << "const_stack:  dc.w 65534 \n";  // Startwert Stackpointer
+	bsm << "const_global:  dc.w 10000 \n";  // Startwert globale variablen
+	bsm << "const_lic:  dc.w 22 \n";  // rücksprungoffset zur lic anweisung
 
 }
 
@@ -605,9 +607,9 @@ void Bacom::outjmp(TReg r, char* c, TJmp type)
 	bsm<<Register::toString( r )<<"+"<<c<<endl;
 }
 
-void Bacom::outlic(TReg r, TReg s, int offs)
+void Bacom::outlic(TReg r, TReg s)
 {
-	bsm<<"lic.w "<<Register::toString(r)<<", "<<Register::toString(s)<<"+"<<offs<<endl;
+	bsm<<"lic.w "<<Register::toString(r)<<", "<<Register::toString(s) << endl;
 }
 
 void Bacom::out_out(TType type, TReg r)

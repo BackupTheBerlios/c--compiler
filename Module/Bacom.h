@@ -29,7 +29,7 @@ private:
 	void outinp(TType, TReg);
 	void outout(TType, TReg);
 	void outcvt(TType, TReg, TReg);
-	void outlic(TReg, TReg, int);
+	void outlic(TReg, TReg);
 	void outbra(TReg, char*);
 	void outbra(TReg, int);
 	void outbra(char*);
