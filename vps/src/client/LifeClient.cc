@@ -10,6 +10,7 @@
 */
 LifeClient::LifeClient( IPNetwork* net, char* servername, short port )
 {
+	seqn=0;
 	this->net = net;
 	// set address and port
 	server.resolve( servername, port );
@@ -44,7 +45,7 @@ int LifeClient::startUp()
 	
 
 	// beim server anmelden
-	net->request( server, &req, 4, &message, 16 );
+	net->request( server, &req, sizeof(req), &message, sizeof(message) );
 
 	// grenzen setzen
 	x1 = message[ 0 ];
@@ -66,7 +67,7 @@ void LifeClient::loop()
 	req[0] = 'N';
 	req[1] = -1;
 	cout<<"A";
- 	net->request( server, &req, 8, &message, 4);
+ 	net->request( server, &req, sizeof(req), &message, sizeof(message));
 	cout<<"B";
 	int step = 0;
 	while (message!=0)	// if Server sends 1, we calculate the next Step
@@ -102,17 +103,24 @@ void LifeClient::makeStep()
 			else if (x==BOARD_WIDTH)	x_=0;
 			else				x_=x;
 			
-			int message;			// todo: evt reihenfolge vertauscht?! wenn ja, einfach laufende nummer ins paket packen
-			int req[3];
-			req[ 0 ] = 1;			// Anfrage eines Punktes
+			int response[ 2 ];
+			int req[ 4 ];
+			req[ 0 ] = 'G';			// Anfrage eines Punktes
 			req[ 1 ] = x_;
 			req[ 2 ] = y_;
+			req[ 3 ] = seqn++;
 // 			cout<<"G";
-// 			cout<<"get-req an Server - x_: "<<req[ 1 ]<<", y_: "<<req[ 2 ]<<", x: "<<x<<", y: "<<y<<", seten an: x: "<<(x-(x1-1))<<", y: "<<(y-(y1-1))<<endl;
-			net->request( server, &req, 12, &message, sizeof(message) );
-			if (message==invalid)
+// 			cout<<"get-req an Server - x_: "<<req[ 1 ]<<", y_: "<<req[ 2 ]<<", x: "<<x<<", y: "<<y<<", setzen an: x: "<<(x-(x1-1))<<", y: "<<(y-(y1-1))<<endl;
+			net->request( server, &req, sizeof(req), &response, sizeof(response) );
+			while (req[ 3 ]!=response[ 1 ])
+			{
+ 				cout<<"get seqnr mismatch: "<<req[3]<<", "<<response[1]<<"req - x_: "<<req[ 1 ]<<", y_: "<<req[ 2 ]<<endl;
+				net->request( server, &req, sizeof(req), &response, sizeof(response) );
+			}
+			if (req[ 3 ]==response[ 1 ]) cout<<"get erfolg!\n";
+			if (response[ 0 ]==invalid)
 				cout<<"x_: "<<x_<<", y_: "<<y<<", error!\n";
- 			board_a->setPos( (x-(x1-1)), (y-(y1-1)), (life_status_t)message);
+ 			board_a->setPos( (x-(x1-1)), (y-(y1-1)), (life_status_t)response[ 0 ]);
 
 		}
 	}
@@ -137,11 +145,12 @@ void LifeClient::makeStep()
 			if ( x>BOARD_WIDTH || x<0 || y>BOARD_HEIGHT || y<0 )
 				cout<<"Index out of bounds!\n";
 
-			char message;
-			int req[ 4 ];
-			req[ 0 ] = 2;			// Setzen eines Punktes
+			int response;
+			int req[ 5 ];
+			req[ 0 ] = 'S';			// Setzen eines Punktes
 			req[ 1 ] = (x-1)+x1;
 			req[ 2 ] = (y-1)+y1;
+			req[ 4 ] = seqn++;
 			
 // 			cout<<"set-req an Server - x: "<<req[ 1 ]<<", y: "<<req[ 2 ]<<", abhaengig von cache_board: x: "<<x<<", y: "<<y<<endl;
 
@@ -160,7 +169,13 @@ void LifeClient::makeStep()
 				else
 					req[ 3 ] = status;
 			}
-			net->request( server, &req, 16, &message, sizeof(message) );
+			net->request( server, &req, sizeof(req), &response, sizeof(response) );
+			while (req[ 4 ]!=response)
+			{
+ 				cout<<"set seqnr mismatch: "<<req[4]<<", "<<response<<endl;
+				net->request( server, &req, sizeof(req), &response, sizeof(response) );
+			}
+			if (req[ 4 ]==response) cout<<"set erfolg!\n";
 
 		}
 	}

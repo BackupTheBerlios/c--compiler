@@ -36,6 +36,8 @@ ssize_t UDPNetwork::request(const Server& server, void* req, size_t reqlen, void
 		FD_SET(sockfd, &fds);
 		int ret = select(sockfd+1, &fds, NULL, NULL, &to);
 		socklen_t slen = sizeof(sockaddr);
+		
+		// todo: sequenznummer einfuegen und pruefen, ob diese mit response uebereinstimmt
 		if (ret) return recvfrom(sockfd, res, reslen, 0, (sockaddr*)&server, &slen);
 		
 		// timeout...

@@ -32,6 +32,7 @@ private:
 	IPAddress server;
 	IPNetwork* net;
 	LocalBoard* board_a;
+	int seqn;
 
 	/**
 	* This function contacts the server and gets the outlines of the boarpart which should be worked on.

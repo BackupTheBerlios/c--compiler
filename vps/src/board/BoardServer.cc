@@ -39,7 +39,7 @@ void BoardServer::start()
 			char hello = 0;
 			
 			// auf client warten
-			net->receive(all, &hello, sizeof(char));
+			net->receive(all, &hello, sizeof(hello));
 			if (hello=='Y') 
 			{
 				// in all steht die source:addr!
@@ -86,21 +86,23 @@ void BoardServer::start()
 		while(notcomplete)
 		{
 			IPAddress all(7654);
-			int msg[4];	
+			int msg[5];	
 			net->receive(all, &msg, sizeof(msg));
 			
-			if (msg[0]==2)  //setPos
+			if (msg[0]=='S')  //setPos
 			{
 				board_b->setPos(msg[1], msg[2], (life_status_t)msg[3]);
-				char anything;
-				net->reply(all, &anything, 1);
+				int anything=msg[ 4 ];
+				net->reply(all, &anything, sizeof(anything));
 			}
-			else if (msg[0]==1) //getPos
+			else if (msg[0]=='G') //getPos
 			{
 				//cout<<"G";
-				int val = board_a->readPos(msg[1], msg[2]);
-				//cout<<val<<" ";
-				net->reply(all, &val, sizeof(life_status_t));
+				int val[ 2 ];
+				val[ 0 ] = board_a->readPos(msg[1], msg[2]);
+				val[ 1 ] = msg[ 3 ];
+// 				cout<<"seqnr: "<<msg[3]<<endl;
+				net->reply(all, &val, sizeof(val));
 			} else if (msg[0]=='N') //barrier
 			{
 				//cerr<<"N";
@@ -226,6 +228,6 @@ void BoardServer::notifyAll()
 		// 1 wenns noch einen nächsten Schritt gibt, sonst 0
 		int r  = (timestep==(timesteps-1))?0:1;
 		cout<<"server sends: "<<r<<endl;
-		net->reply(addresses[i], &r, 4);
+		net->reply(addresses[i], &r, sizeof(r));
 	}
 }
