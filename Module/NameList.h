@@ -1,6 +1,8 @@
 #ifndef namelist_h
 #define namelist_h
 
+#include "OTypes.h"
+
 class NameList
 {
 public:

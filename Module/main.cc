@@ -7,6 +7,7 @@
 #include "IL.h"
 #include "NameList.h"
 #include "ConstList.h"
+#include "FunctionList.h"
 using namespace std;
 
 extern void yyparse();
@@ -18,13 +19,14 @@ extern FILE *yyin, *yyout;
 
 ConstList cl;
 NameList nl;
+FunctionList fl;
 Context c;
 IL il;
 
 
 int main(int argc, char* arv[])
 {
-	system("cat include test.cc > parserfile.cc");
+	system("cat test.cc > parserfile.cc");
 	
 	yyin = fopen("parserfile.cc","r+");
 	

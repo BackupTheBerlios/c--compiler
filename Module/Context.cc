@@ -36,7 +36,7 @@ if(n != 0)
 	        			  	cout<<"\nNamensliste:\n"; nl.out(); 
 	        			  	cout<<"\nFunktionsliste:\n"; fl.out(); 
 	        			  	cout<<"\nKonstantenliste:\n";cl.out();
-	        			  	if (!fl.isDefined("main",0,true)) 
+	        			  	if (fl.isDefined("main",0,true)==0) 
 	        			  	{
 		        			  	cout<<"[context] function main not implemented\n";
 		        			  	exit(-1);
@@ -65,7 +65,7 @@ if(n != 0)
                                             	tmpblock = cblock;
                                             } else if (s.count()==decl) 
                                             {
-                                              f.push(c); ft.push(t); ins(0); func = false;  continue;  // Funktionsident!
+                                              f.push(c); ft.push(t); ins(fl.nextId()); func = false;  continue;  // Funktionsident!
                                       	    } else { tmpblock = 1; } // diese deklaration kommt aus dem hauptblock
                                             
                                             
@@ -116,8 +116,8 @@ if(n != 0)
         case COMPLEX_CONSTANT_OPT       : context(n->n1); break;
         case COMPLEX_CONSTANT_ST_1      : context(n->n1); break;
         case COMPLEX_CONSTANT_ST_2      : context(n->n1); context(n->n2); break;
-        case COMPLEX_CONSTANT_1         : context(n->n1); context(n->n2); break;
-        case COMPLEX_CONSTANT_2         : context(n->n1);   break;
+        case COMPLEX_CONSTANT_1         : 
+        case COMPLEX_CONSTANT_2         : cout<<"[context] Complex initialisers not implemented!\n"; exit(-1); break;
         case FUNC_DECL                  : { 
                                           func = true; 
                                           context(n->n1);
@@ -132,8 +132,8 @@ if(n != 0)
                                             c = s.top(); 
                                             s.pop(1);
                                             ret = stype.top();
-                                            stype.pop(1);
-                                            ins(0);
+                                            stype.pop(1); 
+                                            ins(fl.nextId());                                           
                                           }
                                           
                                           if ((ret!=tvoid)&&(!retu)&&(!proto))
@@ -177,7 +177,7 @@ if(n != 0)
         case PROTOTYPE_5                : context(n->n1); proto = true; break;
         case PROTOTYPE_6                : context(n->n1); context(n->n2);  proto = true; break;
         case RET_TYPE                   : context(n->n1); stype.push((char*)tvoid); break;
-        case FUNC_IDENT                 : s.push((char*)n->n1); if (call) ins(0); break;
+        case FUNC_IDENT                 : s.push((char*)n->n1); break;
         case PAR_TYPE_ST_1              : context(n->n1); break;
         case PAR_TYPE_ST_2              : context(n->n1); context(n->n2); break;
         case PAR_TYPE_1                 : context(n->n1); par.push(lasttype); break;
@@ -281,27 +281,30 @@ if(n != 0)
         case QUALIFYING_2               : context(n->n1); context(n->n2); break;
         case QUALIFYING_3               : context(n->n1); context(n->n2); context(n->n3);break;
         case FUNCTION_CALL_1            : {call=true; context(n->n1);call=false;
-        				    //ins(0); 
+
                                             char* c = s.top();
-                                            if (!fl.isDefined(c, ex,false)) 
+                                            unsigned idx = fl.isDefined(c, ex,false);
+                                            if (idx==0) 
                                             {
                                               cout<<"[context] call to unknown function: "<<c<<"()\n";
                                               exit(-1);
                                             }
                                             s.pop(1);
+                                            ins(idx);
                                           }
                                           break;
         case FUNCTION_CALL_2            : call=true; context(n->n1); context(n->n2); context(n->n3);call=false;
                                           {
                                           char* c = s.top();
-                                          //ins(0);
                                           
-                                          if (!fl.isDefined(c, ex,false)) 
+                                          unsigned idx = fl.isDefined(c, ex,false);
+                                          if (idx==0) 
                                           {
                                             cout<<"[context] call to unknown function: "<<c<<"("<<ex<<" parameter(s) ) \n";
                                             exit(-1);
                                           }
                                           s.pop(1); 
+                                          ins(idx);
                                           }
         break;
         case EPSILON                    :  break;

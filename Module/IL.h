@@ -3,6 +3,7 @@
 #include "OTypes.h"
 #include "NameList.h"
 #include "ConstList.h"
+#include "FunctionList.h"
 #include "Stack.h"
 #include <iostream>
 using namespace std;
@@ -14,6 +15,7 @@ using namespace std;
  */
 extern NameList nl;
 extern ConstList cl;
+extern FunctionList fl;
 
 
 class IL
@@ -35,11 +37,19 @@ private:
 	
 	char* tempid();
 	
+	char* funcid(unsigned);
+	
 	void outcopy(char*, char*);
 	
 	void outbin(char*, char*, TBinOp, char*);
 	
 	void outun(char*, TUnOp, char*);
+	
+	void outgoto(char*, bool);
+	
+	void outlabel(char*);
+	
+	void outret();
 	
 	Stack op;
 	unsigned tempcount;

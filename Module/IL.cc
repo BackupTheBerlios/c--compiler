@@ -16,6 +16,8 @@ char* IL::genIL(unsigned* start, unsigned* end)
 	cout<<endl;
 	unsigned constcount = 1;
 	char* lastident = 0;
+	char* funcident = 0;
+	bool func = false;
 
 	while(start<end)
 	{
@@ -23,7 +25,20 @@ char* IL::genIL(unsigned* start, unsigned* end)
 		{
 			case IDENTIFIER:
 			{
-				lastident = varid(*++start);
+				funcident = 0;
+				unsigned idx = *++start;
+				if (idx>MAX_NO_OF_VARIABLES) {
+					funcident = funcid(idx); 
+					if (func)
+					{
+						func = false;
+						outlabel(funcident);
+					}
+				} else 
+				{
+					lastident = varid(idx);
+				}
+				//if (funcident!=0) cout<<"FUNCID:"<<funcident<<endl;
 				break;
 			}
 			case VARIABLE:
@@ -126,6 +141,26 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				outcopy(dst,src);
 				break;
 			}
+			case FUNCTION_CALL_1:
+			{
+				outgoto(funcident, true);
+				break;
+			}
+			case FUNC_START:
+			{
+				func = true;
+				break;
+			}
+			case IMPLEMENTATION_1:
+			case IMPLEMENTATION_2:
+			case IMPLEMENTATION_3:
+			case IMPLEMENTATION_4:
+			case IMPLEMENTATION_5:
+			case IMPLEMENTATION_6:
+			{
+				outret();
+				break;
+			}
 			case INT_CONSTANT:		op.push(conid(constcount++)); break;
 		}
 		start++;
@@ -167,6 +202,17 @@ char* IL::tempid()
 	return n;
 }
 
+char* IL::funcid(unsigned i)
+{
+	char* c = fl.getIdent(i);
+	if (c==0) return 0;
+	unsigned num = fl.getNum(i);
+	char* n = (char*)malloc(VAR_LENGTH_ID);
+	strcpy(n,c);
+	sprintf(n+strlen(c),"%u",num);
+	return n;
+}
+
 void IL::outcopy(char* l, char* r)
 {
 	cout<<l<<" := "<<r<<";\n";
@@ -190,3 +236,28 @@ void IL::outbin(char* l, char* x, TBinOp o, char* y)
 
 void IL::outun(char* l, TUnOp u, char* y)
 {}
+
+
+/* Sprunganweisung ans Label label
+ * Bei gesetztem call wird ein Funktionsaufruf getätigt
+ * --> Wichtig nachher im Zielcode, da müssen bei call
+ * nämlich die Register gerettet sowie die Rücksprung-
+ * adresse gesichert werden.
+ * Ohne gesetzes call ein normaler Sprung, wie zb. bei
+ * if/else/while/break usw.
+ */ 
+void IL::outgoto(char* label, bool call)
+{
+	cout<<(call?"call":"goto");
+	cout<<" "<<label<<";\n";
+}
+
+void IL::outlabel(char* label)
+{
+	cout<<label<<":\n";
+}
+
+void IL::outret()
+{
+	cout<<"ret;\n";
+}

@@ -6,58 +6,71 @@ using namespace std;
 
 FunctionList::FunctionList()
 {
-	last = 0;
+	no = 0;
+	start = (TFunctionListEntry*)malloc(sizeof(TFunctionListEntry)*MAX_NO_OF_FUNCTIONS);
+	last = start;
 }
 
-void FunctionList::insert(char* n, char* sig, char* ret, unsigned num, bool proto)
+
+unsigned FunctionList::insert(char* n, char* sig, char* ret, unsigned num, bool proto)
 {
-	if (last==0)
-	{
-		last = (TFunctionListEntry*)malloc(sizeof(TFunctionListEntry));
-		last->name = n;
-		last->signature = sig;
-		last->rettype = ret;
-		last->num = num;
-		last->next = 0;
-		last->proto = proto;
-	} else
-	{
-		TFunctionListEntry* tmp = (TFunctionListEntry*)malloc(sizeof(TFunctionListEntry));
-		tmp->name = n;
-		tmp->signature = sig;
-		tmp->rettype = ret;
-		tmp->num = num;
-		tmp->next = last;
-		tmp->proto = proto;
-		last = tmp;
-	}
-	
+	last->name = n;
+	last->signature = sig;
+	last->rettype = ret;
+	last->num = num;
+	last->next = 0;
+	last->proto = proto;
+	last++;
+	return (no++)+MAX_NO_OF_VARIABLES+1;
 }
 
-bool FunctionList::isDefined(char* n, unsigned num, bool proto)
+
+unsigned FunctionList::isDefined(char* n, unsigned num, bool proto)
 {	
-	if (last==0) return false;
-	TFunctionListEntry* cur = last;
+	if (no==0) return 0;
+	TFunctionListEntry* cur = start;
+	unsigned c = MAX_NO_OF_VARIABLES+1;
 	while(1)
 	{
 		//cout<<"name: "<<n<<" Sig: "<<sig<<"  curname: "<<cur->name<<" cursig: "<<cur->signature<<"\n";
 		// NOCH KEINE AUSWERTUNG DER SIGNATUR
 		//if ((strcmp(cur->name,n)==0)&&(strcmp(cur->signature,sig)==0)) return true; 
-		if ((strcmp(cur->name,n)==0)&&(cur->num==num)&&(!(cur->proto&proto))) return true; 
-		cur = cur->next;
-		if (cur==0) return false;
+		if ((strcmp(cur->name,n)==0)&&(cur->num==num)&&(!(cur->proto&&proto))) return c;
+		cur++;
+		c++;
+		if (cur==start+no) return 0;
 	}
 }
 
 void FunctionList::out()
 {
-	if (last==0) { cout<<"<<leer>>"; return; }
-	TFunctionListEntry* cur = last;
+	if (no==0) { cout<<"<<leer>>"; return; }
+	TFunctionListEntry* cur = start;
+	
 	while(1)
 	{
 		cout<<"Name: "<<cur->name<<" Sig: "<<cur->signature<<" Ret: "<<cur->rettype<<" Proto: "<<cur->proto<<"\n";
-		cur = cur->next;
-		if (cur==0) return;
+		cur++;
+		if (cur==start+no) return;
 	}
 }
+
+
+char* FunctionList::getIdent(unsigned u)
+{
+	if (u==0) return 0;
+	return (start+u-MAX_NO_OF_VARIABLES-1)->name;
+}
+
+unsigned FunctionList::getNum(unsigned u)
+{
+	if (u==0) return 0;
+	return (start+u-MAX_NO_OF_VARIABLES-1)->num;
+}
+
+unsigned FunctionList::nextId()
+{
+	return (no+MAX_NO_OF_VARIABLES+1);
+}
+
 

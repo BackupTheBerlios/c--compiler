@@ -8,7 +8,7 @@ NameList::NameList()
 {
 	
 	no = 0;
-	start = (TNameListEntry*)malloc(sizeof(TNameListEntry)*1024);
+	start = (TNameListEntry*)malloc(sizeof(TNameListEntry)*MAX_NO_OF_VARIABLES);
 	last = start;
 }
 

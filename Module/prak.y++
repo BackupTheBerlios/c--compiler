@@ -360,12 +360,12 @@ void out(struct TNode* n)
         case PAR_TYPE_ST_2              : out(n->n1); out(n->n2); gen(n->type); printf("{par_type}* "); break;
         case PAR_TYPE_1                 : out(n->n1); gen(n->type); printf("par_type "); break;
         case PAR_TYPE_2                 : out(n->n1); gen(n->type); printf("par_type "); break;
-        case IMPLEMENTATION_1           : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("implementation "); break;
-        case IMPLEMENTATION_2           : out(n->n1); out(n->n2); out(n->n3); out(n->n4); out(n->n5); gen(n->type); printf("implementation "); break;
-        case IMPLEMENTATION_3           : out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("implementation "); break;
-        case IMPLEMENTATION_4           : out(n->n1); out(n->n2); out(n->n3); out(n->n4); out(n->n5); gen(n->type); printf("implementation "); break;
-        case IMPLEMENTATION_5           : out(n->n1); out(n->n2); gen(n->type); printf("implementation "); break;
-        case IMPLEMENTATION_6           : out(n->n1); out(n->n2); out(n->n3); out(n->n4); gen(n->type); printf("implementation "); break;
+        case IMPLEMENTATION_1           : gen(FUNC_START); out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("implementation "); break;
+        case IMPLEMENTATION_2           : gen(FUNC_START); out(n->n1); out(n->n2); out(n->n3); out(n->n4); out(n->n5); gen(n->type); printf("implementation "); break;
+        case IMPLEMENTATION_3           : gen(FUNC_START); out(n->n1); out(n->n2); out(n->n3); gen(n->type); printf("implementation "); break;
+        case IMPLEMENTATION_4           : gen(FUNC_START); out(n->n1); out(n->n2); out(n->n3); out(n->n4); out(n->n5); gen(n->type); printf("implementation "); break;
+        case IMPLEMENTATION_5           : gen(FUNC_START); out(n->n1); out(n->n2); gen(n->type); printf("implementation "); break;
+        case IMPLEMENTATION_6           : gen(FUNC_START); out(n->n1); out(n->n2); out(n->n3); out(n->n4); gen(n->type); printf("implementation "); break;
         case PAR_DECL_ST_1              : out(n->n1); gen(n->type); printf("{par_decl}* "); break;
         case PAR_DECL_ST_2              : out(n->n1); out(n->n2); gen(n->type); printf("{par_decl}* "); break;
         case PAR_DECL                   : out(n->n1); out(n->n2); gen(n->type); printf("par_decl "); break;

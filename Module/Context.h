@@ -14,6 +14,7 @@ using namespace std;
  */
 extern NameList nl;
 extern ConstList cl;
+extern FunctionList fl;
 extern unsigned* start;
 
 class Context
@@ -36,7 +37,6 @@ private:
 	Stack par;    //Parameter-Stack
 	Stack stype;  //typen-stack
 	
-	FunctionList fl;  //Funktionsnamenliste
 	Stack pro;  // Protypen-ident
 	char* lasttype;  //letzter Basistyp
 	

@@ -120,6 +120,7 @@
 #define EPSILON 117
 #define IDENTIFIER 118
 #define FLOAT_CONSTANT 119
+#define FUNC_START 120 // Beschmuh-Symbol um rechtzeitig festzustellen wann eine func-decl beginnt
 
 
 // maximale Bezeichnerlänge mit Block-ID
@@ -127,6 +128,14 @@
 
 // maximale Bezeichnerlänge ohne Block-ID
 #define VAR_LENGTH 48
+
+// maximale Anzahl Variablen
+#define MAX_NO_OF_VARIABLES 4096
+
+// maximale Anzahl Funtionen
+#define MAX_NO_OF_FUNCTIONS 4096
+
+
 
 struct TNode
 {
