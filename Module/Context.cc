@@ -36,6 +36,12 @@ if(n != 0)
 	        			  	cout<<"\nNamensliste:\n"; nl.out(); 
 	        			  	cout<<"\nFunktionsliste:\n"; fl.out(); 
 	        			  	cout<<"\nKonstantenliste:\n";cl.out();
+	        			  	char* n = fl.checkForUnImplemented();
+	        			  	if (n!=0) 
+	        			  	{
+		        			  	cout<<"[context] missing implementation for prototype "<<n<<"\n";
+		        			  	exit(-1);
+	        			  	}
 	        			  	if (fl.isDefined("main",0,true)==0) 
 	        			  	{
 		        			  	cout<<"[context] function main not implemented\n";

@@ -14,6 +14,22 @@ FunctionList::FunctionList()
 
 unsigned FunctionList::insert(char* n, char* sig, char* ret, unsigned num, bool proto)
 {
+	if (no!=0) 
+	{
+		TFunctionListEntry* cur = start;
+		unsigned c = MAX_NO_OF_VARIABLES+1;
+		while(1)
+		{
+			if ((strcmp(cur->name,n)==0)&&(cur->num==num)&&(cur->proto)) 
+			{
+				cur->proto = 0;
+				break;
+			}
+			cur++;
+			c++;
+			if (cur==start+no) break;
+		}
+	}
 	last->name = n;
 	last->signature = sig;
 	last->rettype = ret;
@@ -23,6 +39,7 @@ unsigned FunctionList::insert(char* n, char* sig, char* ret, unsigned num, bool 
 	last++;
 	return (no++)+MAX_NO_OF_VARIABLES+1;
 }
+
 
 
 unsigned FunctionList::isDefined(char* n, unsigned num, bool proto)
@@ -73,4 +90,15 @@ unsigned FunctionList::nextId()
 	return (no+MAX_NO_OF_VARIABLES+1);
 }
 
-
+char* FunctionList::checkForUnImplemented()
+{
+	if (no==0) return 0;
+	TFunctionListEntry* cur = start;
+	
+	while(1)
+	{
+		if (cur->proto==1) return cur->name;
+		cur++;
+		if (cur==start+no) return 0;
+	}
+}

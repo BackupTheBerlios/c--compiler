@@ -32,6 +32,8 @@ unsigned getNum(unsigned);
 
 unsigned nextId();
 
+char* checkForUnImplemented();
+
 private:
 	
 	struct TFunctionListEntry* last;
