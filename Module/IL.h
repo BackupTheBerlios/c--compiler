@@ -57,6 +57,8 @@ private:
 	
 	void outret(char*);
 	
+	void outgetret(char*);
+	
 	void outpush(char*);
 	
 	void outconvert(char*, char*, TType);

@@ -190,6 +190,10 @@ void List::out()
 			cout<<"ret";
 			break;
 
+			case getret_:
+			cout<<"getret";
+			break;
+
 			case push_:
 			cout<<"push";
 			break;

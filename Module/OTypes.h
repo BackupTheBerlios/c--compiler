@@ -127,6 +127,7 @@
 #define SWITCH_COND 123 // nochn Beschmuh-Symbol um festzustellen, ob das cond zu einem switch gehoert
 
 #define COND_START 124 // nochn Beschmuh-Symbol um festzustellen, wo ein cond beginnt
+#define SWITCH_START 125
 
 
 // maximale Bezeichnerlänge mit Block-ID
@@ -183,6 +184,7 @@ enum	TOpType {
     goto_,
     label_,
     ret_,
+    getret_,
     push_,
     char_,
     int_,

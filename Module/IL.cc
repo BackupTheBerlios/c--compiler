@@ -20,6 +20,15 @@ char* IL::genIL(unsigned* start, unsigned* end)
 	unsigned varidx = 0;
 	bool func = false;
 	bool relation = false;
+	bool switchcond = false;
+	unsigned const trueidx = 0xFFFFFFF;
+	unsigned const falseidx = 0xFFFFFFE;
+	cl.insert(0,falseidx);
+	cl.insert(1,trueidx);
+	char* truevar = conid(trueidx);
+	char* falsevar = conid(falseidx);
+	
+	
 
 	while(start<end)
 	{
@@ -285,13 +294,21 @@ char* IL::genIL(unsigned* start, unsigned* end)
 
 				// wenn man hier angelangt ist(im zwischencode), beginnt der true-block
 				// cout<<"\ntrue-block\n";
-
+				condition=false;
+				if (!switchcond)
+				{
+					char* src = op.top();
+					char* temp = tempid();
+					
+					outbin(temp,src,sub,truevar);
+					
+					outjump(temp,cond.top(),jmpne);	
+				}
 				if (relation) 
 				{
 					op.push(tempid());
-					outcopy(op.top(),"1");
+					outcopy(op.top(), truevar);
 				}
-				condition=false;
 				break;
 			}
 			case WHILE_COND:
@@ -332,8 +349,10 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case FUNCTION_CALL_1:
 			{
 				outgoto(funcident, true);
-				// todo: in dieser tempid muss der rückgabewert stehen
-				op.push(tempid(),fl.getReturnType(funcidx));
+				
+				char* t  = tempid();
+				outgetret(t);
+				op.push(t,fl.getReturnType(funcidx));
 				break;
 			}
 			case FUNCTION_CALL_2:
@@ -349,8 +368,10 @@ char* IL::genIL(unsigned* start, unsigned* end)
 					op.pop(1);
 				}
 				outgoto(funcident, true);
-				// todo: in dieser tempid muss der rückgabewert stehen
-				op.push(tempid(),fl.getReturnType(funcidx));
+				
+				char* t  = tempid();
+				outgetret(t);
+				op.push(t,fl.getReturnType(funcidx));
 				break;
 			}
 			case FUNC_START:
@@ -428,7 +449,10 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				label.push(labelid());
 				break;
 			}
-			
+			case SWITCH_START:
+			{
+				switchcond = true;
+			}
 			case SWITCH:
 			{
 				// übriggebliebenes case-jump label...
@@ -441,6 +465,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				breakst.pop(1);
 				
 				op.pop(1);
+				
 				break;
 			}
 			case SWITCH_COND:
@@ -453,7 +478,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				breakst.push(labelid());
 				// Label fürs erste case
 				label.push(labelid());
-				
+				switchcond = false;
 				break;
 			}
 			case BREAK:
@@ -652,6 +677,13 @@ void IL::outpush(char* l)
 	ilList.append(op);
 }
 
+void IL::outgetret(char* l)
+{
+	struct TOp* op=(TOp*)malloc(sizeof(TOp));
+	op->TOpType=getret_;
+	op->operand1=l;
+	ilList.append(op);	
+}
 
 TType IL::checkConv(char*& m1, char*& m2, TType t1, TType t2)
 {
