@@ -17,7 +17,6 @@ extern NameList nl;
 extern ConstList cl;
 extern FunctionList fl;
 
-
 class IL
 {
 public:
@@ -27,6 +26,7 @@ public:
 IL();
 
 char* genIL(unsigned*, unsigned*);
+void pushLabel(bool);
 
 
 private:
@@ -37,14 +37,16 @@ private:
 	
 	char* tempid();
 	
-	char* funcid(unsigned);
+	char* labelid();
+
+	char* funcid(unsigned);	
 	
 	void outcopy(char*, char*);
 	
 	void outbin(char*, char*, TBinOp, char*);
 	
 	void outun(char*, TUnOp, char*);
-	
+
 	void outgoto(char*, bool);
 	
 	void outlabel(char*);
@@ -54,7 +56,11 @@ private:
 	void outpush(char *);
 	
 	Stack op;
+	Stack label;
 	unsigned tempcount;
+	unsigned labelcount;
+// 	unsigned labelin;
+// 	unsigned labelout;
 
 };
 

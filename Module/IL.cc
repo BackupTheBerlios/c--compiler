@@ -135,6 +135,47 @@ char* IL::genIL(unsigned* start, unsigned* end)
 				op.push(p);
 				break;
 			}
+			case IF_1: //if ohne else
+			{
+				outlabel(label.top());
+				label.pop(1);
+				break;
+			}
+			case IF_2: //if mit else
+			{
+				break;
+			}
+			case STM:
+			{
+				outlabel(label.first());
+				label.pop(label.count());
+			}
+				
+				
+/*				// vorwaerts suchen, ob if folgt und wenn ja, ob vorher ein weiteres stm
+				unsigned* temp=start;
+				temp++;
+				while ((*temp!=STM && *temp!=IF_1 && *temp!=IF_2) && temp<end)
+				{
+					temp++;
+// 					cout<<*temp;
+				}
+				if (*temp==IF_1 || *temp==IF_2)
+				{
+					label.push(labelid()); // label auf stack und jmp erzeugen
+					cout<<"jmp("<<label.top()<<");\n";
+				}
+				break;
+			}
+			case COMPOUND:
+			{
+				if (label.count()>0)
+				{
+// 					cout<<"jmp("<<label.topi(labelout)<<");\n";
+// 					labelout++;
+				}
+				break;
+			}*/
 			case INIT_PART:
 			{
 				char* dst = lastident;
@@ -151,7 +192,7 @@ char* IL::genIL(unsigned* start, unsigned* end)
 			case FUNCTION_CALL_2:
 			{
 				unsigned i = fl.getNum(funcidx);
-				for (int j=0;j<i;j++)
+				for (unsigned j=0;j<i;j++)
 				{
 					outpush(op.top());
 					op.pop(1);
@@ -238,6 +279,16 @@ char* IL::funcid(unsigned i)
 	char* n = (char*)malloc(VAR_LENGTH_ID);
 	strcpy(n,c);
 	sprintf(n+strlen(c),"%u",num);
+
+	return n;
+}
+
+char* IL::labelid()
+{
+	char* n = (char*)malloc(VAR_LENGTH_ID);
+	strcpy(n,"label");
+	sprintf (n+5,"%u",labelcount++);
+
 	return n;
 }
 
@@ -293,4 +344,11 @@ void IL::outret(char* l)
 void IL::outpush(char* l)
 {
 	cout<<"push "<<l<<";\n";
+}
+
+void IL::pushLabel(bool l) //soll label gepusht werden oder platzhalter?
+{
+	if (l)
+		label.push(labelid());
+	else	label.push("0");
 }
