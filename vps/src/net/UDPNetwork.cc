@@ -4,9 +4,9 @@ UDPNetwork::UDPNetwork(short port)
 {
 	//open socket
 	sockfd = socket(PF_INET,SOCK_DGRAM,0);
-// 	IPNetwork server(port);
+ 	IPAddress server(port);
 	//bind port
-// 	bind(sockfd, (struct sockaddr*)&server,sizeof(struct sockaddr));
+ 	bind(sockfd, (struct sockaddr*)&server,sizeof(struct sockaddr));	
 }
 
 UDPNetwork::UDPNetwork()
@@ -19,23 +19,42 @@ UDPNetwork::UDPNetwork()
 ssize_t UDPNetwork::request(const Server& server, void* req, size_t reqlen, void* res, size_t reslen, int timeout)
 {
 	//clear buffer !!!
-	//loop
+	for(unsigned i=0;i<reslen;i++) *((char*)res+i)=0;
+
+	while(1)
+	{
 		//send
-		//use select for timeout, see manpages for further information for select
-			//if not timeout return data
-			//else loop again
+		if (sendto(sockfd, req, reqlen, 0, (sockaddr*)&server, sizeof(sockaddr))==-1)
+		{
+			cout<<"[udpnetwork] request(): sendto failed.\n";
+			exit(-1);
+		}
+		to.tv_sec = timeout_sec;
+		to.tv_usec = 0;
+		fd_set fds;	
+		FD_ZERO(&fds);
+		FD_SET(sockfd, &fds);
+		int ret = select(sockfd+1, &fds, NULL, NULL, &to);
+		if (ret) return recv(sockfd, res, reslen, 0);
+		
+		// timeout...
+		cout<<"[udpnetwork] timeout in request()\n";
+	}
 
 	return 0;
 }
 
 ssize_t UDPNetwork::receive(Client& client, void* req, size_t reqlen){
 	//recvfrom, blocks until a message arrives
-	return 0;
+	socklen_t slen = sizeof(sockaddr);
+	ssize_t i = recvfrom(sockfd, req, reqlen, 0, (sockaddr*)&client, &slen);
+	return i;
 }
 
 ssize_t UDPNetwork::reply(const Client& client, void* res, size_t reslen){
 	//sendto
-	return 0;
+	ssize_t i = sendto(sockfd, res, reslen, 0, (sockaddr*)&client, sizeof(sockaddr));
+	return i;
 }
 
 
